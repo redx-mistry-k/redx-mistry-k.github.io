@@ -3,4 +3,4 @@
 Hello welcome to my page
 
 Todo:
-have to turn my page into website instead of read me
+have to turn my page into website instead of readme
