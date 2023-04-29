@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Translator</title>
+    <style>body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+      }
+      
+      h1 {
+        text-align: center;
+        margin-top: 50px;
+      }
+      
+      form {
+        margin: 0 auto;
+        width: 80%;
+        max-width: 600px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        resize: none;
+      }
+      
+      button {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+      
+      button:hover {
+        background-color: #3e8e41;
+      }</style>
+  </head>
+  <body>
+    <h1>My Translator</h1>
+    
+    <form id="translate-form">
+      <label for="source-text">Source Language:</label>
+      <textarea id="source-text" rows="5" cols="50"></textarea>
+      
+      <label for="target-text">Target Language:</label>
+      <textarea id="target-text" rows="5" cols="50"></textarea>
+      
+      <button type="button" id="translate-button">Translate</button>
+    </form>
+    
+    <script src="script.js"></script>
+  </body>
+</html>
