@@ -70,11 +70,18 @@
       <label for="integer-input">Integer Input:</label>
       <input type="number" id="integer-input" name="integer-input" min="1" max="100" required>
       
+      <label for="zero-option">Starting Integer:</label>
+      <div id="zero-option">
+        <input type="radio" id="with-zero" name="zero-option" value="with-zero" checked>
+        <label for="with-zero">With Zero</label>
+        <input type="radio" id="without-zero" name="zero-option" value="without-zero">
+        <label for="without-zero">Without Zero</label>
+      </div>
+      
       <button type="button" id="delagg-button">Delagg</button>
       <button onclick="copyToClipboard()">Copy Output</button>
-
-     
     </form>
+    
     
     <div id="output"></div>
    
