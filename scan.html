@@ -7,7 +7,8 @@
       background-color: #f8f8f8;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 50px;
+      margin: 0;
     }
 
     h1 {
@@ -17,18 +18,16 @@
     }
 
     .qr-code-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 50px;
+      margin-top: 40px;
     }
 
     .qr-code {
-      margin: 20px 0;
+      margin-top: 20px;
     }
 
     .qr-code img {
-      max-width: 250px;
+      max-width: 100%;
+      height: auto;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
@@ -43,7 +42,23 @@
       margin: 0 auto;
       padding: 0 20px;
     }
+
+    @media only screen and (max-width: 600px) {
+      body {
+        padding-top: 30px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .container {
+        max-width: 100%;
+        padding: 0 10px;
+      }
+    }
   </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <div class="container">
