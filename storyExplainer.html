@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Meaning Learning</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+    <h1>Word Meaning Learning</h1>
+    <p>Enter a word to learn its meaning:</p>
+    <input type="text" id="wordInput" placeholder="Enter a word">
+    <button onclick="lookupWord()">Lookup</button>
+
+    <h2>Meaning:</h2>
+    <p id="meaningOutput"></p>
+
+    <h2>Example:</h2>
+    <p id="exampleOutput"></p>
+
+    <script>
+        // Sample word-meaning data (you can replace this with your own data)
+        const wordMeanings = {
+            "apple": {
+                meaning: "A round fruit with red or green skin and sweet flesh.",
+                example: "I ate a delicious apple for a snack."
+            },
+            "cat": {
+                meaning: "A small domesticated carnivorous mammal with soft fur.",
+                example: "The cat chased after a playful ball of yarn."
+            },
+            // Add more word meanings here
+        };
+
+        function lookupWord() {
+            const wordInput = document.getElementById("wordInput").value.toLowerCase();
+            const meaningOutput = document.getElementById("meaningOutput");
+            const exampleOutput = document.getElementById("exampleOutput");
+
+            if (wordMeanings[wordInput]) {
+                meaningOutput.textContent = wordMeanings[wordInput].meaning;
+                exampleOutput.textContent = `Here's an example: "${wordMeanings[wordInput].example}"`;
+            } else {
+                meaningOutput.textContent = "Word not found in the dictionary.";
+                exampleOutput.textContent = "";
+            }
+        }
+    </script>
+</body>
+</html>
