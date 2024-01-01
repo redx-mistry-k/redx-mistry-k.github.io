@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobriety Calendar</title>
+    <style>
+        body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.calendar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+}
+
+.month {
+  margin: 10px;
+  border: 1px solid #ddd;
+}
+
+.month-title {
+  text-align: center;
+  font-weight: bold;
+  padding: 5px 0;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 30px);
+  justify-content: center;
+  text-align: center;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 30px);
+  justify-content: center;
+  text-align: center;
+}
+
+.day {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+.day-headers {
+  display: grid;
+  grid-template-columns: repeat(7, 30px);
+  justify-content: center;
+  text-align: center;
+}
+.sober { background-color: green; }
+.tipsy { background-color: blue; }
+.drunk { background-color: red; }
+
+
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Alcohol Calendar</h1>
+    <div id="calendar">
+
+    </div>
+    
+
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          generateCalendar();
+        });
+        
+        function generateCalendar() {
+          const today = new Date();
+          const calendarEl = document.querySelector('#calendar');
+        
+          let year = 2023;
+          let month = 11; // December
+        
+          while (year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth())) {
+            const monthEl = document.createElement('div');
+            monthEl.className = 'month';
+        
+            const monthTitle = createMonthTitle(year, month);
+            monthEl.appendChild(monthTitle);
+        
+            addDayHeaders(monthEl);
+        
+            const daysEl = document.createElement('div');
+            daysEl.className = 'days';
+            addDays(daysEl, year, month, today);
+            monthEl.appendChild(daysEl);
+        
+            calendarEl.appendChild(monthEl);
+        
+            month++;
+            if (month > 11) {
+              month = 0;
+              year++;
+            }
+          }
+        }
+        
+        function createMonthTitle(year, month) {
+          const monthTitle = document.createElement('div');
+          monthTitle.className = 'month-title';
+          monthTitle.textContent = `${getMonthName(month)} ${year}`;
+          return monthTitle;
+        }
+        
+        function addDayHeaders(monthEl) {
+  const dayHeadersEl = document.createElement('div');
+  dayHeadersEl.className = 'day-headers';
+  
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  daysOfWeek.forEach(dayName => {
+    const dayHeader = document.createElement('div');
+    dayHeader.className = 'header';
+    dayHeader.textContent = dayName;
+    dayHeadersEl.appendChild(dayHeader); // Append to the headers container
+  });
+
+  monthEl.appendChild(dayHeadersEl); // Append the headers container to the month element
+}
+        
+        function addDays(daysEl, year, month, today) {
+          let date = new Date(year, month, 1);
+          let firstDay = date.getDay();
+          for (let i = 0; i < firstDay; i++) {
+            daysEl.appendChild(document.createElement('div')); // Fill empty slots
+          }
+        
+          while (date.getMonth() === month) {
+            const dayEl = document.createElement('div');
+            dayEl.className = 'day';
+            const dayKey = `${year}-${month}-${date.getDate()}`;
+        
+            const savedColor = loadColor(dayKey);
+            if (savedColor) {
+              dayEl.classList.add(savedColor);
+            } else if (date <= today) {
+              dayEl.classList.add('sober');
+            }
+        
+            dayEl.textContent = date.getDate();
+            dayEl.addEventListener('click', function() {
+              const newColor = getNextColor(this.classList[1]);
+              this.className = 'day'; // Reset class
+              if (newColor) {
+                this.classList.add(newColor);
+              }
+              saveColor(dayKey, newColor);
+            });
+        
+            daysEl.appendChild(dayEl);
+            date.setDate(date.getDate() + 1);
+          }
+        }
+        
+        function getNextColor(currentClass) {
+          switch (currentClass) {
+            case 'sober':
+              return 'tipsy';
+            case 'tipsy':
+              return 'drunk';
+            case 'drunk':
+              return '';
+            default:
+              return 'sober';
+          }
+        }
+        
+        function saveColor(dayKey, color) {
+          localStorage.setItem(dayKey, color);
+        }
+        
+        function loadColor(dayKey) {
+          return localStorage.getItem(dayKey);
+        }
+        
+        function getMonthName(monthIndex) {
+          const monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"];
+          return monthNames[monthIndex];
+        }
+        </script>
+        
+</body>
+</html>
