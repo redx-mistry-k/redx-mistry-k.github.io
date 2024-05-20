@@ -7,190 +7,286 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <style>
         body {
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
 
-.calendar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
-}
+        .calendar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: start;
+        }
 
-.month {
-  margin: 10px;
-  border: 1px solid #ddd;
-}
+        .month {
+            margin: 10px;
+            border: 1px solid #ddd;
+        }
 
-.month-title {
-  text-align: center;
-  font-weight: bold;
-  padding: 5px 0;
-}
+        .month-title {
+            text-align: center;
+            font-weight: bold;
+            padding: 5px 0;
+        }
 
-.weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 30px);
-  justify-content: center;
-  text-align: center;
-}
+        .day-headers, .days {
+            display: grid;
+            grid-template-columns: repeat(7, 30px);
+            justify-content: center;
+            text-align: center;
+        }
 
-.days {
-  display: grid;
-  grid-template-columns: repeat(7, 30px);
-  justify-content: center;
-  text-align: center;
-}
+        .day {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
 
-.day {
-  width: 30px;
-  height: 30px;
-  line-height: 30px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-}
-.day-headers {
-  display: grid;
-  grid-template-columns: repeat(7, 30px);
-  justify-content: center;
-  text-align: center;
-}
-.sober { background-color: green; }
-.tipsy { background-color: blue; }
-.drunk { background-color: red; }
+        .sober { background-color: green; }
+        .tipsy { background-color: blue; }
+        .drunk { background-color: red; }
 
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
 
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+
+        .legend-sober { background-color: green; }
+        .legend-tipsy { background-color: blue; }
+        .legend-drunk { background-color: red; }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .actions button, .actions input {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <h1 style="text-align: center;">Alcohol Calendar</h1>
-    <div id="calendar">
-
-    </div>
     
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color legend-sober"></div>
+            Sober
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-tipsy"></div>
+            Tipsy
+        </div>
+        <div class="legend-item">
+            <div class="legend-color legend-drunk"></div>
+            Drunk
+        </div>
+    </div>
 
+    <div class="actions">
+        <button onclick="exportToCSV()" class="btn btn-primary">Export to CSV</button>
+        <input type="file" id="importFile" accept=".csv" onchange="importFromCSV(event)" class="btn btn-secondary">
+    </div>
 
-
+    <div id="calendar" class="calendar"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          generateCalendar();
-        });
-        
-        function generateCalendar() {
-          const today = new Date();
-          const calendarEl = document.querySelector('#calendar');
-        
-          let year = 2023;
-          let month = 11; // December
-        
-          while (year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth())) {
-            const monthEl = document.createElement('div');
-            monthEl.className = 'month';
-        
-            const monthTitle = createMonthTitle(year, month);
-            monthEl.appendChild(monthTitle);
-        
-            addDayHeaders(monthEl);
-        
-            const daysEl = document.createElement('div');
-            daysEl.className = 'days';
-            addDays(daysEl, year, month, today);
-            monthEl.appendChild(daysEl);
-        
-            calendarEl.appendChild(monthEl);
-        
-            month++;
-            if (month > 11) {
-              month = 0;
-              year++;
-            }
-          }
-        }
-        
-        function createMonthTitle(year, month) {
-          const monthTitle = document.createElement('div');
-          monthTitle.className = 'month-title';
-          monthTitle.textContent = `${getMonthName(month)} ${year}`;
-          return monthTitle;
-        }
-        
-        function addDayHeaders(monthEl) {
-  const dayHeadersEl = document.createElement('div');
-  dayHeadersEl.className = 'day-headers';
-  
-  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  daysOfWeek.forEach(dayName => {
-    const dayHeader = document.createElement('div');
-    dayHeader.className = 'header';
-    dayHeader.textContent = dayName;
-    dayHeadersEl.appendChild(dayHeader); // Append to the headers container
-  });
+        document.addEventListener('DOMContentLoaded', generateCalendar);
 
-  monthEl.appendChild(dayHeadersEl); // Append the headers container to the month element
-}
-        
-        function addDays(daysEl, year, month, today) {
-          let date = new Date(year, month, 1);
-          let firstDay = date.getDay();
-          for (let i = 0; i < firstDay; i++) {
-            daysEl.appendChild(document.createElement('div')); // Fill empty slots
-          }
-        
-          while (date.getMonth() === month) {
-            const dayEl = document.createElement('div');
-            dayEl.className = 'day';
-            const dayKey = `${year}-${month}-${date.getDate()}`;
-        
-            const savedColor = loadColor(dayKey);
-            if (savedColor) {
-              dayEl.classList.add(savedColor);
-            } else if (date <= today) {
-              dayEl.classList.add('sober');
+        function generateCalendar() {
+            const today = new Date();
+            const calendarEl = document.getElementById('calendar');
+
+            let year = 2023;
+            let month = 11; // December
+
+            while (year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth())) {
+                const monthEl = document.createElement('div');
+                monthEl.className = 'month';
+
+                const monthTitle = createMonthTitle(year, month);
+                monthEl.appendChild(monthTitle);
+
+                addDayHeaders(monthEl);
+
+                const daysEl = document.createElement('div');
+                daysEl.className = 'days';
+                addDays(daysEl, year, month, today);
+                monthEl.appendChild(daysEl);
+
+                calendarEl.appendChild(monthEl);
+
+                month++;
+                if (month > 11) {
+                    month = 0;
+                    year++;
+                }
             }
-        
-            dayEl.textContent = date.getDate();
-            dayEl.addEventListener('click', function() {
-              const newColor = getNextColor(this.classList[1]);
-              this.className = 'day'; // Reset class
-              if (newColor) {
-                this.classList.add(newColor);
-              }
-              saveColor(dayKey, newColor);
+        }
+
+        function createMonthTitle(year, month) {
+            const monthTitle = document.createElement('div');
+            monthTitle.className = 'month-title';
+            monthTitle.textContent = `${getMonthName(month)} ${year}`;
+            return monthTitle;
+        }
+
+        function addDayHeaders(monthEl) {
+            const dayHeadersEl = document.createElement('div');
+            dayHeadersEl.className = 'day-headers';
+
+            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            daysOfWeek.forEach(dayName => {
+                const dayHeader = document.createElement('div');
+                dayHeader.textContent = dayName;
+                dayHeadersEl.appendChild(dayHeader);
             });
-        
-            daysEl.appendChild(dayEl);
-            date.setDate(date.getDate() + 1);
-          }
+
+            monthEl.appendChild(dayHeadersEl);
         }
-        
+
+        function addDays(daysEl, year, month, today) {
+            let date = new Date(year, month, 1);
+            const firstDay = date.getDay();
+
+            for (let i = 0; i < firstDay; i++) {
+                daysEl.appendChild(document.createElement('div')); // Fill empty slots
+            }
+
+            while (date.getMonth() === month) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'day';
+                const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+                const savedColor = loadColor(dayKey);
+                if (savedColor) {
+                    dayEl.classList.add(savedColor);
+                } else if (date <= today) {
+                    dayEl.classList.add('sober');
+                }
+
+                dayEl.textContent = date.getDate();
+                dayEl.addEventListener('click', function () {
+                    const newColor = getNextColor(this.classList[1]);
+                    this.className = 'day'; // Reset class
+                    if (newColor) {
+                        this.classList.add(newColor);
+                    }
+                    saveColor(dayKey, newColor);
+                });
+
+                daysEl.appendChild(dayEl);
+                date.setDate(date.getDate() + 1);
+            }
+        }
+
         function getNextColor(currentClass) {
-          switch (currentClass) {
-            case 'sober':
-              return 'tipsy';
-            case 'tipsy':
-              return 'drunk';
-            case 'drunk':
-              return '';
-            default:
-              return 'sober';
-          }
+            switch (currentClass) {
+                case 'sober':
+                    return 'tipsy';
+                case 'tipsy':
+                    return 'drunk';
+                case 'drunk':
+                    return '';
+                default:
+                    return 'sober';
+            }
         }
-        
+
         function saveColor(dayKey, color) {
-          localStorage.setItem(dayKey, color);
+            if (color) {
+                localStorage.setItem(dayKey, color);
+            } else {
+                localStorage.removeItem(dayKey);
+            }
         }
-        
+
         function loadColor(dayKey) {
-          return localStorage.getItem(dayKey);
+            return localStorage.getItem(dayKey);
         }
-        
+
         function getMonthName(monthIndex) {
-          const monthNames = ["January", "February", "March", "April", "May", "June",
-                              "July", "August", "September", "October", "November", "December"];
-          return monthNames[monthIndex];
+            const monthNames = [
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ];
+            return monthNames[monthIndex];
         }
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+        function exportToCSV() {
+            const today = new Date();
+            let year = 2023;
+            let month = 11; // December
+
+            let csvContent = "data:text/csv;charset=utf-8,Date,Status\n";
+
+            while (year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth())) {
+                let date = new Date(year, month, 1);
+
+                while (date.getMonth() === month) {
+                    const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                    const status = loadColor(dayKey) || 'sober';
+                    csvContent += `${dayKey},${status}\n`;
+
+                    date.setDate(date.getDate() + 1);
+                }
+
+                month++;
+                if (month > 11) {
+                    month = 0;
+                    year++;
+                }
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "sobriety_calendar.csv");
+            document.body.appendChild(link); // Required for Firefox
+
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importFromCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const text = e.target.result;
+                const rows = text.split('\n').slice(1); // Skip header row
+
+                rows.forEach(row => {
+                    const [date, status] = row.split(',');
+                    if (date && status) {
+                        saveColor(date.trim(), status.trim());
+                    }
+                });
+
+                // Clear the calendar and regenerate it with the imported data
+                document.getElementById('calendar').innerHTML = '';
+                generateCalendar();
+            };
+
+            reader.readAsText(file);
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
