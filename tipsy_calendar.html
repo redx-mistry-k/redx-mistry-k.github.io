@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sobriety Calendar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -78,6 +79,23 @@
         .actions button, .actions input {
             margin-right: 10px;
         }
+
+        .charts {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .chart-container {
+            width: 400px;
+            height: 400px;
+            margin: 20px;
+        }
+
+        .probability {
+            text-align: center;
+            margin: 20px;
+        }
     </style>
 </head>
 <body>
@@ -105,8 +123,22 @@
 
     <div id="calendar" class="calendar"></div>
 
+    <div class="charts">
+        <div class="chart-container">
+            <canvas id="statusPieChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="statusBarChart"></canvas>
+        </div>
+    </div>
+
+    <div class="probability" id="drunkProbability"></div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', generateCalendar);
+        document.addEventListener('DOMContentLoaded', () => {
+            generateCalendar();
+            generateCharts();
+        });
 
         function generateCalendar() {
             const today = new Date();
@@ -188,6 +220,7 @@
                         this.classList.add(newColor);
                     }
                     saveColor(dayKey, newColor);
+                    generateCharts(); // Update charts on day color change
                 });
 
                 daysEl.appendChild(dayEl);
@@ -282,9 +315,87 @@
                 // Clear the calendar and regenerate it with the imported data
                 document.getElementById('calendar').innerHTML = '';
                 generateCalendar();
+                generateCharts(); // Update charts after import
             };
 
             reader.readAsText(file);
+        }
+
+        function generateCharts() {
+            const counts = { sober: 0, tipsy: 0, drunk: 0 };
+            const today = new Date();
+            let year = 2023;
+            let month = 11; // December
+            let totalDays = 0;
+
+            while (year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth())) {
+                let date = new Date(year, month, 1);
+
+                while (date.getMonth() === month) {
+                    const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                    const status = loadColor(dayKey) || 'sober';
+                    if (counts[status] !== undefined) {
+                        counts[status]++;
+                    }
+                    totalDays++;
+                    date.setDate(date.getDate() + 1);
+                }
+
+                month++;
+                if (month > 11) {
+                    month = 0;
+                    year++;
+                }
+            }
+
+            // Calculate Probability of Getting Drunk
+            const probabilityDrunk = (counts.drunk / totalDays * 100).toFixed(2);
+
+            // Display Probability
+            document.getElementById('drunkProbability').textContent = `Probability of Getting Drunk Today: ${probabilityDrunk}%`;
+
+            // Create Pie Chart
+            const ctxPie = document.getElementById('statusPieChart').getContext('2d');
+            new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: ['Sober', 'Tipsy', 'Drunk'],
+                    datasets: [{
+                        data: [counts.sober, counts.tipsy, counts.drunk],
+                        backgroundColor: ['green', 'blue', 'red']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+
+            // Create Bar Chart
+            const ctxBar = document.getElementById('statusBarChart').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Sober', 'Tipsy', 'Drunk'],
+                    datasets: [{
+                        label: 'Days Count',
+                        data: [counts.sober, counts.tipsy, counts.drunk],
+                        backgroundColor: ['green', 'blue', 'red']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
