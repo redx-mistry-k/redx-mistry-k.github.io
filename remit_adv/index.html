@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Editable Table and CSV Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f9fafb;
+            color: #333;
+        }
+        h1 {
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #357ABD;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4a90e2;
+            color: #fff;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        td[contenteditable="true"] {
+            background-color: #f9fafb;
+            outline: none;
+            cursor: text;
+        }
+        td[contenteditable="true"]:focus {
+            background-color: #e6f7ff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Text to Editable Table</h1>
+    <textarea id="textInput" placeholder="Paste your text here..."></textarea>
+    <input type="text" id="filename" placeholder="Enter CSV filename (e.g., my_data)">
+    <div class="button-container">
+        <button onclick="displayTable()">Generate Table</button>
+        <button onclick="copyTableText()">Copy Table as Text</button>
+        <button onclick="downloadCSV()">Download CSV</button>
+    </div>
+
+    <div id="tableContainer"></div>
+
+    <script>
+        function displayTable() {
+            const text = document.getElementById("textInput").value;
+            const lines = text.trim().split("\n");
+            
+            if (lines.length === 0) return;
+
+            const headers = ["DATE", "TYPE", "REF.", "BOOKING REF", "DEBIT", "CREDIT", "REMITTED", "BALANCE"];
+            const dataset = [];
+            dataset.push(headers);
+
+            for (let i = 0; i < lines.length; i++) {
+                let values = lines[i].split(" ");
+                values.splice(3, 0, "");  // Insert empty string for "BOOKING REF"
+                while (values.length < headers.length) values.push("");
+                dataset.push(values);
+            }
+
+            let tableHTML = "<table><thead><tr>";
+            headers.forEach(header => tableHTML += `<th>${header}</th>`);
+            tableHTML += "</tr></thead><tbody>";
+
+            for (let i = 1; i < dataset.length; i++) {
+                tableHTML += "<tr>";
+                dataset[i].forEach((value, index) => {
+                    if (index === 3) {
+                        tableHTML += `<td contenteditable="true">${value}</td>`; // Only "BOOKING REF" is editable
+                    } else {
+                        tableHTML += `<td>${value}</td>`; // Other cells are non-editable
+                    }
+                });
+                tableHTML += "</tr>";
+            }
+            tableHTML += "</tbody></table>";
+
+            document.getElementById("tableContainer").innerHTML = tableHTML;
+        }
+
+        function copyTableText() {
+            const table = document.querySelector("table");
+            if (!table) return;
+
+            let tableText = "";
+            for (let i = 0; i < table.rows.length; i++) {
+                let rowText = Array.from(table.rows[i].cells)
+                    .map(cell => cell.innerText)
+                    .join("\t"); // Tab-separated values for each cell in a row
+                tableText += rowText + "\n"; // Newline for each row
+            }
+
+            // Copy the formatted text to clipboard
+            navigator.clipboard.writeText(tableText).then(() => {
+                alert("Table copied to clipboard in spreadsheet format.");
+            }).catch(err => {
+                console.error("Error copying text: ", err);
+            });
+        }
+
+        function downloadCSV() {
+            const filenameInput = document.getElementById("filename").value.trim();
+            const filename = filenameInput ? filenameInput : "dataset"; // Default filename if none provided
+            const table = document.querySelector("table");
+            if (!table) return;
+
+            const dataset = [];
+            for (const row of table.rows) {
+                const rowData = [];
+                for (const cell of row.cells) {
+                    rowData.push(cell.innerText);
+                }
+                dataset.push(rowData);
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8," 
+                + dataset.map(e => e.join(",")).join("\n");
+
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", `${filename}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
+</body>
+</html>
