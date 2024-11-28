@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date 💖 Night</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Date ❤️‍🔥 Night</h1>
+
+    <!-- Dice 1: What to Eat -->
+    <div class="dice-wrapper">
+      <div class="dice-container">
+        <div class="dice" id="dice1">
+          <div class="face front">Pizza 🍕</div>
+          <div class="face back">Sushi 🍣</div>
+          <div class="face top">Tacos 🌮</div>
+          <div class="face bottom">Pasta 🍝</div>
+          <div class="face left">Burgers 🍔</div>
+          <div class="face right">Salad 🥗</div>
+        </div>
+      </div>
+      <button class="roll-button" onclick="rollDice('dice1')">What to eat?</button>
+    </div>
+
+    <!-- Dice 2: What to Do -->
+    <div class="dice-wrapper">
+      <div class="dice-container">
+        <div class="dice" id="dice2">
+          <div class="face front">Watch a movie 🎥</div>
+          <div class="face back">Play a game 🎮</div>
+          <div class="face top">Sing songs 🎶</div>
+          <div class="face bottom">Listen to songs 🎶</div>
+          <div class="face left">Sketch 🎨</div>
+          <div class="face right">Plan vacation 🗺️</div>
+        </div>
+      </div>
+      <button class="roll-button" onclick="rollDice('dice2')">What to do?</button>
+    </div>
+
+    <!-- Dice 3: After That -->
+    <div class="dice-wrapper">
+      <div class="dice-container">
+        <div class="dice" id="dice3">
+          <div class="face front">Dessert 🍰</div>
+          <div class="face back">Funny videos 😂</div>
+          <div class="face top">Love letter ✍️</div>
+          <div class="face bottom">Share stories 🧒</div>
+          <div class="face left">Stargaze 🌌</div>
+          <div class="face right">Photoshoot 📸</div>
+        </div>
+      </div>
+      <button class="roll-button" onclick="rollDice('dice3')">After that</button>
+    </div>
+
+    <!-- Dice 4: Sexy Time -->
+    <div class="dice-wrapper">
+      <div class="dice-container">
+        <div class="dice" id="dice4">
+          <div class="face front">Truth or dare 😉</div>
+          <div class="face back">Spicy story 📜</div>
+          <div class="face top">Video call 👗</div>
+          <div class="face bottom">Fantasy ✨</div>
+          <div class="face left">Would you rather 🔥</div>
+          <div class="face right">Love note ❤️</div>
+        </div>
+      </div>
+      <button class="roll-button" onclick="rollDice('dice4')">Sexy time</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
