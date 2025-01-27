@@ -46,6 +46,18 @@
         button:hover {
             background-color: #357ABD;
         }
+        /* Add fade-in animation */
+.hero {
+  opacity: 0;
+  transform: translateY(-20px); /* Slight upward effect */
+  transition: opacity 1.3s ease, transform 1.3s ease;
+}
+
+.hero.visible {
+  opacity: 1;
+  transform: translateY(0); /* Reset position */
+}
+
         table {
             border-collapse: collapse;
             width: 100%;
@@ -173,6 +185,12 @@
             link.click();
             document.body.removeChild(link);
         }
+        // Add fade-in animation to the hero section
+window.addEventListener('load', () => {
+  const heroSection = document.querySelector('.hero');
+  heroSection.classList.add('visible');
+});
+
     </script>
 
 </body>
