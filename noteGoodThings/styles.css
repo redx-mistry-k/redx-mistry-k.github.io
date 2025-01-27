@@ -10,6 +10,17 @@ body {
     flex-direction: column;
     align-items: center;
 }
+/* Add fade-in animation */
+.hero {
+  opacity: 0;
+  transform: translateY(-20px); /* Slight upward effect */
+  transition: opacity 1.3s ease, transform 1.3s ease;
+}
+
+.hero.visible {
+  opacity: 1;
+  transform: translateY(0); /* Reset position */
+}
 
 h1 {
     color: #2C3E50;
