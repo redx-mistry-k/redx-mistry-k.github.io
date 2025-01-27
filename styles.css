@@ -6,6 +6,17 @@
   font-family: 'Kumbh Sans', sans-serif;
   scroll-behavior: smooth;
 }
+/* Add fade-in animation */
+.hero {
+  opacity: 0;
+  transform: translateY(-20px); /* Slight upward effect */
+  transition: opacity 1.3s ease, transform 1.3s ease;
+}
+
+.hero.visible {
+  opacity: 1;
+  transform: translateY(0); /* Reset position */
+}
 
 .navbar {
   background: #131313;
