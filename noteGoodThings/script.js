@@ -1,15 +1,15 @@
 document.getElementById('entryForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const input = document.getElementById('goodThingInput');
-    const dateInput = document.getElementById('dateInput'); // Adding a date input field
+    const dateInput = document.getElementById('dateInput');
     const value = input.value;
-    const dateValue = dateInput.value || new Date().toLocaleDateString(); // If no date is entered, use the current date
+    const dateValue = dateInput.value || new Date().toLocaleDateString();
 
     if (value) {
         addEntry(value, dateValue);
         saveEntries(value, dateValue);
-        input.value = ''; // Clear the input after adding
-        dateInput.value = ''; // Clear the date input after adding
+        input.value = '';
+        dateInput.value = '';
     }
 });
 
@@ -18,16 +18,34 @@ function addEntry(text, date) {
     const entry = document.createElement('div');
     entry.classList.add('entry');
 
-    entry.textContent = `${date} - ${text}`;
+    const entryText = document.createElement('span');
+    entryText.textContent = `${date} - ${text}`;
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.onclick = function() {
+        if (confirm('Are you sure you want to delete this entry?')) {
+            container.removeChild(entry);
+            removeEntry(text, date);
+        }
+    };
+
+    entry.appendChild(entryText);
+    entry.appendChild(deleteButton);
     container.appendChild(entry);
 
-    // Smooth scroll to the new entry
     entry.scrollIntoView({ behavior: 'smooth' });
 }
 
 function saveEntries(entry, date) {
     let entries = JSON.parse(localStorage.getItem('goodThings')) || [];
     entries.push({ entry, date });
+    localStorage.setItem('goodThings', JSON.stringify(entries));
+}
+
+function removeEntry(entry, date) {
+    let entries = JSON.parse(localStorage.getItem('goodThings')) || [];
+    entries = entries.filter(e => e.entry !== entry || e.date !== date);
     localStorage.setItem('goodThings', JSON.stringify(entries));
 }
 
@@ -38,4 +56,12 @@ function loadEntries() {
     });
 }
 
-window.onload = loadEntries;
+document.getElementById('goodThingInput').addEventListener('input', function() {
+    const charCount = document.getElementById('charCount');
+    charCount.textContent = `${this.value.length}/500`;
+});
+
+window.onload = function() {
+    loadEntries();
+    document.getElementById('goodThingInput').dispatchEvent(new Event('input'));
+};
