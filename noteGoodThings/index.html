@@ -5,23 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Good Things Journal</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>My Good Things Journal</h1>
+    <header>
+        <h1>My Good Things Journal</h1>
+        <p>Every day may not be good, but there's something good in every day.</p>
+    </header>
     <form id="entryForm">
-    <textarea id="goodThingInput" placeholder="What good thing happened today?" required></textarea>
-    <input type="date" id="dateInput"> <!-- New date input field -->
-    <button type="submit">Add Entry</button>
-</form>
+        <label for="goodThingInput">What good thing happened today?</label>
+        <textarea id="goodThingInput" placeholder="Write something good..." required maxlength="500"></textarea>
+        <div id="charCount">0/500</div>
+        <label for="dateInput">Date</label>
+        <input type="date" id="dateInput">
+        <button type="submit">Add Entry</button>
+    </form>
     <div id="entriesContainer">
         <h2>All Good Things</h2>
     </div>
+    <footer>
+        <p>&copy; 2023 My Good Things Journal. All rights reserved.</p>
+    </footer>
     <script src="script.js"></script>
-    <script>// Add fade-in animation to the hero section
-window.addEventListener('load', () => {
-  const heroSection = document.querySelector('.hero');
-  heroSection.classList.add('visible');
-});
-</script>
 </body>
 </html>
