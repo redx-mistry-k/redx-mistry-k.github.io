@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Countdown Timer</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div id="countdown">
-    <div class="time-box">
-        <span id="days"></span>
-        <div class="label">Days</div>
+    <div class="hero">
+        <h1>Countdown to the Big Event!</h1>
+        <div id="countdown">
+            <div class="time-box">
+                <span id="days"></span>
+                <div class="label">Days</div>
+            </div>
+            <div class="time-box">
+                <span id="hours"></span>
+                <div class="label">Hours</div>
+            </div>
+            <div class="time-box">
+                <span id="minutes"></span>
+                <div class="label">Minutes</div>
+            </div>
+            <div class="time-box">
+                <span id="seconds"></span>
+                <div class="label">Seconds</div>
+            </div>
+        </div>
+        <div id="progress-bar">
+            <div id="progress"></div>
+        </div>
     </div>
-    <div class="time-box">
-        <span id="hours"></span>
-        <div class="label">Hours</div>
-    </div>
-    <div class="time-box">
-        <span id="minutes"></span>
-        <div class="label">Minutes</div>
-    </div>
-    <div class="time-box">
-        <span id="seconds"></span>
-        <div class="label">Seconds</div>
-    </div>
-</div>
-<script src="script.js"></script>
-<script>// Add fade-in animation to the hero section
-window.addEventListener('load', () => {
-  const heroSection = document.querySelector('.hero');
-  heroSection.classList.add('visible');
-});
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
