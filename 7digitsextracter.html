@@ -18,6 +18,7 @@
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border-radius: 8px;
+    animation: fadeIn 1s ease-in-out;
   }
   textarea {
     width: 100%;
@@ -37,13 +38,15 @@
     cursor: pointer;
     background-color: #5c67f2;
     color: white;
-    transition: background-color 0.3s;
+    transition: transform 0.2s ease-in-out, background-color 0.3s;
   }
   button:hover {
+    transform: scale(1.05);
     background-color: #4a54e1;
   }
   #output {
     margin-top: 20px;
+    animation: pulse 0.5s ease-in-out;
   }
   .number {
     padding: 8px;
@@ -53,9 +56,37 @@
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
+    animation: slideUp 0.5s ease-out;
   }
   .number:hover {
     background-color: #d0d0d0;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  #loading {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #5c67f2;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    display: none;
   }
 </style>
 </head>
@@ -65,27 +96,39 @@
   <textarea id="textInput" placeholder="Enter bulk text here..."></textarea><br>
   <button onclick="extractNumbers()">Extract Numbers</button>
   <button onclick="copyNumbers()">Copy to Clipboard</button>
+  <button onclick="stopConfettiAndClear()">Stop Confetti & Clear</button>
+  <div id="loading"></div>
   <div id="output"></div>
 </div>
+<canvas id="confetti" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
 
 <script>
+let confettiAnimationFrame;
+
 function extractNumbers() {
-  const text = document.getElementById('textInput').value;
-  const regex = /\b\d{7}\b/g;
-  const numbers = text.match(regex) || [];
-  const outputDiv = document.getElementById('output');
-  outputDiv.innerHTML = '';
-  numbers.forEach(number => {
-    const span = document.createElement('span');
-    span.classList.add('number');
-    span.textContent = number;
-    span.onclick = function() { copyToClipboard(number); };
-    outputDiv.appendChild(span);
-  });
+  const loading = document.getElementById('loading');
+  loading.style.display = 'block';
+
+  setTimeout(() => {
+    const text = document.getElementById('textInput').value;
+    const regex = /\b\d{7}\b/g;
+    const numbers = text.match(regex) || [];
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = '';
+    numbers.forEach(number => {
+      const span = document.createElement('span');
+      span.classList.add('number');
+      span.textContent = number;
+      span.onclick = function() { copyToClipboard(number); };
+      outputDiv.appendChild(span);
+    });
+    loading.style.display = 'none';
+  }, 1000); // Simulate a delay for the spinner
 }
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
+    confettiEffect();
     alert('Number copied: ' + text);
   }, err => {
     alert('Failed to copy: ' + err);
@@ -96,10 +139,74 @@ function copyNumbers() {
   const numbers = Array.from(document.querySelectorAll('.number')).map(n => '\n  ' + n.textContent).join(',');
   const sqlQuery = `select * from json_table('[${numbers}\n]', '$[*]' COLUMNS( id INT PATH '$' ERROR ON ERROR )) as v\nleft join property_bookings_propertybooking t on t.booking_ref = v.id\nwhere t.id is null;`;
   navigator.clipboard.writeText(sqlQuery).then(() => {
+    confettiEffect();
     alert('SQL query copied to clipboard:\n' + sqlQuery);
   }, err => {
     alert('Failed to copy: ' + err);
   });
+}
+
+function confettiEffect() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+
+  const confetti = [];
+  const confettiCount = 100;
+
+  for (let i = 0; i < confettiCount; i++) {
+    confetti.push({
+      x: Math.random() * width,
+      y: Math.random() * -height,
+      radius: Math.random() * 5 + 2,
+      density: Math.random() * 0.5 + 0.5,
+      color: '#' + Math.floor(Math.random() * 16777215).toString(16),
+      speed: Math.random() * 3 + 2,
+      tilt: Math.random() * 10 - 10,
+      tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+      tiltAngle: 0
+    });
+  }
+
+  function drawConfetti() {
+    ctx.clearRect(0, 0, width, height);
+    confetti.forEach(confetto => {
+      ctx.beginPath();
+      ctx.arc(confetto.x, confetto.y, confetto.radius, 0, Math.PI * 2);
+      ctx.fillStyle = confetto.color;
+      ctx.fill();
+
+      confetto.tiltAngle += confetto.tiltAngleIncrement;
+      confetto.y += (Math.cos(confetto.tiltAngle) + 3 + confetto.density) * confetto.speed / 2;
+      confetto.x += Math.sin(confetto.tiltAngle) * 2;
+
+      if (confetto.y > height) {
+        confetto.x = Math.random() * width;
+        confetto.y = -20;
+      }
+    });
+
+    confettiAnimationFrame = requestAnimationFrame(drawConfetti);
+  }
+
+  drawConfetti();
+  setTimeout(() => {
+    cancelAnimationFrame(confettiAnimationFrame);
+    ctx.clearRect(0, 0, width, height);
+  }, 3000);
+}
+
+function stopConfettiAndClear() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  cancelAnimationFrame(confettiAnimationFrame);
+
+  document.getElementById('textInput').value = '';
+  document.getElementById('output').innerHTML = '';
 }
 </script>
 
