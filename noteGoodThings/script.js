@@ -1,3 +1,29 @@
+// Toggle Dark Mode
+const themeToggle = document.getElementById('themeToggle');
+const body = document.body;
+
+// Check localStorage for theme preference
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+    body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️ Light Mode';
+} else {
+    body.classList.remove('dark-mode');
+    themeToggle.textContent = '🌙 Dark Mode';
+}
+
+themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+    if (body.classList.contains('dark-mode')) {
+        themeToggle.textContent = '☀️ Light Mode';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        themeToggle.textContent = '🌙 Dark Mode';
+        localStorage.setItem('theme', 'light');
+    }
+});
+
+// Rest of the JavaScript code remains the same
 document.getElementById('entryForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const input = document.getElementById('goodThingInput');
