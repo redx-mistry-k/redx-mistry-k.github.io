@@ -28,10 +28,43 @@ header h1 {
     margin: 0;
 }
 
+body.dark-mode header h1 {
+    color: #ECF0F1;
+}
+
 header p {
     color: #666;
     font-size: 1.2rem;
     margin: 0;
+}
+
+body.dark-mode header p {
+    color: #BDC3C7;
+}
+
+#themeToggle {
+    background: #3498DB;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 10px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+#themeToggle:hover {
+    background: #2980B9;
+    transform: scale(1.05);
+}
+
+body.dark-mode #themeToggle {
+    background: #1ABC9C;
+}
+
+body.dark-mode #themeToggle:hover {
+    background: #16A085;
 }
 
 textarea {
@@ -47,6 +80,12 @@ textarea {
     font-family: 'Poppins', sans-serif;
 }
 
+body.dark-mode textarea {
+    background: #34495E;
+    color: #ECF0F1;
+    border-color: #1ABC9C;
+}
+
 textarea:focus {
     transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
@@ -57,6 +96,10 @@ textarea:focus {
     font-size: 0.8rem;
     color: #666;
     margin-bottom: 10px;
+}
+
+body.dark-mode #charCount {
+    color: #BDC3C7;
 }
 
 button {
@@ -79,6 +122,14 @@ button:hover {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+body.dark-mode button {
+    background-color: #1ABC9C;
+}
+
+body.dark-mode button:hover {
+    background-color: #16A085;
+}
+
 #entriesContainer {
     width: 90%;
     max-width: 500px;
@@ -87,6 +138,11 @@ button:hover {
     padding: 20px;
     border-radius: 4px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body.dark-mode #entriesContainer {
+    background: #34495E;
+    color: #ECF0F1;
 }
 
 .entry {
@@ -102,9 +158,19 @@ button:hover {
     align-items: center;
 }
 
+body.dark-mode .entry {
+    background: #2C3E50;
+    border-color: #1ABC9C;
+    color: #ECF0F1;
+}
+
 .entry:hover {
     background: #DDEFF1;
     cursor: pointer;
+}
+
+body.dark-mode .entry:hover {
+    background: #34495E;
 }
 
 .entry button {
@@ -131,6 +197,10 @@ footer {
     margin-top: 20px;
     color: #666;
     font-size: 0.9rem;
+}
+
+body.dark-mode footer {
+    color: #BDC3C7;
 }
 
 @media (max-width: 600px) {
