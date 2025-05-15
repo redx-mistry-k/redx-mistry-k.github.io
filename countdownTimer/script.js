@@ -1,5 +1,5 @@
 // Set the target date and time
-const endDate = new Date("April 14, 2025 00:00:00").getTime();
+const endDate = new Date("May 16, 2025 20:45:00").getTime();
 
 // Update the timer every second
 const x = setInterval(updateTimer, 1000);
