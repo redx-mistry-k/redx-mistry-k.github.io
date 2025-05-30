@@ -1,3 +1,4 @@
+/* Base Styles */
 body {
   font-family: Arial, sans-serif;
   background: #f8f9fa;
@@ -5,29 +6,49 @@ body {
   justify-content: center;
   align-items: center;
   height: 100vh;
+  margin: 0;
 }
 
+/* Container Styles */
 .container {
   background: #ffffff;
   padding: 2rem;
   border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
   max-width: 400px;
   width: 100%;
 }
 
-label, input {
+/* Form Elements */
+label,
+input {
   display: block;
-  margin: 1rem 0 0.5rem;
   width: 100%;
 }
 
-input {
-  padding: 0.5rem;
+label {
+  margin: 1rem 0 0.5rem;
+  font-weight: 600;
+  color: #333;
 }
 
+input {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Button Styles */
 button {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   padding: 0.75rem;
   background-color: #007bff;
   color: white;
@@ -35,22 +56,60 @@ button {
   width: 100%;
   cursor: pointer;
   border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.1s;
 }
 
 button:hover {
   background-color: #0056b3;
 }
 
-#results {
-  margin-top: 1.5rem;
-  background-color: #e9f7ef;
-  padding: 1rem;
-  border-radius: 5px;
+button:active {
+  transform: scale(0.98);
 }
+
+/* Results Section */
 #results {
   margin-top: 1.5rem;
   background-color: #fffbe6;
-  padding: 1rem;
+  padding: 1.25rem;
   border-left: 5px solid #ffcc00;
   border-radius: 5px;
+  color: #333;
+}
+
+#results h3 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+#results p {
+  margin: 0.75rem 0;
+  line-height: 1.5;
+}
+
+#results strong {
+  color: #2c3e50;
+}
+
+#results small {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .container {
+    padding: 1.5rem;
+    margin: 0 1rem;
+  }
+  
+  body {
+    height: auto;
+    padding: 1rem 0;
+  }
 }
