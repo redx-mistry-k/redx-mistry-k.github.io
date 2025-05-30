@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Period & Ovulation Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Period & Ovulation Calculator</h1>
+    <label for="lastPeriod">First day of your last period:</label>
+    <input type="date" id="lastPeriod">
+
+    <label for="cycleLength">Average cycle length (days):</label>
+    <input type="number" id="cycleLength" value="28" min="20" max="40">
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div id="results"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
