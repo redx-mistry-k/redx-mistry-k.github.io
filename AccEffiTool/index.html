@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounting Tool - Trial Balance Processor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .account-row:hover {
+            background-color: #f3f4f6;
+        }
+        .draggable {
+            cursor: move;
+        }
+        .dropzone {
+            min-height: 100px;
+            transition: background-color 0.3s;
+        }
+        .dropzone.active {
+            background-color: #e5e7eb;
+        }
+        .negative-amount {
+            color: #ef4444;
+        }
+        .positive-amount {
+            color: #10b981;
+        }
+        .section-header {
+            position: sticky;
+            top: 0;
+            background-color: #ffffff;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <div class="bg-blue-600 px-6 py-4">
+                <h1 class="text-2xl font-bold text-white">Trial Balance Processor</h1>
+                <p class="text-blue-100">Paste your trial balance data to categorize accounts</p>
+            </div>
+            
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="trialBalance" class="block text-sm font-medium text-gray-700 mb-2">
+                            Paste Trial Balance Data (Format: "Code" "Account name" "Amount")
+                        </label>
+                        <textarea id="trialBalance" rows="10" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="1 Sales -88834.29&#10;51 Cost of Sales 77184.15&#10;101 Directors' Salaries 5085.05"></textarea>
+                        <div class="mt-4 flex space-x-3">
+                            <button id="processBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                <i class="fas fa-cog mr-2"></i> Process Data
+                            </button>
+                            <button id="clearBtn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                                <i class="fas fa-trash-alt mr-2"></i> Clear
+                            </button>
+                            <button id="exampleBtn" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                                <i class="fas fa-lightbulb mr-2"></i> Load Example
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                            <h3 class="font-medium text-gray-700 mb-2">Instructions:</h3>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> Paste trial balance data in the format: "Code" "Account name" "Amount"</li>
+                                <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> Each account should be on a new line</li>
+                                <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> Negative amounts should have a minus sign</li>
+                                <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> Click "Process Data" to categorize accounts</li>
+                                <li><i class="fas fa-check-circle text-blue-500 mr-2"></i> Use "Load Example" to see sample data</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="mt-4 bg-gray-50 p-4 rounded-md border border-gray-200">
+                            <h3 class="font-medium text-gray-700 mb-2">Totals:</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-white p-3 rounded-md shadow-sm">
+                                    <p class="text-sm text-gray-500">P&L Total</p>
+                                    <p id="plTotal" class="text-xl font-semibold">£0.00</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-md shadow-sm">
+                                    <p class="text-sm text-gray-500">BS Total</p>
+                                    <p id="bsTotal" class="text-xl font-semibold">£0.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Profit & Loss Section -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-green-600 px-6 py-3 section-header">
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <i class="fas fa-chart-line mr-2"></i> Profit & Loss Statement
+                    </h2>
+                </div>
+                <div class="p-4">
+                    <div id="plContent" class="space-y-4">
+                        <p class="text-gray-500 text-center py-4">No P&L data processed yet</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Balance Sheet Section -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="bg-purple-600 px-6 py-3 section-header">
+                    <h2 class="text-xl font-bold text-white flex items-center">
+                        <i class="fas fa-balance-scale mr-2"></i> Balance Sheet
+                    </h2>
+                </div>
+                <div class="p-4">
+                    <div id="bsContent" class="space-y-4">
+                        <p class="text-gray-500 text-center py-4">No Balance Sheet data processed yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart of Accounts
+        const chartOfAccounts = {
+            // ===== PROFIT & LOSS ACCOUNTS =====
+            // Sales
+            1: {category: "Sales", section: "P&L"},
+            
+            // Other Income
+            11: {category: "Interest Received", section: "P&L"},
+            21: {category: "Rent Receivable", section: "P&L"},
+            25: {category: "Commissions Received", section: "P&L"},
+            31: {category: "Management Charges Received", section: "P&L"},
+            35: {category: "Other Operating Income", section: "P&L"},
+            36: {category: "Court Order Admin Fees", section: "P&L"},
+            37: {category: "Private Pension Admin Fee", section: "P&L"},
+            40: {category: "Rounding Gain/Loss", section: "P&L"},
+            
+            // Direct Costs
+            51: {category: "Cost of Sales", section: "P&L"},
+            52: {category: "Contractor Billable Expenses", section: "P&L"},
+            55: {category: "Purchases (Goods)", section: "P&L"},
+            61: {category: "Materials (Goods)", section: "P&L"},
+            65: {category: "Carriage", section: "P&L"},
+            71: {category: "Packaging Materials", section: "P&L"},
+            75: {category: "Subcontractor Costs", section: "P&L"},
+            81: {category: "Commission Paid", section: "P&L"},
+            91: {category: "Opening Stock (Goods)", section: "P&L"},
+            95: {category: "Closing Stock (Goods)", section: "P&L"},
+            
+            // Wages
+            101: {category: "Directors' Salaries", section: "P&L"},
+            102: {category: "Directors' Employer NICs", section: "P&L"},
+            103: {category: "Directors' Staff Pensions", section: "P&L"},
+            111: {category: "Salaries", section: "P&L"},
+            112: {category: "Employer NICs", section: "P&L"},
+            113: {category: "Staff Pensions", section: "P&L"},
+            "113A": {category: "Private Pension", section: "P&L"},
+            114: {category: "Recruitment Costs", section: "P&L"},
+            115: {category: "Accrued Salaries Expense", section: "P&L"},
+            116: {category: "Deduction from Gross Pay", section: "P&L"},
+            
+            // Premises
+            201: {category: "Rent & Rates", section: "P&L"},
+            202: {category: "Light, Heat & Water", section: "P&L"},
+            203: {category: "Insurance", section: "P&L"},
+            211: {category: "Repairs and Renewals", section: "P&L"},
+            215: {category: "Cleaning Products", section: "P&L"},
+            
+            // Office Costs
+            221: {category: "Telephone/Internet/Mobile", section: "P&L"},
+            226: {category: "Postage", section: "P&L"},
+            227: {category: "Printing", section: "P&L"},
+            228: {category: "Stationery", section: "P&L"},
+            229: {category: "Books", section: "P&L"},
+            230: {category: "Subscriptions", section: "P&L"},
+            231: {category: "Equipment Hire", section: "P&L"},
+            232: {category: "Other Office Costs", section: "P&L"},
+            
+            // Motor & Travel
+            236: {category: "Motor Expenses", section: "P&L"},
+            237: {category: "Mileage", section: "P&L"},
+            238: {category: "Other Travel", section: "P&L"},
+            239: {category: "Subsistence", section: "P&L"},
+            240: {category: "Accommodation and Meals", section: "P&L"},
+            241: {category: "Use of Home", section: "P&L"},
+            242: {category: "Unprocessed Reimbursements", section: "P&L"},
+            
+            // Advertising & Entertainment
+            246: {category: "Advertising and Promotion", section: "P&L"},
+            247: {category: "Staff Entertaining", section: "P&L"},
+            248: {category: "Client Entertaining", section: "P&L"},
+            
+            // Computer Costs
+            251: {category: "Computer Software (Server)", section: "P&L"},
+            252: {category: "Computer Hardware", section: "P&L"},
+            253: {category: "Computer Software (Cloud)", section: "P&L"},
+            
+            // Other Expenses
+            256: {category: "Sundries", section: "P&L"},
+            257: {category: "Staff Training", section: "P&L"},
+            258: {category: "Donations", section: "P&L"},
+            
+            // Legal & Professional Fees
+            261: {category: "Legal and Professional Fees", section: "P&L"},
+            262: {category: "Accountancy Fees", section: "P&L"},
+            263: {category: "Consultancy Fees", section: "P&L"},
+            
+            // Depreciation
+            301: {category: "Depreciation - Plant & Machinery", section: "P&L"},
+            302: {category: "Depreciation - Fixtures & Fittings", section: "P&L"},
+            303: {category: "Depreciation - Motor Vehicles", section: "P&L"},
+            304: {category: "Depreciation - Office Equipment", section: "P&L"},
+            306: {category: "Amortisation of Goodwill", section: "P&L"},
+            310: {category: "Loss/Gain on Disposal of Fixed Asset", section: "P&L"},
+            
+            // Bad Debt
+            321: {category: "Bad Debts Written Off", section: "P&L"},
+            
+            // Finance Costs
+            331: {category: "Bank Interest Payable", section: "P&L"},
+            332: {category: "Loan Interest Payable", section: "P&L"},
+            333: {category: "Hire Purchase Interest Payable", section: "P&L"},
+            334: {category: "Bank Charges", section: "P&L"},
+            335: {category: "Credit Card Charges", section: "P&L"},
+            340: {category: "Foreign Exchange Gain/Loss", section: "P&L"},
+            
+            // Corporation Tax
+            401: {category: "Corporation Tax Charge", section: "P&L"},
+            402: {category: "Deferred Corporation Tax", section: "P&L"},
+            403: {category: "Prior Year Under/Over Provision", section: "P&L"},
+            
+            // ===== BALANCE SHEET ACCOUNTS =====
+            // Investments
+            "501A": {category: "Investments Brought Forward", section: "BS", group: "Non-Current Assets"},
+            "501B": {category: "Investments Additions", section: "BS", group: "Non-Current Assets"},
+            "501C": {category: "Investments Revaluations", section: "BS", group: "Non-Current Assets"},
+            "501D": {category: "Investments Disposals", section: "BS", group: "Non-Current Assets"},
+            
+            // Intangibles (Goodwill)
+            "521A": {category: "Goodwill B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "521B": {category: "Goodwill Additions", section: "BS", group: "Non-Current Assets"},
+            "521C": {category: "Goodwill Disposals", section: "BS", group: "Non-Current Assets"},
+            "521D": {category: "Goodwill Amortisation B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "521E": {category: "Goodwill Amortisation Charge", section: "BS", group: "Non-Current Assets"},
+            "521F": {category: "Goodwill Amortisation on Disposals", section: "BS", group: "Non-Current Assets"},
+            
+            // Freehold Property
+            "551A": {category: "Freehold Property B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "551B": {category: "Freehold Property Additions", section: "BS", group: "Non-Current Assets"},
+            "551C": {category: "Freehold Property Disposals", section: "BS", group: "Non-Current Assets"},
+            "551D": {category: "Freehold Property Revaluation", section: "BS", group: "Non-Current Assets"},
+            "551E": {category: "Freehold Property Accumulated Depn", section: "BS", group: "Non-Current Assets"},
+            "551F": {category: "Freehold Property Depn Charge", section: "BS", group: "Non-Current Assets"},
+            "551G": {category: "Freehold Property Depn on Disposals", section: "BS", group: "Non-Current Assets"},
+            "551H": {category: "Freehold Property Reval Adjustment", section: "BS", group: "Non-Current Assets"},
+            
+            // Plant and Machinery
+            "562A": {category: "Plant & Machinery B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "562B": {category: "Plant & Machinery Additions", section: "BS", group: "Non-Current Assets"},
+            "562C": {category: "Plant & Machinery Disposals", section: "BS", group: "Non-Current Assets"},
+            "562D": {category: "Plant & Machinery Depn B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "562E": {category: "Plant & Machinery Depn Charge", section: "BS", group: "Non-Current Assets"},
+            "562F": {category: "Plant & Machinery Depn on Disposals", section: "BS", group: "Non-Current Assets"},
+            
+            // Fixtures and Fittings
+            "563A": {category: "Fixtures & Fittings B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "563B": {category: "Fixtures & Fittings Additions", section: "BS", group: "Non-Current Assets"},
+            "563C": {category: "Fixtures & Fittings Disposals", section: "BS", group: "Non-Current Assets"},
+            "563D": {category: "Fixtures & Fittings Depn B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "563E": {category: "Fixtures & Fittings Depn Charge", section: "BS", group: "Non-Current Assets"},
+            "563F": {category: "Fixtures & Fittings Depn on Disposals", section: "BS", group: "Non-Current Assets"},
+            
+            // Motor Vehicles
+            "564A": {category: "Motor Vehicles B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "564B": {category: "Motor Vehicles Additions", section: "BS", group: "Non-Current Assets"},
+            "564C": {category: "Motor Vehicles Disposals", section: "BS", group: "Non-Current Assets"},
+            "564D": {category: "Motor Vehicles Depn B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "564E": {category: "Motor Vehicles Depn Charge", section: "BS", group: "Non-Current Assets"},
+            "564F": {category: "Motor Vehicles Depn on Disposals", section: "BS", group: "Non-Current Assets"},
+            
+            // Office Equipment
+            "565A": {category: "Office Equipment B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "565B": {category: "Office Equipment Additions", section: "BS", group: "Non-Current Assets"},
+            "565C": {category: "Office Equipment Disposals", section: "BS", group: "Non-Current Assets"},
+            "565D": {category: "Office Equipment Depn B/Fwd", section: "BS", group: "Non-Current Assets"},
+            "565E": {category: "Office Equipment Depn Charge", section: "BS", group: "Non-Current Assets"},
+            "565F": {category: "Office Equipment Depn on Disposals", section: "BS", group: "Non-Current Assets"},
+            
+            // Current Assets
+            601: {category: "Stock", section: "BS", group: "Current Assets"},
+            651: {category: "Petty Cash", section: "BS", group: "Current Assets"},
+            "655A": {category: "Bank Current Account", section: "BS", group: "Current Assets"},
+            "655T": {category: "Interbank Transfers", section: "BS", group: "Current Assets"},
+            656: {category: "Bank Deposit Account", section: "BS", group: "Current Assets"},
+            
+            701: {category: "Trade Debtors", section: "BS", group: "Current Assets"},
+            702: {category: "Prepayments", section: "BS", group: "Current Assets"},
+            703: {category: "Other Debtors", section: "BS", group: "Current Assets"},
+            "703A": {category: "Corporation Tax Recoverable", section: "BS", group: "Current Assets"},
+            704: {category: "Unpresented Items", section: "BS", group: "Current Assets"},
+            705: {category: "Advances", section: "BS", group: "Current Assets"},
+            "705A": {category: "Other Advances", section: "BS", group: "Current Assets"},
+            707: {category: "Reimbursements Control", section: "BS", group: "Current Assets"},
+            
+            // Current Liabilities
+            706: {category: "Advances Suspense", section: "BS", group: "Current Liabilities"},
+            750: {category: "Custom Tax Deduction", section: "BS", group: "Current Liabilities"},
+            751: {category: "Trade Creditors", section: "BS", group: "Current Liabilities"},
+            752: {category: "Accruals", section: "BS", group: "Current Liabilities"},
+            753: {category: "Other Creditors", section: "BS", group: "Current Liabilities"},
+            754: {category: "Provisions", section: "BS", group: "Current Liabilities"},
+            755: {category: "HP Liabilities <1 Year", section: "BS", group: "Current Liabilities"},
+            756: {category: "HP Liabilities >1 Year", section: "BS", group: "Non-Current Liabilities"},
+            
+            757: {category: "Net Wages", section: "BS", group: "Current Liabilities"},
+            758: {category: "Pension Creditor", section: "BS", group: "Current Liabilities"},
+            "758A": {category: "Private Pension Creditor", section: "BS", group: "Current Liabilities"},
+            759: {category: "PAYE/NI", section: "BS", group: "Current Liabilities"},
+            760: {category: "Other Payroll Deductions", section: "BS", group: "Current Liabilities"},
+            761: {category: "VAT", section: "BS", group: "Current Liabilities"},
+            762: {category: "Corporation Tax", section: "BS", group: "Current Liabilities"},
+            763: {category: "Payroll Expenses Creditor", section: "BS", group: "Current Liabilities"},
+            764: {category: "Net Pay Balancing", section: "BS", group: "Current Liabilities"},
+            
+            "765A": {category: "Director 1 Loan", section: "BS", group: "Current Liabilities"},
+            "765B": {category: "Director 2 Loan", section: "BS", group: "Current Liabilities"},
+            "765C": {category: "Director 3 Loan", section: "BS", group: "Current Liabilities"},
+            "765D": {category: "Director 4 Loan", section: "BS", group: "Current Liabilities"},
+            "765E": {category: "Director 5 Loan", section: "BS", group: "Current Liabilities"},
+            
+            "766A": {category: "Shareholder 1 Loan", section: "BS", group: "Current Liabilities"},
+            "766B": {category: "Shareholder 2 Loan", section: "BS", group: "Current Liabilities"},
+            "766C": {category: "Shareholder 3 Loan", section: "BS", group: "Current Liabilities"},
+            "766D": {category: "Shareholder 4 Loan", section: "BS", group: "Current Liabilities"},
+            "766E": {category: "Shareholder 5 Loan", section: "BS", group: "Current Liabilities"},
+            
+            770: {category: "Bank Loan", section: "BS", group: "Non-Current Liabilities"},
+            
+            781: {category: "Salaries Control", section: "BS", group: "Current Liabilities"},
+            782: {category: "Court Order Creditor", section: "BS", group: "Current Liabilities"},
+            783: {category: "Holiday Pay Creditor", section: "BS", group: "Current Liabilities"},
+            784: {category: "Gross Pay Deduction Creditor", section: "BS", group: "Current Liabilities"},
+            
+            // Equity
+            901: {category: "Retained Earnings", section: "BS", group: "Equity"},
+            911: {category: "Share Capital B/Fwd", section: "BS", group: "Equity"},
+            912: {category: "Share Capital Issued", section: "BS", group: "Equity"},
+            921: {category: "Share Premium", section: "BS", group: "Equity"},
+            "931A": {category: "Dividend - Type 1", section: "BS", group: "Equity"},
+            "931B": {category: "Dividend - Type 2", section: "BS", group: "Equity"},
+            "931C": {category: "Dividend - Type 3", section: "BS", group: "Equity"},
+            "931D": {category: "Dividend - Type 4", section: "BS", group: "Equity"},
+            "931E": {category: "Dividend - Type 5", section: "BS", group: "Equity"}
+        };
+
+        // DOM Elements
+        const trialBalanceInput = document.getElementById('trialBalance');
+        const processBtn = document.getElementById('processBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const exampleBtn = document.getElementById('exampleBtn');
+        const plContent = document.getElementById('plContent');
+        const bsContent = document.getElementById('bsContent');
+        const plTotal = document.getElementById('plTotal');
+        const bsTotal = document.getElementById('bsTotal');
+
+        // Event Listeners
+        processBtn.addEventListener('click', processTrialBalance);
+        clearBtn.addEventListener('click', clearAll);
+        exampleBtn.addEventListener('click', loadExample);
+
+        // Process Trial Balance Data
+        function processTrialBalance() {
+            const inputText = trialBalanceInput.value.trim();
+            if (!inputText) {
+                alert('Please paste trial balance data first');
+                return;
+            }
+
+            const lines = inputText.split('\n');
+            const accounts = [];
+            let plAccounts = [];
+            let bsAccounts = [];
+            let plSum = 0;
+            let bsSum = 0;
+
+            // Parse each line
+            for (const line of lines) {
+                if (!line.trim()) continue;
+                
+                // Split line into code, name, amount (handling tabs/spaces)
+                const parts = line.trim().split(/\s+/);
+                if (parts.length < 3) continue;
+                
+                // First part is always the account code
+                let accountCode = parts[0];
+                
+                // Handle alphanumeric account codes
+                if (/[a-zA-Z]/.test(accountCode)) {
+                    const match = accountCode.match(/^(\d+)([a-zA-Z]+)$/);
+                    if (match) {
+                        accountCode = match[1] + match[2].toUpperCase();
+                    }
+                }
+                
+                // Last part is always the amount
+                const amount = parseFloat(parts[parts.length-1]);
+                
+                // Account name is everything in between
+                const accountName = parts.slice(1, parts.length-1).join(' ');
+                
+                // Find account in chart of accounts
+                const accountInfo = chartOfAccounts[accountCode];
+                
+                if (accountInfo) {
+                    const account = {
+                        code: accountCode,
+                        name: accountName || accountInfo.category,
+                        amount: amount,
+                        category: accountInfo.category,
+                        section: accountInfo.section,
+                        group: accountInfo.group || null
+                    };
+                    
+                    accounts.push(account);
+                    
+                    if (accountInfo.section === 'P&L') {
+                        plAccounts.push(account);
+                        plSum += amount;
+                    } else if (accountInfo.section === 'BS') {
+                        bsAccounts.push(account);
+                        bsSum += amount;
+                    }
+                } else {
+                    console.warn(`Account code ${accountCode} not found in chart of accounts`);
+                }
+            }
+
+            // Display results
+            displayResults(plAccounts, bsAccounts, plSum, bsSum);
+        }
+
+        // Display Results
+        function displayResults(plAccounts, bsAccounts, plSum, bsSum) {
+            // Display P&L Accounts
+            if (plAccounts.length > 0) {
+                const groupedPlAccounts = groupByCategory(plAccounts);
+                let plHtml = '';
+                
+                for (const [category, accounts] of Object.entries(groupedPlAccounts)) {
+                    plHtml += `
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-gray-800 border-b border-gray-200 pb-2 mb-3">${category}</h3>
+                            <div class="space-y-2">
+                                ${accounts.map(account => createAccountRow(account)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                plContent.innerHTML = plHtml;
+            } else {
+                plContent.innerHTML = '<p class="text-gray-500 text-center py-4">No P&L accounts found</p>';
+            }
+            
+            // Display Balance Sheet Accounts
+            if (bsAccounts.length > 0) {
+                const groupedBsAccounts = groupByGroup(bsAccounts);
+                let bsHtml = '';
+                
+                for (const [group, accounts] of Object.entries(groupedBsAccounts)) {
+                    bsHtml += `
+                        <div class="mb-6">
+                            <h3 class="font-semibold text-gray-800 border-b border-gray-200 pb-2 mb-3">${group}</h3>
+                            <div class="space-y-2">
+                                ${accounts.map(account => createAccountRow(account)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                bsContent.innerHTML = bsHtml;
+            } else {
+                bsContent.innerHTML = '<p class="text-gray-500 text-center py-4">No Balance Sheet accounts found</p>';
+            }
+            
+            // Update totals
+            plTotal.textContent = formatCurrency(plSum);
+            bsTotal.textContent = formatCurrency(bsSum);
+            
+            // Color totals based on value
+            plTotal.className = `text-xl font-semibold ${plSum < 0 ? 'negative-amount' : 'positive-amount'}`;
+            bsTotal.className = `text-xl font-semibold ${bsSum < 0 ? 'negative-amount' : 'positive-amount'}`;
+        }
+
+        // Helper function to group accounts by category (for P&L)
+        function groupByCategory(accounts) {
+            return accounts.reduce((groups, account) => {
+                const category = account.category;
+                if (!groups[category]) {
+                    groups[category] = [];
+                }
+                groups[category].push(account);
+                return groups;
+            }, {});
+        }
+
+        // Helper function to group accounts by group (for BS)
+        function groupByGroup(accounts) {
+            return accounts.reduce((groups, account) => {
+                const group = account.group || 'Other';
+                if (!groups[group]) {
+                    groups[group] = [];
+                }
+                groups[group].push(account);
+                return groups;
+            }, {});
+        }
+
+        // Create HTML for an account row
+        function createAccountRow(account) {
+            const amountClass = account.amount < 0 ? 'negative-amount' : 'positive-amount';
+            return `
+                <div class="account-row flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                    <div>
+                        <span class="text-sm font-medium text-gray-600">${account.code}</span>
+                        <span class="text-sm text-gray-500 ml-2">${account.name}</span>
+                    </div>
+                    <span class="${amountClass} font-medium">${formatCurrency(account.amount)}</span>
+                </div>
+            `;
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-GB', {
+                style: 'currency',
+                currency: 'GBP',
+                minimumFractionDigits: 2
+            }).format(amount);
+        }
+
+        // Clear all data
+        function clearAll() {
+            trialBalanceInput.value = '';
+            plContent.innerHTML = '<p class="text-gray-500 text-center py-4">No P&L data processed yet</p>';
+            bsContent.innerHTML = '<p class="text-gray-500 text-center py-4">No Balance Sheet data processed yet</p>';
+            plTotal.textContent = '£0.00';
+            bsTotal.textContent = '£0.00';
+            plTotal.className = 'text-xl font-semibold';
+            bsTotal.className = 'text-xl font-semibold';
+        }
+
+        // Load example data
+        function loadExample() {
+            const exampleData = `1 Sales -88834.29
+51 Cost of Sales 77184.15
+101 Directors' Salaries 5085.05
+102 Directors' Employer NICs 700.21
+111 Salaries 11008.08
+112 Employer NICs 1463.55
+113 Staff Pensions 413.72
+114 Recruitment costs 624
+201 Rent & rates (Goods) 1500
+221 Telephone/Internet/Mobile 1200
+236 Motor Expenses 850
+251 Computer Software (Server) 1200
+261 Legal and Professional Fees 1500
+331 Bank Interest Payable 150
+334 Bank Charges 75
+401 Corporation Tax Charge 2500
+655A Bank Current Account 12000
+701 Trade Debtors 8500
+751 Trade Creditors 4500
+761 VAT 3200
+901 Retained Earnings -15000`;
+            
+            trialBalanceInput.value = exampleData;
+        }
+    </script>
+</body>
+</html>
