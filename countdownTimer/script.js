@@ -1,5 +1,5 @@
 // Set the target date and time
-const endDate = new Date("May 16, 2025 20:45:00").getTime();
+const endDate = new Date("Oct 2nd, 2025 00:00:00").getTime();
 
 // Update the timer every second
 const x = setInterval(updateTimer, 1000);
@@ -38,3 +38,4 @@ window.addEventListener('load', () => {
     const heroSection = document.querySelector('.hero');
     heroSection.classList.add('visible');
 });
+
