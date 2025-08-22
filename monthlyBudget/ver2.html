@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Primary Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Track your monthly income and expenses with this easy-to-use budget calculator">
+    <meta name="keywords" content="budget, calculator, finance, money, expenses, income">
+    
+    <title>Monthly Budget Calculator | Track Your Finances</title>
+    
+    <!-- External Resources -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
+          crossorigin="anonymous" 
+          referrerpolicy="no-referrer" />
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Animation for alerts */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-full-width {
+                width: 100% !important;
+            }
+            body {
+                zoom: 85%;
+            }
+        }
+        
+        /* Custom animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-positive {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        .pulse-negative {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        /* Custom chart container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .mobile-stack {
+                flex-direction: column;
+            }
+            
+            .mobile-full-width {
+                width: 100%;
+            }
+            
+            .mobile-padding {
+                padding: 1rem;
+            }
+            
+            .mobile-text-center {
+                text-align: center;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .dark-mode-invert {
+                filter: invert(1) hue-rotate(180deg);
+            }
+        }
+        
+        /* Focus styles for accessibility */
+        button:focus, input:focus, select:focus {
+            outline: 2px solid #3B82F6;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8 max-w-7xl space-y-8">
+        <!-- Page Header with Navigation -->
+        <header class="text-center space-y-4 mb-6">
+            <div class="flex justify-between items-center mb-4 no-print">
+                <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
+                    <i class="fas fa-moon text-gray-700"></i>
+                </button>
+                <h1 class="text-4xl font-bold text-indigo-700 flex-1">
+                    Monthly Budget Calculator
+                </h1>
+                <div class="flex space-x-2">
+                    <button id="import-btn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300" title="Import Data">
+                        <i class="fas fa-upload text-gray-700"></i>
+                    </button>
+                    <button id="export-btn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300" title="Export Data">
+                        <i class="fas fa-download text-gray-700"></i>
+                    </button>
+                    <button id="print-btn" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300" title="Print Report">
+                        <i class="fas fa-print text-gray-700"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Easily track your income and expenses to maintain financial health
+            </p>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500">Total Income</p>
+                        <h3 class="text-2xl font-bold text-green-600" id="total-income">₹0.00</h3>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-money-bill-wave text-green-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-sm text-gray-500" id="income-count">0 items</div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500">Total Expenses</p>
+                        <h3 class="text-2xl font-bold text-red-600" id="total-expenses">₹0.00</h3>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fas fa-shopping-cart text-red-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-sm text-gray-500" id="expense-count">0 items</div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500">Balance</p>
+                        <h3 class="text-2xl font-bold text-indigo-600" id="balance">₹0.00</h3>
+                    </div>
+                    <div class="bg-indigo-100 p-3 rounded-full">
+                        <i class="fas fa-wallet text-indigo-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-sm" id="balance-status">
+                    <span class="text-gray-500">No transactions yet</span>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500">Savings Rate</p>
+                        <h3 class="text-2xl font-bold text-blue-600" id="savings-rate">0%</h3>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-piggy-bank text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-sm text-gray-500" id="savings-status">Based on income & expenses</div>
+            </div>
+        </div>
+
+        <!-- Budget Planning Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8 no-print">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    Budget Planning
+                </h2>
+                <p class="text-gray-500 mt-1">
+                    Set monthly budget targets for each category
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">Income Goals</h3>
+                    <div id="income-budget-list" class="space-y-3">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-800 mb-4">Expense Limits</h3>
+                    <div id="expense-budget-list" class="space-y-3">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Item Form -->
+        <div class="bg-white rounded-xl shadow-md p-6 no-print">
+            <div class="mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800">
+                    Add New Budget Item
+                </h2>
+                <p class="text-gray-500 mt-1">
+                    Enter your income or expense details below
+                </p>
+            </div>
+            
+            <form id="budget-form" class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <select id="type" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="category" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <!-- Categories will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
+                    <input type="number" id="amount" step="0.01" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" id="date" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <i class="fas fa-plus mr-2"></i> Add Item
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="bg-white rounded-xl shadow-md p-4 no-print">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-center space-x-4 mobile-full-width mobile-stack">
+                    <div class="mobile-full-width">
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                        <input type="text" id="search" placeholder="Search by category..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    
+                    <div class="mobile-full-width">
+                        <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                        <select id="type-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="all">All Types</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mobile-full-width">
+                        <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                        <select id="date-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            <!-- Will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="flex items-end">
+                    <button id="clear-filters" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Items Table Section -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-semibold text-gray-800">
+                        Your Budget Items
+                    </h2>
+                    <span id="item-count" class="text-sm text-gray-500">
+                        <!-- Will be populated by JavaScript -->
+                    </span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budget-items" class="bg-white divide-y divide-gray-200">
+                        <!-- Budget items will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="empty-state" class="p-8 text-center">
+                <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-500">No budget items yet</h3>
+                <p class="text-gray-400">Add your first income or expense to get started</p>
+            </div>
+        </div>
+
+        <!-- Financial Analysis Section -->
+        <div class="space-y-6">
+            <h2 class="text-2xl font-semibold text-gray-800">
+                Financial Analysis
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Income Chart Card -->
+                <div class="bg-white rounded-xl shadow-md p-6 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800">
+                                Income Breakdown
+                            </h3>
+                            <p class="text-sm text-gray-500">
+                                Distribution of your income sources
+                            </p>
+                        </div>
+                        <button class="text-indigo-600 text-sm font-medium" id="income-chart-toggle">
+                            Switch to Bar Chart
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Expense Chart Card -->
+                <div class="bg-white rounded-xl shadow-md p-6 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-800">
+                                Expense Breakdown
+                            </h3>
+                            <p class="text-sm text-gray-500">
+                                Where your money is being spent
+                            </p>
+                        </div>
+                        <button class="text-indigo-600 text-sm font-medium" id="expense-chart-toggle">
+                            Switch to Bar Chart
+                        </button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Monthly Trends Chart -->
+            <div class="bg-white rounded-xl shadow-md p-6 space-y-4">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-800">
+                        Monthly Trends
+                    </h3>
+                    <p class="text-sm text-gray-500">
+                        Your income and expenses over time
+                    </p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification System -->
+        <div id="alert" 
+             class="fixed top-6 right-6 w-80 z-50 transform transition-all duration-300 ease-in-out hidden translate-x-6">
+            <div class="relative bg-green-500 text-white px-5 py-4 rounded-xl shadow-xl fade-in">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 pt-0.5">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <p id="alert-message" class="text-sm font-medium">
+                            Item added successfully!
+                        </p>
+                    </div>
+                    <button onclick="hideAlert()" 
+                            class="ml-4 flex-shrink-0 focus:outline-none hover:opacity-75 transition-opacity">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Edit Budget Item</h2>
+            </div>
+            <form id="edit-form" class="p-6">
+                <input type="hidden" id="edit-id">
+                <div class="mb-4">
+                    <label for="edit-type" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <select id="edit-type" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="edit-category" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <!-- Categories will be populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-amount" class="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
+                    <input type="number" id="edit-amount" step="0.01" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" id="edit-date" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="export-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Export Data</h2>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Export Format</label>
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            <input id="export-json" type="radio" name="export-format" value="json" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300" checked>
+                            <label for="export-json" class="ml-3 block text-sm font-medium text-gray-700">JSON (Backup)</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="export-csv" type="radio" name="export-format" value="csv" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                            <label for="export-csv" class="ml-3 block text-sm font-medium text-gray-700">CSV (Spreadsheet)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeExportModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </button>
+                    <button id="export-confirm" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Input (hidden) -->
+    <input type="file" id="import-file" accept=".json,.csv" class="hidden">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Categories for income and expenses
+        const categories = {
+            income: ['Salary', 'Freelance', 'Investments', 'Gifts', 'Other Income'],
+            expense: ['Housing', 'Utilities', 'Food', 'Transportation', 'Healthcare', 'Entertainment', 'Education', 'Shopping', 'Savings', 'Other Expenses']
+        };
+
+        // Initialize variables for charts
+        let incomeChart = null;
+        let expenseChart = null;
+        let trendChart = null;
+        let incomeChartType = 'doughnut';
+        let expenseChartType = 'doughnut';
+
+        // DOM elements
+        const budgetForm = document.getElementById('budget-form');
+        const typeSelect = document.getElementById('type');
+        const categorySelect = document.getElementById('category');
+        const amountInput = document.getElementById('amount');
+        const dateInput = document.getElementById('date');
+        const budgetItemsTable = document.getElementById('budget-items');
+        const emptyState = document.getElementById('empty-state');
+        const totalIncomeElement = document.getElementById('total-income');
+        const totalExpensesElement = document.getElementById('total-expenses');
+        const balanceElement = document.getElementById('balance');
+        const incomeCountElement = document.getElementById('income-count');
+        const expenseCountElement = document.getElementById('expense-count');
+        const balanceStatusElement = document.getElementById('balance-status');
+        const savingsRateElement = document.getElementById('savings-rate');
+        const savingsStatusElement = document.getElementById('savings-status');
+        const alertElement = document.getElementById('alert');
+        const alertMessage = document.getElementById('alert-message');
+        const editModal = document.getElementById('edit-modal');
+        const editForm = document.getElementById('edit-form');
+        const editIdInput = document.getElementById('edit-id');
+        const editTypeSelect = document.getElementById('edit-type');
+        const editCategorySelect = document.getElementById('edit-category');
+        const editAmountInput = document.getElementById('edit-amount');
+        const editDateInput = document.getElementById('edit-date');
+        const searchInput = document.getElementById('search');
+        const typeFilter = document.getElementById('type-filter');
+        const dateFilter = document.getElementById('date-filter');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        const importBtn = document.getElementById('import-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const printBtn = document.getElementById('print-btn');
+        const exportModal = document.getElementById('export-modal');
+        const importFileInput = document.getElementById('import-file');
+        const exportConfirmBtn = document.getElementById('export-confirm');
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const incomeChartToggle = document.getElementById('income-chart-toggle');
+        const expenseChartToggle = document.getElementById('expense-chart-toggle');
+        const incomeBudgetList = document.getElementById('income-budget-list');
+        const expenseBudgetList = document.getElementById('expense-budget-list');
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current date as default
+            const today = new Date();
+            dateInput.value = today.toISOString().split('T')[0];
+            
+            updateCategoryOptions();
+            loadBudgetItems();
+            populateDateFilter();
+            loadBudgetGoals();
+            
+            // Event listeners
+            typeSelect.addEventListener('change', updateCategoryOptions);
+            budgetForm.addEventListener('submit', addBudgetItem);
+            editForm.addEventListener('submit', updateBudgetItem);
+            searchInput.addEventListener('input', filterBudgetItems);
+            typeFilter.addEventListener('change', filterBudgetItems);
+            dateFilter.addEventListener('change', filterBudgetItems);
+            clearFiltersBtn.addEventListener('click', clearFilters);
+            importBtn.addEventListener('click', triggerImport);
+            exportBtn.addEventListener('click', openExportModal);
+            printBtn.addEventListener('click', printReport);
+            exportConfirmBtn.addEventListener('click', exportData);
+            themeToggleBtn.addEventListener('click', toggleTheme);
+            incomeChartToggle.addEventListener('click', toggleIncomeChart);
+            expenseChartToggle.addEventListener('click', toggleExpenseChart);
+            
+            // Check for saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode-invert');
+                themeToggleBtn.innerHTML = '<i class="fas fa-sun text-yellow-500"></i>';
+            }
+            
+            // Initialize file import
+            importFileInput.addEventListener('change', importData);
+        });
+
+        // Update category options based on selected type
+        function updateCategoryOptions() {
+            const type = typeSelect.value;
+            categorySelect.innerHTML = '';
+            
+            categories[type].forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Add a new budget item
+        function addBudgetItem(e) {
+            e.preventDefault();
+            
+            const type = typeSelect.value;
+            const category = categorySelect.value;
+            const amount = parseFloat(amountInput.value);
+            const date = dateInput.value;
+            const id = Date.now().toString();
+            
+            if (isNaN(amount) || amount <= 0) {
+                showAlert('Please enter a valid amount', 'error');
+                return;
+            }
+            
+            if (!date) {
+                showAlert('Please select a date', 'error');
+                return;
+            }
+            
+            const budgetItem = { id, type, category, amount, date };
+            
+            // Get existing items from local storage
+            let budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            
+            // Add new item
+            budgetItems.push(budgetItem);
+            
+            // Save to local storage
+            localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
+            
+            // Reset form
+            budgetForm.reset();
+            dateInput.value = new Date().toISOString().split('T')[0];
+            updateCategoryOptions();
+            
+            // Update UI
+            loadBudgetItems();
+            showAlert('Budget item added successfully!');
+        }
+
+        // Load all budget items from local storage
+        function loadBudgetItems() {
+            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            
+            // Clear table
+            budgetItemsTable.innerHTML = '';
+            
+            if (budgetItems.length === 0) {
+                emptyState.classList.remove('hidden');
+                budgetItemsTable.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                budgetItemsTable.classList.remove('hidden');
+                
+                // Calculate totals
+                let totalIncome = 0;
+                let totalExpenses = 0;
+                let incomeCount = 0;
+                let expenseCount = 0;
+                
+                // Group by category for charts
+                const incomeByCategory = {};
+                const expenseByCategory = {};
+                
+                // Initialize category totals
+                categories.income.forEach(cat => incomeByCategory[cat] = 0);
+                categories.expense.forEach(cat => expenseByCategory[cat] = 0);
+                
+                // Sort by date (newest first)
+                budgetItems.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Add items to table and calculate totals
+                budgetItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.category}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${item.type === 'income' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}">
+                            ₹${item.amount.toFixed(2)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(item.date)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="openEditModal('${item.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteBudgetItem('${item.id}')" class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    `;
+                    budgetItemsTable.appendChild(row);
+                    
+                    // Calculate totals
+                    if (item.type === 'income') {
+                        totalIncome += item.amount;
+                        incomeCount++;
+                        incomeByCategory[item.category] += item.amount;
+                    } else {
+                        totalExpenses += item.amount;
+                        expenseCount++;
+                        expenseByCategory[item.category] += item.amount;
+                    }
+                });
+                
+                // Update summary cards
+                totalIncomeElement.textContent = `₹${totalIncome.toFixed(2)}`;
+                totalExpensesElement.textContent = `₹${totalExpenses.toFixed(2)}`;
+                
+                const balance = totalIncome - totalExpenses;
+                balanceElement.textContent = `₹${balance.toFixed(2)}`;
+                
+                // Add animation class based on balance
+                if (balance > 0) {
+                    balanceElement.classList.add('pulse-positive');
+                    setTimeout(() => balanceElement.classList.remove('pulse-positive'), 500);
+                    balanceStatusElement.innerHTML = '<span class="text-green-500">Positive balance</span>';
+                } else if (balance < 0) {
+                    balanceElement.classList.add('pulse-negative');
+                    setTimeout(() => balanceElement.classList.remove('pulse-negative'), 500);
+                    balanceStatusElement.innerHTML = '<span class="text-red-500">Negative balance</span>';
+                } else {
+                    balanceStatusElement.innerHTML = '<span class="text-gray-500">Balanced</span>';
+                }
+                
+                // Update counts
+                incomeCountElement.textContent = `${incomeCount} item${incomeCount !== 1 ? 's' : ''}`;
+                expenseCountElement.textContent = `${expenseCount} item${expenseCount !== 1 ? 's' : ''}`;
+                
+                // Calculate savings rate
+                const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome * 100) : 0;
+                savingsRateElement.textContent = `${savingsRate.toFixed(1)}%`;
+                
+                if (savingsRate > 20) {
+                    savingsStatusElement.innerHTML = '<span class="text-green-500">Excellent savings!</span>';
+                } else if (savingsRate > 10) {
+                    savingsStatusElement.innerHTML = '<span class="text-blue-500">Good savings</span>';
+                } else if (savingsRate > 0) {
+                    savingsStatusElement.innerHTML = '<span class="text-yellow-500">Positive savings</span>';
+                } else {
+                    savingsStatusElement.innerHTML = '<span class="text-red-500">Spending exceeds income</span>';
+                }
+                
+                // Update charts
+                updateCharts(incomeByCategory, expenseByCategory);
+                updateTrendChart(budgetItems);
+                
+                // Update budget goals
+                updateBudgetGoals(incomeByCategory, expenseByCategory);
+            }
+            
+            // Update item count
+            document.getElementById('item-count').textContent = `${budgetItems.length} item${budgetItems.length !== 1 ? 's' : ''}`;
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Open edit modal with item data
+        function openEditModal(id) {
+            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            const item = budgetItems.find(item => item.id === id);
+            
+            if (item) {
+                editIdInput.value = item.id;
+                editTypeSelect.value = item.type;
+                
+                // Update category options based on type
+                editCategorySelect.innerHTML = '';
+                const itemCategories = item.type === 'income' ? categories.income : categories.expense;
+                itemCategories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    editCategorySelect.appendChild(option);
+                });
+                
+                editCategorySelect.value = item.category;
+                editAmountInput.value = item.amount;
+                editDateInput.value = item.date;
+                
+                editModal.classList.remove('hidden');
+            }
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            editModal.classList.add('hidden');
+        }
+
+        // Update budget item
+        function updateBudgetItem(e) {
+            e.preventDefault();
+            
+            const id = editIdInput.value;
+            const type = editTypeSelect.value;
+            const category = editCategorySelect.value;
+            const amount = parseFloat(editAmountInput.value);
+            const date = editDateInput.value;
+            
+            if (isNaN(amount) || amount <= 0) {
+                showAlert('Please enter a valid amount', 'error');
+                return;
+            }
+            
+            if (!date) {
+                showAlert('Please select a date', 'error');
+                return;
+            }
+            
+            let budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            const itemIndex = budgetItems.findIndex(item => item.id === id);
+            
+            if (itemIndex !== -1) {
+                budgetItems[itemIndex] = {
+                    ...budgetItems[itemIndex],
+                    type,
+                    category,
+                    amount,
+                    date
+                };
+                
+                localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
+                loadBudgetItems();
+                closeEditModal();
+                showAlert('Budget item updated successfully!');
+            }
+        }
+
+        // Delete budget item
+        function deleteBudgetItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                let budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+                budgetItems = budgetItems.filter(item => item.id !== id);
+                
+                localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
+                loadBudgetItems();
+                showAlert('Budget item deleted successfully!');
+            }
+        }
+
+        // Show alert notification
+        function showAlert(message, type = 'success') {
+            alertMessage.textContent = message;
+            
+            // Set alert color based on type
+            const alertDiv = alertElement.querySelector('div');
+            alertDiv.className = `relative px-5 py-4 rounded-xl shadow-xl fade-in flex items-start ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+            
+            // Update icon based on type
+            const icon = alertDiv.querySelector('i');
+            icon.className = type === 'success' ? 'fas fa-check-circle text-xl' : 'fas fa-exclamation-circle text-xl';
+            
+            alertElement.classList.remove('hidden');
+            
+            // Hide after 3 seconds
+            setTimeout(hideAlert, 3000);
+        }
+
+        // Hide alert notification
+        function hideAlert() {
+            alertElement.classList.add('hidden');
+        }
+
+        // Update charts with current data
+        function updateCharts(incomeData, expenseData) {
+            // Prepare data for income chart
+            const incomeLabels = categories.income;
+            const incomeValues = incomeLabels.map(label => incomeData[label] || 0);
+            
+            // Prepare data for expense chart
+            const expenseLabels = categories.expense;
+            const expenseValues = expenseLabels.map(label => expenseData[label] || 0);
+            
+            // Get chart canvases
+            const incomeCtx = document.getElementById('incomeChart').getContext('2d');
+            const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+            
+            // Destroy existing charts if they exist
+            if (incomeChart) incomeChart.destroy();
+            if (expenseChart) expenseChart.destroy();
+            
+            // Create income chart
+            incomeChart = new Chart(incomeCtx, {
+                type: incomeChartType,
+                data: {
+                    labels: incomeLabels,
+                    datasets: [{
+                        data: incomeValues,
+                        backgroundColor: [
+                            '#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Income by Category'
+                        }
+                    }
+                }
+            });
+            
+            // Create expense chart
+            expenseChart = new Chart(expenseCtx, {
+                type: expenseChartType,
+                data: {
+                    labels: expenseLabels,
+                    datasets: [{
+                        data: expenseValues,
+                        backgroundColor: [
+                            '#EF4444', '#F97316', '#F59E0B', '#84CC16', '#10B981',
+                            '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Expenses by Category'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update trend chart with historical data
+        function updateTrendChart(budgetItems) {
+            // Group by month
+            const monthlyData = {};
+            
+            budgetItems.forEach(item => {
+                const date = new Date(item.date);
+                const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                
+                if (!monthlyData[monthYear]) {
+                    monthlyData[monthYear] = {
+                        income: 0,
+                        expenses: 0
+                    };
+                }
+                
+                if (item.type === 'income') {
+                    monthlyData[monthYear].income += item.amount;
+                } else {
+                    monthlyData[monthYear].expenses += item.amount;
+                }
+            });
+            
+            // Sort months chronologically
+            const sortedMonths = Object.keys(monthlyData).sort();
+            
+            // Prepare data for trend chart
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (trendChart) trendChart.destroy();
+            
+            // Create trend chart
+            trendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: sortedMonths.map(month => {
+                        const [year, monthNum] = month.split('-');
+                        return new Date(year, monthNum - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                    }),
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: sortedMonths.map(month => monthlyData[month].income),
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Expenses',
+                            data: sortedMonths.map(month => monthlyData[month].expenses),
+                            borderColor: '#EF4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Monthly Income vs Expenses'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Populate date filter with available months
+        function populateDateFilter() {
+            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            const months = new Set();
+            
+            // Add current month
+            const today = new Date();
+            const currentMonth = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+            months.add(currentMonth);
+            
+            // Add months from existing items
+            budgetItems.forEach(item => {
+                const date = new Date(item.date);
+                const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                months.add(monthYear);
+            });
+            
+            // Convert to array and sort
+            const sortedMonths = Array.from(months).sort();
+            
+            // Clear existing options
+            dateFilter.innerHTML = '';
+            
+            // Add "All Months" option
+            const allOption = document.createElement('option');
+            allOption.value = 'all';
+            allOption.textContent = 'All Months';
+            dateFilter.appendChild(allOption);
+            
+            // Add month options
+            sortedMonths.forEach(month => {
+                const [year, monthNum] = month.split('-');
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = new Date(year, monthNum - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                dateFilter.appendChild(option);
+            });
+        }
+
+        // Filter budget items based on search and filters
+        function filterBudgetItems() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const typeFilterValue = typeFilter.value;
+            const dateFilterValue = dateFilter.value;
+            
+            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            let filteredItems = budgetItems;
+            
+            // Apply type filter
+            if (typeFilterValue !== 'all') {
+                filteredItems = filteredItems.filter(item => item.type === typeFilterValue);
+            }
+            
+            // Apply date filter
+            if (dateFilterValue !== 'all') {
+                filteredItems = filteredItems.filter(item => {
+                    const itemDate = new Date(item.date);
+                    const itemMonth = `${itemDate.getFullYear()}-${(itemDate.getMonth() + 1).toString().padStart(2, '0')}`;
+                    return itemMonth === dateFilterValue;
+                });
+            }
+            
+            // Apply search filter
+            if (searchTerm) {
+                filteredItems = filteredItems.filter(item => 
+                    item.category.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Update table with filtered items
+            budgetItemsTable.innerHTML = '';
+            
+            if (filteredItems.length === 0) {
+                emptyState.classList.remove('hidden');
+                budgetItemsTable.classList.add('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                budgetItemsTable.classList.remove('hidden');
+                
+                filteredItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.category}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${item.type === 'income' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}">
+                            ₹${item.amount.toFixed(2)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(item.date)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="openEditModal('${item.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteBudgetItem('${item.id}')" class="text-red-600 hover:text-red-900">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    `;
+                    budgetItemsTable.appendChild(row);
+                });
+            }
+            
+            // Update item count
+            document.getElementById('item-count').textContent = `${filteredItems.length} item${filteredItems.length !== 1 ? 's' : ''} (filtered)`;
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            searchInput.value = '';
+            typeFilter.value = 'all';
+            dateFilter.value = 'all';
+            filterBudgetItems();
+        }
+
+        // Trigger import file selection
+        function triggerImport() {
+            importFileInput.click();
+        }
+
+        // Open export modal
+        function openExportModal() {
+            exportModal.classList.remove('hidden');
+        }
+
+        // Close export modal
+        function closeExportModal() {
+            exportModal.classList.add('hidden');
+        }
+
+        // Export data based on selected format
+        function exportData() {
+            const exportFormat = document.querySelector('input[name="export-format"]:checked').value;
+            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            const budgetGoals = JSON.parse(localStorage.getItem('budgetGoals')) || {};
+            
+            let dataStr, filename, type;
+            
+            if (exportFormat === 'json') {
+                // Export as JSON
+                const data = {
+                    budgetItems,
+                    budgetGoals,
+                    exportDate: new Date().toISOString()
+                };
+                dataStr = JSON.stringify(data, null, 2);
+                filename = `budget-data-${new Date().toISOString().split('T')[0]}.json`;
+                type = 'application/json';
+            } else {
+                // Export as CSV
+                let csv = 'Type,Category,Amount,Date\n';
+                budgetItems.forEach(item => {
+                    csv += `${item.type},${item.category},${item.amount},${item.date}\n`;
+                });
+                dataStr = csv;
+                filename = `budget-data-${new Date().toISOString().split('T')[0]}.csv`;
+                type = 'text/csv';
+            }
+            
+            // Create download link
+            const blob = new Blob([dataStr], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            closeExportModal();
+            showAlert('Data exported successfully!');
+        }
+
+        // Import data from file
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Confirm before importing (to prevent accidental data loss)
+            if (!confirm('Importing data will replace your current budget items. Continue?')) {
+                e.target.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    let budgetItems, budgetGoals;
+                    
+                    if (file.name.endsWith('.json')) {
+                        // Import JSON
+                        const data = JSON.parse(content);
+                        budgetItems = data.budgetItems || [];
+                        budgetGoals = data.budgetGoals || {};
+                    } else if (file.name.endsWith('.csv')) {
+                        // Import CSV
+                        budgetItems = [];
+                        const lines = content.split('\n');
+                        for (let i = 1; i < lines.length; i++) {
+                            const line = lines[i].trim();
+                            if (!line) continue;
+                            
+                            const [type, category, amount, date] = line.split(',');
+                            if (type && category && amount && date) {
+                                budgetItems.push({
+                                    id: Date.now().toString() + i,
+                                    type,
+                                    category,
+                                    amount: parseFloat(amount),
+                                    date
+                                });
+                            }
+                        }
+                        budgetGoals = {};
+                    } else {
+                        throw new Error('Unsupported file format');
+                    }
+                    
+                    // Save imported data
+                    localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
+                    localStorage.setItem('budgetGoals', JSON.stringify(budgetGoals));
+                    
+                    // Update UI
+                    loadBudgetItems();
+                    populateDateFilter();
+                    loadBudgetGoals();
+                    
+                    showAlert('Data imported successfully!');
+                } catch (error) {
+                    showAlert('Error importing data: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset file input
+            e.target.value = '';
+        }
+
+        // Print report
+        function printReport() {
+            window.print();
+        }
+
+        // Toggle theme between light and dark
+        function toggleTheme() {
+            if (document.body.classList.contains('dark-mode-invert')) {
+                document.body.classList.remove('dark-mode-invert');
+                localStorage.setItem('theme', 'light');
+                themeToggleBtn.innerHTML = '<i class="fas fa-moon text-gray-700"></i>';
+            } else {
+                document.body.classList.add('dark-mode-invert');
+                localStorage.setItem('theme', 'dark');
+                themeToggleBtn.innerHTML = '<i class="fas fa-sun text-yellow-500"></i>';
+            }
+        }
+
+        // Toggle income chart type
+        function toggleIncomeChart() {
+            incomeChartType = incomeChartType === 'doughnut' ? 'bar' : 'doughnut';
+            incomeChartToggle.textContent = incomeChartType === 'doughnut' ? 'Switch to Bar Chart' : 'Switch to Pie Chart';
+            
+            // Reload charts
+            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            let incomeByCategory = {};
+            categories.income.forEach(cat => incomeByCategory[cat] = 0);
+            
+            budgetItems.forEach(item => {
+                if (item.type === 'income') {
+                    incomeByCategory[item.category] += item.amount;
+                }
+            });
+            
+            updateCharts(incomeByCategory, {});
+        }
+
+        // Toggle expense chart type
+        function toggleExpenseChart() {
+            expenseChartType = expenseChartType === 'doughnut' ? 'bar' : 'doughnut';
+            expenseChartToggle.textContent = expenseChartType === 'doughnut' ? 'Switch to Bar Chart' : 'Switch to Pie Chart';
+            
+            // Reload charts
+            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            let expenseByCategory = {};
+            categories.expense.forEach(cat => expenseByCategory[cat] = 0);
+            
+            budgetItems.forEach(item => {
+                if (item.type === 'expense') {
+                    expenseByCategory[item.category] += item.amount;
+                }
+            });
+            
+            updateCharts({}, expenseByCategory);
+        }
+
+        // Load budget goals from local storage
+        function loadBudgetGoals() {
+            const budgetGoals = JSON.parse(localStorage.getItem('budgetGoals')) || {};
+            
+            // Clear existing lists
+            incomeBudgetList.innerHTML = '';
+            expenseBudgetList.innerHTML = '';
+            
+            // Create income goal items
+            categories.income.forEach(category => {
+                const goal = budgetGoals[category] || 0;
+                const item = createBudgetGoalItem(category, goal, 'income');
+                incomeBudgetList.appendChild(item);
+            });
+            
+            // Create expense goal items
+            categories.expense.forEach(category => {
+                const goal = budgetGoals[category] || 0;
+                const item = createBudgetGoalItem(category, goal, 'expense');
+                expenseBudgetList.appendChild(item);
+            });
+        }
+
+        // Create a budget goal item element
+        function createBudgetGoalItem(category, goal, type) {
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between';
+            div.innerHTML = `
+                <span class="text-sm font-medium text-gray-700">${category}</span>
+                <div class="flex items-center space-x-2">
+                    <input type="number" 
+                           data-category="${category}" 
+                           data-type="${type}"
+                           value="${goal}" 
+                           step="0.01" 
+                           min="0" 
+                           class="w-24 px-2 py-1 border border-gray-300 rounded-md text-sm"
+                           onchange="saveBudgetGoal('${category}', '${type}', this.value)">
+                    <span class="text-sm text-gray-500">₹</span>
+                </div>
+            `;
+            return div;
+        }
+
+        // Save budget goal to local storage
+        function saveBudgetGoal(category, type, value) {
+            const budgetGoals = JSON.parse(localStorage.getItem('budgetGoals')) || {};
+            budgetGoals[category] = parseFloat(value) || 0;
+            localStorage.setItem('budgetGoals', JSON.stringify(budgetGoals));
+            
+            // Update UI to show progress against goals
+            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+            loadBudgetItems();
+        }
+
+        // Update budget goals display with progress
+        function updateBudgetGoals(incomeData, expenseData) {
+            const budgetGoals = JSON.parse(localStorage.getItem('budgetGoals')) || {};
+            
+            // Update income goals
+            categories.income.forEach(category => {
+                const goal = budgetGoals[category] || 0;
+                const actual = incomeData[category] || 0;
+                const input = document.querySelector(`input[data-category="${category}"][data-type="income"]`);
+                
+                if (input) {
+                    if (goal > 0) {
+                        const percentage = Math.min(100, (actual / goal) * 100);
+                        input.style.background = `linear-gradient(to right, #10B981 ${percentage}%, #fff ${percentage}%)`;
+                        
+                        if (actual > goal) {
+                            input.classList.add('border-green-500');
+                            input.classList.remove('border-red-500');
+                        } else if (actual < goal) {
+                            input.classList.add('border-red-500');
+                            input.classList.remove('border-green-500');
+                        } else {
+                            input.classList.remove('border-green-500', 'border-red-500');
+                        }
+                    } else {
+                        input.style.background = '';
+                        input.classList.remove('border-green-500', 'border-red-500');
+                    }
+                }
+            });
+            
+            // Update expense goals
+            categories.expense.forEach(category => {
+                const goal = budgetGoals[category] || 0;
+                const actual = expenseData[category] || 0;
+                const input = document.querySelector(`input[data-category="${category}"][data-type="expense"]`);
+                
+                if (input) {
+                    if (goal > 0) {
+                        const percentage = Math.min(100, (actual / goal) * 100);
+                        input.style.background = `linear-gradient(to right, #EF4444 ${percentage}%, #fff ${percentage}%)`;
+                        
+                        if (actual > goal) {
+                            input.classList.add('border-red-500');
+                            input.classList.remove('border-green-500');
+                        } else if (actual < goal) {
+                            input.classList.add('border-green-500');
+                            input.classList.remove('border-red-500');
+                        } else {
+                            input.classList.remove('border-green-500', 'border-red-500');
+                        }
+                    } else {
+                        input.style.background = '';
+                        input.classList.remove('border-green-500', 'border-red-500');
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
