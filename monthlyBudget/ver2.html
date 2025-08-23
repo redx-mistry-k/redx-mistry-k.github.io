@@ -1,23 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Primary Meta Tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Track your monthly income and expenses with this easy-to-use budget calculator">
-    <meta name="keywords" content="budget, calculator, finance, money, expenses, income">
-    
-    <title>Monthly Budget Calculator | Track Your Finances</title>
+    <title>Monthly Budget Calculator | Advanced Visualization</title>
     
     <!-- External Resources -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-          integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
-          crossorigin="anonymous" 
-          referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
     <style>
-        /* Custom scrollbar */
+        /* Custom styles */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -32,7 +26,6 @@
             background: #555;
         }
         
-        /* Animation for alerts */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -42,78 +35,58 @@
             animation: fadeIn 0.3s ease-out forwards;
         }
         
-        /* Print styles */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            .print-full-width {
-                width: 100% !important;
-            }
-            body {
-                zoom: 85%;
-            }
+        .d3-tooltip {
+            position: absolute;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 14px;
+            z-index: 10;
         }
         
-        /* Custom animations */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
+        .d3-axis-label {
+            font-size: 12px;
+            fill: #666;
         }
         
-        .pulse-positive {
-            animation: pulse 0.5s ease-in-out;
+        .d3-chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            fill: #333;
         }
         
-        .pulse-negative {
-            animation: pulse 0.5s ease-in-out;
+        .d3-legend {
+            font-size: 12px;
         }
         
-        /* Custom chart container */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
+        .bar:hover {
+            opacity: 0.7;
         }
         
-        /* Mobile optimizations */
-        @media (max-width: 768px) {
-            .mobile-stack {
-                flex-direction: column;
-            }
-            
-            .mobile-full-width {
-                width: 100%;
-            }
-            
-            .mobile-padding {
-                padding: 1rem;
-            }
-            
-            .mobile-text-center {
-                text-align: center;
-            }
+        .area {
+            opacity: 0.7;
         }
         
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-            .dark-mode-invert {
-                filter: invert(1) hue-rotate(180deg);
-            }
+        .line {
+            fill: none;
+            stroke-width: 2px;
         }
         
-        /* Focus styles for accessibility */
-        button:focus, input:focus, select:focus {
-            outline: 2px solid #3B82F6;
-            outline-offset: 2px;
+        .trend-circle {
+            fill: white;
+            stroke-width: 2px;
+        }
+        
+        .trend-circle:hover {
+            r: 6;
         }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <!-- Main Container -->
     <div class="container mx-auto px-4 py-8 max-w-7xl space-y-8">
-        <!-- Page Header with Navigation -->
+        <!-- Page Header -->
         <header class="text-center space-y-4 mb-6">
             <div class="flex justify-between items-center mb-4 no-print">
                 <button id="theme-toggle" class="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
@@ -135,7 +108,7 @@
                 </div>
             </div>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                Easily track your income and expenses to maintain financial health
+                Easily track your income and expenses
             </p>
         </header>
 
@@ -196,34 +169,6 @@
             </div>
         </div>
 
-        <!-- Budget Planning Section -->
-        <div class="bg-white rounded-xl shadow-md p-6 mb-8 no-print">
-            <div class="mb-6">
-                <h2 class="text-2xl font-semibold text-gray-800">
-                    Budget Planning
-                </h2>
-                <p class="text-gray-500 mt-1">
-                    Set monthly budget targets for each category
-                </p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h3 class="text-lg font-medium text-gray-800 mb-4">Income Goals</h3>
-                    <div id="income-budget-list" class="space-y-3">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                </div>
-                
-                <div>
-                    <h3 class="text-lg font-medium text-gray-800 mb-4">Expense Limits</h3>
-                    <div id="expense-budget-list" class="space-y-3">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Budget Item Form -->
         <div class="bg-white rounded-xl shadow-md p-6 no-print">
             <div class="mb-6">
@@ -263,40 +208,6 @@
                     </button>
                 </div>
             </form>
-        </div>
-
-        <!-- Filters and Search -->
-        <div class="bg-white rounded-xl shadow-md p-4 no-print">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="flex items-center space-x-4 mobile-full-width mobile-stack">
-                    <div class="mobile-full-width">
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                        <input type="text" id="search" placeholder="Search by category..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                    
-                    <div class="mobile-full-width">
-                        <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                        <select id="type-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="all">All Types</option>
-                            <option value="income">Income</option>
-                            <option value="expense">Expense</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mobile-full-width">
-                        <label for="date-filter" class="block text-sm font-medium text-gray-700 mb-1">Month</label>
-                        <select id="date-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            <!-- Will be populated by JavaScript -->
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="flex items-end">
-                    <button id="clear-filters" class="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
-                        Clear Filters
-                    </button>
-                </div>
-            </div>
         </div>
 
         <!-- Budget Items Table Section -->
@@ -341,44 +252,30 @@
             </h2>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Income Chart Card -->
+                <!-- Income Treemap Chart Card -->
                 <div class="bg-white rounded-xl shadow-md p-6 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-800">
-                                Income Breakdown
-                            </h3>
-                            <p class="text-sm text-gray-500">
-                                Distribution of your income sources
-                            </p>
-                        </div>
-                        <button class="text-indigo-600 text-sm font-medium" id="income-chart-toggle">
-                            Switch to Bar Chart
-                        </button>
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-800">
+                            Income Treemap
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            Visual proportion of income sources
+                        </p>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="incomeChart"></canvas>
-                    </div>
+                    <div id="income-treemap" class="h-72 w-full"></div>
                 </div>
                 
-                <!-- Expense Chart Card -->
+                <!-- Expense Sunburst Chart Card -->
                 <div class="bg-white rounded-xl shadow-md p-6 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-800">
-                                Expense Breakdown
-                            </h3>
-                            <p class="text-sm text-gray-500">
-                                Where your money is being spent
-                            </p>
-                        </div>
-                        <button class="text-indigo-600 text-sm font-medium" id="expense-chart-toggle">
-                            Switch to Bar Chart
-                        </button>
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-800">
+                            Expense Sunburst
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            Hierarchical view of your expenses
+                        </p>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="expenseChart"></canvas>
-                    </div>
+                    <div id="expense-sunburst" class="h-72 w-full"></div>
                 </div>
             </div>
             
@@ -392,15 +289,25 @@
                         Your income and expenses over time
                     </p>
                 </div>
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
+                <div id="trend-chart" class="h-72 w-full"></div>
+            </div>
+            
+            <!-- Income vs Expense Scatter Plot -->
+            <div class="bg-white rounded-xl shadow-md p-6 space-y-4">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-800">
+                        Income vs Expense Correlation
+                    </h3>
+                    <p class="text-sm text-gray-500">
+                        Relationship between income and expense amounts
+                    </p>
                 </div>
+                <div id="scatter-plot" class="h-72 w-full"></div>
             </div>
         </div>
 
         <!-- Notification System -->
-        <div id="alert" 
-             class="fixed top-6 right-6 w-80 z-50 transform transition-all duration-300 ease-in-out hidden translate-x-6">
+        <div id="alert" class="fixed top-6 right-6 w-80 z-50 transform transition-all duration-300 ease-in-out hidden translate-x-6">
             <div class="relative bg-green-500 text-white px-5 py-4 rounded-xl shadow-xl fade-in">
                 <div class="flex items-start">
                     <div class="flex-shrink-0 pt-0.5">
@@ -411,8 +318,7 @@
                             Item added successfully!
                         </p>
                     </div>
-                    <button onclick="hideAlert()" 
-                            class="ml-4 flex-shrink-0 focus:outline-none hover:opacity-75 transition-opacity">
+                    <button onclick="hideAlert()" class="ml-4 flex-shrink-0 focus:outline-none hover:opacity-75 transition-opacity">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -461,42 +367,9 @@
         </div>
     </div>
 
-    <!-- Export Modal -->
-    <div id="export-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold text-gray-800">Export Data</h2>
-            </div>
-            <div class="p-6">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Export Format</label>
-                    <div class="space-y-2">
-                        <div class="flex items-center">
-                            <input id="export-json" type="radio" name="export-format" value="json" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300" checked>
-                            <label for="export-json" class="ml-3 block text-sm font-medium text-gray-700">JSON (Backup)</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input id="export-csv" type="radio" name="export-format" value="csv" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
-                            <label for="export-csv" class="ml-3 block text-sm font-medium text-gray-700">CSV (Spreadsheet)</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeExportModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Cancel
-                    </button>
-                    <button id="export-confirm" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Export Data
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Import Input (hidden) -->
     <input type="file" id="import-file" accept=".json,.csv" class="hidden">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Categories for income and expenses
         const categories = {
@@ -504,12 +377,17 @@
             expense: ['Housing', 'Utilities', 'Food', 'Transportation', 'Healthcare', 'Entertainment', 'Education', 'Shopping', 'Savings', 'Other Expenses']
         };
 
-        // Initialize variables for charts
-        let incomeChart = null;
-        let expenseChart = null;
-        let trendChart = null;
-        let incomeChartType = 'doughnut';
-        let expenseChartType = 'doughnut';
+        // Color scales for D3 visualizations
+        const colorScales = {
+            income: d3.scaleOrdinal()
+                .domain(categories.income)
+                .range(['#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899']),
+                
+            expense: d3.scaleOrdinal()
+                .domain(categories.expense)
+                .range(['#EF4444', '#F97316', '#F59E0B', '#84CC16', '#10B981',
+                        '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'])
+        };
 
         // DOM elements
         const budgetForm = document.getElementById('budget-form');
@@ -536,21 +414,11 @@
         const editCategorySelect = document.getElementById('edit-category');
         const editAmountInput = document.getElementById('edit-amount');
         const editDateInput = document.getElementById('edit-date');
-        const searchInput = document.getElementById('search');
-        const typeFilter = document.getElementById('type-filter');
-        const dateFilter = document.getElementById('date-filter');
-        const clearFiltersBtn = document.getElementById('clear-filters');
         const importBtn = document.getElementById('import-btn');
         const exportBtn = document.getElementById('export-btn');
         const printBtn = document.getElementById('print-btn');
-        const exportModal = document.getElementById('export-modal');
         const importFileInput = document.getElementById('import-file');
-        const exportConfirmBtn = document.getElementById('export-confirm');
         const themeToggleBtn = document.getElementById('theme-toggle');
-        const incomeChartToggle = document.getElementById('income-chart-toggle');
-        const expenseChartToggle = document.getElementById('expense-chart-toggle');
-        const incomeBudgetList = document.getElementById('income-budget-list');
-        const expenseBudgetList = document.getElementById('expense-budget-list');
 
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -560,24 +428,18 @@
             
             updateCategoryOptions();
             loadBudgetItems();
-            populateDateFilter();
-            loadBudgetGoals();
             
             // Event listeners
             typeSelect.addEventListener('change', updateCategoryOptions);
             budgetForm.addEventListener('submit', addBudgetItem);
             editForm.addEventListener('submit', updateBudgetItem);
-            searchInput.addEventListener('input', filterBudgetItems);
-            typeFilter.addEventListener('change', filterBudgetItems);
-            dateFilter.addEventListener('change', filterBudgetItems);
-            clearFiltersBtn.addEventListener('click', clearFilters);
             importBtn.addEventListener('click', triggerImport);
-            exportBtn.addEventListener('click', openExportModal);
+            exportBtn.addEventListener('click', exportData);
             printBtn.addEventListener('click', printReport);
-            exportConfirmBtn.addEventListener('click', exportData);
             themeToggleBtn.addEventListener('click', toggleTheme);
-            incomeChartToggle.addEventListener('click', toggleIncomeChart);
-            expenseChartToggle.addEventListener('click', toggleExpenseChart);
+            
+            // Initialize file import
+            importFileInput.addEventListener('change', importData);
             
             // Check for saved theme
             const savedTheme = localStorage.getItem('theme');
@@ -585,9 +447,6 @@
                 document.body.classList.add('dark-mode-invert');
                 themeToggleBtn.innerHTML = '<i class="fas fa-sun text-yellow-500"></i>';
             }
-            
-            // Initialize file import
-            importFileInput.addEventListener('change', importData);
         });
 
         // Update category options based on selected type
@@ -722,12 +581,8 @@
                 
                 // Add animation class based on balance
                 if (balance > 0) {
-                    balanceElement.classList.add('pulse-positive');
-                    setTimeout(() => balanceElement.classList.remove('pulse-positive'), 500);
                     balanceStatusElement.innerHTML = '<span class="text-green-500">Positive balance</span>';
                 } else if (balance < 0) {
-                    balanceElement.classList.add('pulse-negative');
-                    setTimeout(() => balanceElement.classList.remove('pulse-negative'), 500);
                     balanceStatusElement.innerHTML = '<span class="text-red-500">Negative balance</span>';
                 } else {
                     balanceStatusElement.innerHTML = '<span class="text-gray-500">Balanced</span>';
@@ -751,12 +606,8 @@
                     savingsStatusElement.innerHTML = '<span class="text-red-500">Spending exceeds income</span>';
                 }
                 
-                // Update charts
-                updateCharts(incomeByCategory, expenseByCategory);
-                updateTrendChart(budgetItems);
-                
-                // Update budget goals
-                updateBudgetGoals(incomeByCategory, expenseByCategory);
+                // Update D3.js visualizations
+                updateD3Visualizations(incomeByCategory, expenseByCategory, budgetItems);
             }
             
             // Update item count
@@ -875,85 +726,355 @@
             alertElement.classList.add('hidden');
         }
 
-        // Update charts with current data
-        function updateCharts(incomeData, expenseData) {
-            // Prepare data for income chart
-            const incomeLabels = categories.income;
-            const incomeValues = incomeLabels.map(label => incomeData[label] || 0);
+        // Update D3.js visualizations with current data
+        function updateD3Visualizations(incomeData, expenseData, budgetItems) {
+            // Prepare data for visualizations
+            const incomeDataForViz = Object.entries(incomeData)
+                .filter(([_, value]) => value > 0)
+                .map(([name, value]) => ({ name, value }));
+                
+            const expenseDataForViz = Object.entries(expenseData)
+                .filter(([_, value]) => value > 0)
+                .map(([name, value]) => ({ name, value }));
             
-            // Prepare data for expense chart
-            const expenseLabels = categories.expense;
-            const expenseValues = expenseLabels.map(label => expenseData[label] || 0);
-            
-            // Get chart canvases
-            const incomeCtx = document.getElementById('incomeChart').getContext('2d');
-            const expenseCtx = document.getElementById('expenseChart').getContext('2d');
-            
-            // Destroy existing charts if they exist
-            if (incomeChart) incomeChart.destroy();
-            if (expenseChart) expenseChart.destroy();
-            
-            // Create income chart
-            incomeChart = new Chart(incomeCtx, {
-                type: incomeChartType,
-                data: {
-                    labels: incomeLabels,
-                    datasets: [{
-                        data: incomeValues,
-                        backgroundColor: [
-                            '#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Income by Category'
-                        }
-                    }
-                }
-            });
-            
-            // Create expense chart
-            expenseChart = new Chart(expenseCtx, {
-                type: expenseChartType,
-                data: {
-                    labels: expenseLabels,
-                    datasets: [{
-                        data: expenseValues,
-                        backgroundColor: [
-                            '#EF4444', '#F97316', '#F59E0B', '#84CC16', '#10B981',
-                            '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Expenses by Category'
-                        }
-                    }
-                }
-            });
+            // Create visualizations
+            createIncomeTreemap(incomeDataForViz);
+            createExpenseSunburst(expenseDataForViz);
+            createTrendChart(budgetItems);
+            createScatterPlot(budgetItems);
         }
 
-        // Update trend chart with historical data
-        function updateTrendChart(budgetItems) {
+        // Create Income Treemap visualization
+        function createIncomeTreemap(data) {
+            // Clear previous chart
+            d3.select('#income-treemap').html('');
+            
+            if (data.length === 0) {
+                d3.select('#income-treemap')
+                    .append('div')
+                    .attr('class', 'h-full flex items-center justify-center text-gray-400')
+                    .text('No income data available');
+                return;
+            }
+            
+            const width = document.getElementById('income-treemap').clientWidth;
+            const height = document.getElementById('income-treemap').clientHeight;
+            
+            // Create treemap layout
+            const treemap = d3.treemap()
+                .size([width, height])
+                .padding(1)
+                .round(true);
+            
+            // Create hierarchy from data
+            const root = d3.hierarchy({children: data})
+                .sum(d => d.value)
+                .sort((a, b) => b.value - a.value);
+            
+            // Generate treemap
+            treemap(root);
+            
+            // Create SVG
+            const svg = d3.select('#income-treemap')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Add cells
+            const cell = svg.selectAll('g')
+                .data(root.leaves())
+                .enter().append('g')
+                .attr('transform', d => `translate(${d.x0},${d.y0})`);
+            
+            // Add rectangles
+            cell.append('rect')
+                .attr('width', d => d.x1 - d.x0)
+                .attr('height', d => d.y1 - d.y0)
+                .attr('fill', d => colorScales.income(d.data.name))
+                .attr('stroke', '#fff');
+            
+            // Add labels
+            cell.append('text')
+                .selectAll('tspan')
+                .data(d => [d.data.name, `₹${d.data.value.toLocaleString()}`])
+                .enter().append('tspan')
+                .attr('x', 4)
+                .attr('y', (d, i) => 13 + i * 10)
+                .attr('font-size', 10)
+                .attr('fill', 'white')
+                .text(d => d);
+        }
+
+        // Create Expense Sunburst visualization
+        function createExpenseSunburst(data) {
+            // Clear previous chart
+            d3.select('#expense-sunburst').html('');
+            
+            if (data.length === 0) {
+                d3.select('#expense-sunburst')
+                    .append('div')
+                    .attr('class', 'h-full flex items-center justify-center text-gray-400')
+                    .text('No expense data available');
+                return;
+            }
+            
+            const width = document.getElementById('expense-sunburst').clientWidth;
+            const height = document.getElementById('expense-sunburst').clientHeight;
+            const radius = Math.min(width, height) / 2;
+            
+            // Create SVG
+            const svg = d3.select('#expense-sunburst')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', `translate(${width / 2},${height / 2})`);
+            
+            // Create partition layout
+            const partition = d3.partition()
+                .size([2 * Math.PI, radius]);
+            
+            // Create hierarchy from data
+            const root = d3.hierarchy({children: data})
+                .sum(d => d.value)
+                .sort((a, b) => b.value - a.value);
+            
+            // Generate partition
+            partition(root);
+            
+            // Add arcs
+            const arc = d3.arc()
+                .startAngle(d => d.x0)
+                .endAngle(d => d.x1)
+                .innerRadius(d => d.y0)
+                .outerRadius(d => d.y1);
+            
+            svg.selectAll('path')
+                .data(root.descendants().filter(d => d.depth === 1))
+                .enter().append('path')
+                .attr('d', arc)
+                .style('fill', d => colorScales.expense(d.data.name))
+                .style('opacity', 0.8)
+                .style('stroke', 'white')
+                .on('mouseover', function(event, d) {
+                    d3.select(this).style('opacity', 1);
+                    
+                    // Show tooltip
+                    tooltip.style('visibility', 'visible')
+                        .html(`${d.data.name}<br>₹${d.value.toLocaleString()}<br>${((d.value / root.value) * 100).toFixed(1)}%`);
+                })
+                .on('mousemove', function(event) {
+                    tooltip.style('top', (event.pageY - 10) + 'px')
+                        .style('left', (event.pageX + 10) + 'px');
+                })
+                .on('mouseout', function() {
+                    d3.select(this).style('opacity', 0.8);
+                    tooltip.style('visibility', 'hidden');
+                });
+            
+            // Add tooltip
+            const tooltip = d3.select('body')
+                .append('div')
+                .attr('class', 'd3-tooltip')
+                .style('position', 'absolute')
+                .style('visibility', 'hidden');
+        }
+
+        // Create Trend Chart visualization
+        function createTrendChart(budgetItems) {
+            // Clear previous chart
+            d3.select('#trend-chart').html('');
+            
+            if (budgetItems.length === 0) {
+                d3.select('#trend-chart')
+                    .append('div')
+                    .attr('class', 'h-full flex items-center justify-center text-gray-400')
+                    .text('No data available for trends');
+                return;
+            }
+            
+            const width = document.getElementById('trend-chart').clientWidth;
+            const height = document.getElementById('trend-chart').clientHeight;
+            const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+            
             // Group by month
+            const monthlyData = {};
+            
+            budgetItems.forEach(item => {
+                const date = new Date(item.date);
+                const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                
+                if (!monthlyData[monthYear]) {
+                    monthlyData[monthYear] = {
+                        income: 0,
+                        expenses: 0,
+                        balance: 0
+                    };
+                }
+                
+                if (item.type === 'income') {
+                    monthlyData[monthYear].income += item.amount;
+                    monthlyData[monthYear].balance += item.amount;
+                } else {
+                    monthlyData[monthYear].expenses += item.amount;
+                    monthlyData[monthYear].balance -= item.amount;
+                }
+            });
+            
+            // Convert to array and sort
+            const sortedMonths = Object.entries(monthlyData)
+                .map(([month, data]) => ({
+                    month,
+                    ...data
+                }))
+                .sort((a, b) => a.month.localeCompare(b.month));
+            
+            // Create SVG
+            const svg = d3.select('#trend-chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+            
+            // Create scales
+            const x = d3.scaleBand()
+                .domain(sortedMonths.map(d => {
+                    const [year, month] = d.month.split('-');
+                    return new Date(year, month - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                }))
+                .range([0, chartWidth])
+                .padding(0.1);
+            
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(sortedMonths, d => Math.max(d.income, d.expenses)) * 1.1])
+                .range([chartHeight, 0]);
+            
+            // Add X axis
+            svg.append('g')
+                .attr('transform', `translate(0,${chartHeight})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+            
+            // Add Y axis
+            svg.append('g')
+                .call(d3.axisLeft(y).ticks(5).tickFormat(d => `₹${d}`));
+            
+            // Add income bars
+            svg.selectAll('.income-bar')
+                .data(sortedMonths)
+                .enter().append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => x(new Date(d.month.split('-')[0], d.month.split('-')[1] - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })))
+                .attr('y', d => y(d.income))
+                .attr('width', x.bandwidth() / 2)
+                .attr('height', d => chartHeight - y(d.income))
+                .attr('fill', '#10B981')
+                .on('mouseover', function(event, d) {
+                    d3.select(this).attr('opacity', 0.7);
+                    
+                    // Show tooltip
+                    tooltip.style('visibility', 'visible')
+                        .html(`Income (${new Date(d.month.split('-')[0], d.month.split('-')[1] - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })})
+                               <br>₹${d.income.toLocaleString()}`);
+                })
+                .on('mousemove', function(event) {
+                    tooltip.style('top', (event.pageY - 10) + 'px')
+                        .style('left', (event.pageX + 10) + 'px');
+                })
+                .on('mouseout', function() {
+                    d3.select(this).attr('opacity', 1);
+                    tooltip.style('visibility', 'hidden');
+                });
+            
+            // Add expense bars
+            svg.selectAll('.expense-bar')
+                .data(sortedMonths)
+                .enter().append('rect')
+                .attr('class', 'bar')
+                .attr('x', d => x(new Date(d.month.split('-')[0], d.month.split('-')[1] - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })) + x.bandwidth() / 2)
+                .attr('y', d => y(d.expenses))
+                .attr('width', x.bandwidth() / 2)
+                .attr('height', d => chartHeight - y(d.expenses))
+                .attr('fill', '#EF4444')
+                .on('mouseover', function(event, d) {
+                    d3.select(this).attr('opacity', 0.7);
+                    
+                    // Show tooltip
+                    tooltip.style('visibility', 'visible')
+                        .html(`Expenses (${new Date(d.month.split('-')[0], d.month.split('-')[1] - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })})
+                               <br>₹${d.expenses.toLocaleString()}`);
+                })
+                .on('mousemove', function(event) {
+                    tooltip.style('top', (event.pageY - 10) + 'px')
+                        .style('left', (event.pageX + 10) + 'px');
+                })
+                .on('mouseout', function() {
+                    d3.select(this).attr('opacity', 1);
+                    tooltip.style('visibility', 'hidden');
+                });
+            
+            // Add tooltip
+            const tooltip = d3.select('body')
+                .append('div')
+                .attr('class', 'd3-tooltip')
+                .style('position', 'absolute')
+                .style('visibility', 'hidden');
+            
+            // Add legend
+            const legend = svg.append('g')
+                .attr('transform', `translate(${chartWidth - 120}, 0)`);
+            
+            legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('width', 15)
+                .attr('height', 15)
+                .attr('fill', '#10B981');
+            
+            legend.append('text')
+                .attr('x', 20)
+                .attr('y', 12)
+                .text('Income')
+                .style('font-size', '12px');
+            
+            legend.append('rect')
+                .attr('x', 0)
+                .attr('y', 20)
+                .attr('width', 15)
+                .attr('height', 15)
+                .attr('fill', '#EF4444');
+            
+            legend.append('text')
+                .attr('x', 20)
+                .attr('y', 32)
+                .text('Expenses')
+                .style('font-size', '12px');
+        }
+
+        // Create Scatter Plot visualization
+        function createScatterPlot(budgetItems) {
+            // Clear previous chart
+            d3.select('#scatter-plot').html('');
+            
+            if (budgetItems.length === 0) {
+                d3.select('#scatter-plot')
+                    .append('div')
+                    .attr('class', 'h-full flex items-center justify-center text-gray-400')
+                    .text('No data available for correlation');
+                return;
+            }
+            
+            const width = document.getElementById('scatter-plot').clientWidth;
+            const height = document.getElementById('scatter-plot').clientHeight;
+            const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+            
+            // Filter to only include items with both income and expenses in the same month
             const monthlyData = {};
             
             budgetItems.forEach(item => {
@@ -974,184 +1095,155 @@
                 }
             });
             
-            // Sort months chronologically
-            const sortedMonths = Object.keys(monthlyData).sort();
+            // Convert to array
+            const data = Object.entries(monthlyData)
+                .map(([month, values]) => ({
+                    month,
+                    income: values.income,
+                    expenses: values.expenses
+                }))
+                .filter(d => d.income > 0 && d.expenses > 0);
             
-            // Prepare data for trend chart
-            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            // Create SVG
+            const svg = d3.select('#scatter-plot')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
             
-            // Destroy existing chart if it exists
-            if (trendChart) trendChart.destroy();
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
             
-            // Create trend chart
-            trendChart = new Chart(trendCtx, {
-                type: 'line',
-                data: {
-                    labels: sortedMonths.map(month => {
-                        const [year, monthNum] = month.split('-');
-                        return new Date(year, monthNum - 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-                    }),
-                    datasets: [
-                        {
-                            label: 'Income',
-                            data: sortedMonths.map(month => monthlyData[month].income),
-                            borderColor: '#10B981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Expenses',
-                            data: sortedMonths.map(month => monthlyData[month].expenses),
-                            borderColor: '#EF4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Monthly Income vs Expenses'
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '₹' + value;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Populate date filter with available months
-        function populateDateFilter() {
-            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
-            const months = new Set();
+            // Create scales
+            const x = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.income) * 1.1])
+                .range([0, chartWidth]);
             
-            // Add current month
-            const today = new Date();
-            const currentMonth = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
-            months.add(currentMonth);
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.expenses) * 1.1])
+                .range([chartHeight, 0]);
             
-            // Add months from existing items
-            budgetItems.forEach(item => {
-                const date = new Date(item.date);
-                const monthYear = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-                months.add(monthYear);
-            });
+            // Add X axis
+            svg.append('g')
+                .attr('transform', `translate(0,${chartHeight})`)
+                .call(d3.axisBottom(x).tickFormat(d => `₹${d}`))
+                .append('text')
+                .attr('class', 'd3-axis-label')
+                .attr('x', chartWidth / 2)
+                .attr('y', 35)
+                .attr('fill', 'black')
+                .text('Monthly Income');
             
-            // Convert to array and sort
-            const sortedMonths = Array.from(months).sort();
+            // Add Y axis
+            svg.append('g')
+                .call(d3.axisLeft(y).tickFormat(d => `₹${d}`))
+                .append('text')
+                .attr('class', 'd3-axis-label')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -40)
+                .attr('x', -chartHeight / 2)
+                .attr('fill', 'black')
+                .text('Monthly Expenses');
             
-            // Clear existing options
-            dateFilter.innerHTML = '';
-            
-            // Add "All Months" option
-            const allOption = document.createElement('option');
-            allOption.value = 'all';
-            allOption.textContent = 'All Months';
-            dateFilter.appendChild(allOption);
-            
-            // Add month options
-            sortedMonths.forEach(month => {
-                const [year, monthNum] = month.split('-');
-                const option = document.createElement('option');
-                option.value = month;
-                option.textContent = new Date(year, monthNum - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                dateFilter.appendChild(option);
-            });
-        }
-
-        // Filter budget items based on search and filters
-        function filterBudgetItems() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const typeFilterValue = typeFilter.value;
-            const dateFilterValue = dateFilter.value;
-            
-            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
-            let filteredItems = budgetItems;
-            
-            // Apply type filter
-            if (typeFilterValue !== 'all') {
-                filteredItems = filteredItems.filter(item => item.type === typeFilterValue);
-            }
-            
-            // Apply date filter
-            if (dateFilterValue !== 'all') {
-                filteredItems = filteredItems.filter(item => {
-                    const itemDate = new Date(item.date);
-                    const itemMonth = `${itemDate.getFullYear()}-${(itemDate.getMonth() + 1).toString().padStart(2, '0')}`;
-                    return itemMonth === dateFilterValue;
+            // Add dots
+            svg.selectAll('circle')
+                .data(data)
+                .enter().append('circle')
+                .attr('cx', d => x(d.income))
+                .attr('cy', d => y(d.expenses))
+                .attr('r', 6)
+                .attr('fill', d => d.income > d.expenses ? '#10B981' : '#EF4444')
+                .attr('opacity', 0.7)
+                .on('mouseover', function(event, d) {
+                    d3.select(this).attr('r', 8).attr('opacity', 1);
+                    
+                    // Show tooltip
+                    tooltip.style('visibility', 'visible')
+                        .html(`${new Date(d.month.split('-')[0], d.month.split('-')[1] - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                               <br>Income: ₹${d.income.toLocaleString()}
+                               <br>Expenses: ₹${d.expenses.toLocaleString()}
+                               <br>Balance: ₹${(d.income - d.expenses).toLocaleString()}`);
+                })
+                .on('mousemove', function(event) {
+                    tooltip.style('top', (event.pageY - 10) + 'px')
+                        .style('left', (event.pageX + 10) + 'px');
+                })
+                .on('mouseout', function() {
+                    d3.select(this).attr('r', 6).attr('opacity', 0.7);
+                    tooltip.style('visibility', 'hidden');
                 });
-            }
             
-            // Apply search filter
-            if (searchTerm) {
-                filteredItems = filteredItems.filter(item => 
-                    item.category.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            // Update table with filtered items
-            budgetItemsTable.innerHTML = '';
-            
-            if (filteredItems.length === 0) {
-                emptyState.classList.remove('hidden');
-                budgetItemsTable.classList.add('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                budgetItemsTable.classList.remove('hidden');
+            // Add trend line (linear regression)
+            const linearRegression = data => {
+                const n = data.length;
+                const sumX = data.reduce((sum, d) => sum + d.income, 0);
+                const sumY = data.reduce((sum, d) => sum + d.expenses, 0);
+                const sumXY = data.reduce((sum, d) => sum + (d.income * d.expenses), 0);
+                const sumXX = data.reduce((sum, d) => sum + (d.income * d.income), 0);
                 
-                filteredItems.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-gray-50';
-                    row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.category}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm ${item.type === 'income' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}">
-                            ₹${item.amount.toFixed(2)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(item.date)}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onclick="openEditModal('${item.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="deleteBudgetItem('${item.id}')" class="text-red-600 hover:text-red-900">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    `;
-                    budgetItemsTable.appendChild(row);
-                });
+                const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+                const intercept = (sumY - slope * sumX) / n;
+                
+                return { slope, intercept };
+            };
+            
+            const regression = linearRegression(data);
+            
+            if (data.length > 1) {
+                const lineData = [
+                    { income: 0, expenses: regression.intercept },
+                    { income: d3.max(data, d => d.income), expenses: regression.intercept + regression.slope * d3.max(data, d => d.income) }
+                ];
+                
+                const line = d3.line()
+                    .x(d => x(d.income))
+                    .y(d => y(d.expenses));
+                
+                svg.append('path')
+                    .datum(lineData)
+                    .attr('class', 'line')
+                    .attr('d', line)
+                    .attr('stroke', '#6366F1')
+                    .attr('stroke-width', 2)
+                    .attr('stroke-dasharray', '5,5')
+                    .attr('opacity', 0.7);
             }
             
-            // Update item count
-            document.getElementById('item-count').textContent = `${filteredItems.length} item${filteredItems.length !== 1 ? 's' : ''} (filtered)`;
-        }
-
-        // Clear all filters
-        function clearFilters() {
-            searchInput.value = '';
-            typeFilter.value = 'all';
-            dateFilter.value = 'all';
-            filterBudgetItems();
+            // Add tooltip
+            const tooltip = d3.select('body')
+                .append('div')
+                .attr('class', 'd3-tooltip')
+                .style('position', 'absolute')
+                .style('visibility', 'hidden');
+            
+            // Add balance line (y = x)
+            const balanceLineData = [
+                { income: 0, expenses: 0 },
+                { income: Math.max(d3.max(data, d => d.income), d3.max(data, d => d.expenses)), 
+                  expenses: Math.max(d3.max(data, d => d.income), d3.max(data, d => d.expenses)) }
+            ];
+            
+            const balanceLine = d3.line()
+                .x(d => x(d.income))
+                .y(d => y(d.expenses));
+            
+            svg.append('path')
+                .datum(balanceLineData)
+                .attr('class', 'line')
+                .attr('d', balanceLine)
+                .attr('stroke', '#6B7280')
+                .attr('stroke-width', 1)
+                .attr('stroke-dasharray', '3,3')
+                .attr('opacity', 0.7);
+            
+            // Add legend for balance line
+            svg.append('text')
+                .attr('x', chartWidth - 100)
+                .attr('y', 15)
+                .text('Balance Line (Income = Expenses)')
+                .style('font-size', '10px')
+                .style('fill', '#6B7280');
         }
 
         // Trigger import file selection
@@ -1159,57 +1251,19 @@
             importFileInput.click();
         }
 
-        // Open export modal
-        function openExportModal() {
-            exportModal.classList.remove('hidden');
-        }
-
-        // Close export modal
-        function closeExportModal() {
-            exportModal.classList.add('hidden');
-        }
-
-        // Export data based on selected format
+        // Export data as JSON
         function exportData() {
-            const exportFormat = document.querySelector('input[name="export-format"]:checked').value;
             const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
-            const budgetGoals = JSON.parse(localStorage.getItem('budgetGoals')) || {};
+            const dataStr = JSON.stringify(budgetItems, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
             
-            let dataStr, filename, type;
+            const exportFileDefaultName = 'budget-data.json';
             
-            if (exportFormat === 'json') {
-                // Export as JSON
-                const data = {
-                    budgetItems,
-                    budgetGoals,
-                    exportDate: new Date().toISOString()
-                };
-                dataStr = JSON.stringify(data, null, 2);
-                filename = `budget-data-${new Date().toISOString().split('T')[0]}.json`;
-                type = 'application/json';
-            } else {
-                // Export as CSV
-                let csv = 'Type,Category,Amount,Date\n';
-                budgetItems.forEach(item => {
-                    csv += `${item.type},${item.category},${item.amount},${item.date}\n`;
-                });
-                dataStr = csv;
-                filename = `budget-data-${new Date().toISOString().split('T')[0]}.csv`;
-                type = 'text/csv';
-            }
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
             
-            // Create download link
-            const blob = new Blob([dataStr], { type });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            closeExportModal();
             showAlert('Data exported successfully!');
         }
 
@@ -1218,55 +1272,17 @@
             const file = e.target.files[0];
             if (!file) return;
             
-            // Confirm before importing (to prevent accidental data loss)
-            if (!confirm('Importing data will replace your current budget items. Continue?')) {
-                e.target.value = '';
-                return;
-            }
-            
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const content = e.target.result;
-                    let budgetItems, budgetGoals;
-                    
-                    if (file.name.endsWith('.json')) {
-                        // Import JSON
-                        const data = JSON.parse(content);
-                        budgetItems = data.budgetItems || [];
-                        budgetGoals = data.budgetGoals || {};
-                    } else if (file.name.endsWith('.csv')) {
-                        // Import CSV
-                        budgetItems = [];
-                        const lines = content.split('\n');
-                        for (let i = 1; i < lines.length; i++) {
-                            const line = lines[i].trim();
-                            if (!line) continue;
-                            
-                            const [type, category, amount, date] = line.split(',');
-                            if (type && category && amount && date) {
-                                budgetItems.push({
-                                    id: Date.now().toString() + i,
-                                    type,
-                                    category,
-                                    amount: parseFloat(amount),
-                                    date
-                                });
-                            }
-                        }
-                        budgetGoals = {};
-                    } else {
-                        throw new Error('Unsupported file format');
-                    }
+                    const budgetItems = JSON.parse(content);
                     
                     // Save imported data
                     localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
-                    localStorage.setItem('budgetGoals', JSON.stringify(budgetGoals));
                     
                     // Update UI
                     loadBudgetItems();
-                    populateDateFilter();
-                    loadBudgetGoals();
                     
                     showAlert('Data imported successfully!');
                 } catch (error) {
@@ -1274,9 +1290,6 @@
                 }
             };
             reader.readAsText(file);
-            
-            // Reset file input
-            e.target.value = '';
         }
 
         // Print report
@@ -1295,158 +1308,6 @@
                 localStorage.setItem('theme', 'dark');
                 themeToggleBtn.innerHTML = '<i class="fas fa-sun text-yellow-500"></i>';
             }
-        }
-
-        // Toggle income chart type
-        function toggleIncomeChart() {
-            incomeChartType = incomeChartType === 'doughnut' ? 'bar' : 'doughnut';
-            incomeChartToggle.textContent = incomeChartType === 'doughnut' ? 'Switch to Bar Chart' : 'Switch to Pie Chart';
-            
-            // Reload charts
-            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
-            let incomeByCategory = {};
-            categories.income.forEach(cat => incomeByCategory[cat] = 0);
-            
-            budgetItems.forEach(item => {
-                if (item.type === 'income') {
-                    incomeByCategory[item.category] += item.amount;
-                }
-            });
-            
-            updateCharts(incomeByCategory, {});
-        }
-
-        // Toggle expense chart type
-        function toggleExpenseChart() {
-            expenseChartType = expenseChartType === 'doughnut' ? 'bar' : 'doughnut';
-            expenseChartToggle.textContent = expenseChartType === 'doughnut' ? 'Switch to Bar Chart' : 'Switch to Pie Chart';
-            
-            // Reload charts
-            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
-            let expenseByCategory = {};
-            categories.expense.forEach(cat => expenseByCategory[cat] = 0);
-            
-            budgetItems.forEach(item => {
-                if (item.type === 'expense') {
-                    expenseByCategory[item.category] += item.amount;
-                }
-            });
-            
-            updateCharts({}, expenseByCategory);
-        }
-
-        // Load budget goals from local storage
-        function loadBudgetGoals() {
-            const budgetGoals = JSON.parse(localStorage.getItem('budgetGoals')) || {};
-            
-            // Clear existing lists
-            incomeBudgetList.innerHTML = '';
-            expenseBudgetList.innerHTML = '';
-            
-            // Create income goal items
-            categories.income.forEach(category => {
-                const goal = budgetGoals[category] || 0;
-                const item = createBudgetGoalItem(category, goal, 'income');
-                incomeBudgetList.appendChild(item);
-            });
-            
-            // Create expense goal items
-            categories.expense.forEach(category => {
-                const goal = budgetGoals[category] || 0;
-                const item = createBudgetGoalItem(category, goal, 'expense');
-                expenseBudgetList.appendChild(item);
-            });
-        }
-
-        // Create a budget goal item element
-        function createBudgetGoalItem(category, goal, type) {
-            const div = document.createElement('div');
-            div.className = 'flex items-center justify-between';
-            div.innerHTML = `
-                <span class="text-sm font-medium text-gray-700">${category}</span>
-                <div class="flex items-center space-x-2">
-                    <input type="number" 
-                           data-category="${category}" 
-                           data-type="${type}"
-                           value="${goal}" 
-                           step="0.01" 
-                           min="0" 
-                           class="w-24 px-2 py-1 border border-gray-300 rounded-md text-sm"
-                           onchange="saveBudgetGoal('${category}', '${type}', this.value)">
-                    <span class="text-sm text-gray-500">₹</span>
-                </div>
-            `;
-            return div;
-        }
-
-        // Save budget goal to local storage
-        function saveBudgetGoal(category, type, value) {
-            const budgetGoals = JSON.parse(localStorage.getItem('budgetGoals')) || {};
-            budgetGoals[category] = parseFloat(value) || 0;
-            localStorage.setItem('budgetGoals', JSON.stringify(budgetGoals));
-            
-            // Update UI to show progress against goals
-            const budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
-            loadBudgetItems();
-        }
-
-        // Update budget goals display with progress
-        function updateBudgetGoals(incomeData, expenseData) {
-            const budgetGoals = JSON.parse(localStorage.getItem('budgetGoals')) || {};
-            
-            // Update income goals
-            categories.income.forEach(category => {
-                const goal = budgetGoals[category] || 0;
-                const actual = incomeData[category] || 0;
-                const input = document.querySelector(`input[data-category="${category}"][data-type="income"]`);
-                
-                if (input) {
-                    if (goal > 0) {
-                        const percentage = Math.min(100, (actual / goal) * 100);
-                        input.style.background = `linear-gradient(to right, #10B981 ${percentage}%, #fff ${percentage}%)`;
-                        
-                        if (actual > goal) {
-                            input.classList.add('border-green-500');
-                            input.classList.remove('border-red-500');
-                        } else if (actual < goal) {
-                            input.classList.add('border-red-500');
-                            input.classList.remove('border-green-500');
-                        } else {
-                            input.classList.remove('border-green-500', 'border-red-500');
-                        }
-                    } else {
-                        input.style.background = '';
-                        input.classList.remove('border-green-500', 'border-red-500');
-                    }
-                }
-            });
-            
-            // Update expense goals
-            categories.expense.forEach(category => {
-                const goal = budgetGoals[category] || 0;
-                const actual = expenseData[category] || 0;
-                const input = document.querySelector(`input[data-category="${category}"][data-type="expense"]`);
-                
-                if (input) {
-                    if (goal > 0) {
-                        const percentage = Math.min(100, (actual / goal) * 100);
-                        input.style.background = `linear-gradient(to right, #EF4444 ${percentage}%, #fff ${percentage}%)`;
-                        
-                        if (actual > goal) {
-                            input.classList.add('border-red-500');
-                            input.classList.remove('border-green-500');
-                        } else if (actual < goal) {
-                            input.classList.add('border-green-500');
-                            input.classList.remove('border-red-500');
-                        } else {
-                            input.classList.remove('border-green-500', 'border-red-500');
-                        }
-                    } else {
-                        input.style.background = '';
-                        input.classList.remove('border-green-500', 'border-red-500');
-                    }
-                }
-            });
         }
     </script>
 </body>
