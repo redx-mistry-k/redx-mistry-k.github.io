@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Ovulation Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .gradient-bg {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      }
+      .cycle-day {
+        transition: all 0.3s ease;
+      }
+      .cycle-day:hover {
+        transform: scale(1.05);
+      }
+      .stat-value {
+        transition: all 0.5s ease;
+      }
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body class="font-inter gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-indigo-800 mb-2">
+          Smart Ovulation Calculator
+        </h1>
+        <p class="text-lg text-indigo-600">
+          Track your cycle and improve predictions over time
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Calculator Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
+          <h2 class="text-2xl font-semibold text-indigo-700 mb-6">
+            Cycle Calculator
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Last Period Start Date</label
+              >
+              <input
+                type="date"
+                id="lastPeriodDate"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >Average Cycle Length (days)</label
+              >
+              <input
+                type="number"
+                id="cycleLength"
+                value="28"
+                min="21"
+                max="45"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-1"
+              >Track Actual Period Start Dates</label
+            >
+            <p class="text-xs text-gray-500 mb-2">
+              Add your actual period start dates to calculate statistics
+            </p>
+            <div class="flex items-center space-x-2">
+              <input
+                type="date"
+                id="trackPeriodDate"
+                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <button
+                id="addPeriodBtn"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+              >
+                <i data-feather="plus"></i> Add Actual
+              </button>
+            </div>
+          </div>
+
+          <div class="flex space-x-4">
+            <button
+              id="calculateBtn"
+              class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition flex-1"
+            >
+              Calculate Ovulation
+            </button>
+            <button
+              id="saveDataBtn"
+              class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition"
+            >
+              <i data-feather="save"></i> Save Prediction
+            </button>
+          </div>
+
+          <div id="results" class="mt-8 hidden">
+            <h3 class="text-xl font-semibold text-indigo-700 mb-4">
+              Your Cycle Overview
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-indigo-50 p-4 rounded-lg">
+                <p class="text-sm text-indigo-600">Next Period</p>
+                <p
+                  id="nextPeriod"
+                  class="text-lg font-semibold text-indigo-800"
+                >
+                  --
+                </p>
+              </div>
+              <div class="bg-pink-50 p-4 rounded-lg">
+                <p class="text-sm text-pink-600">Fertile Window</p>
+                <p
+                  id="fertileWindow"
+                  class="text-lg font-semibold text-pink-800"
+                >
+                  --
+                </p>
+              </div>
+              <div class="bg-purple-50 p-4 rounded-lg">
+                <p class="text-sm text-purple-600">Ovulation Day</p>
+                <p
+                  id="ovulationDay"
+                  class="text-lg font-semibold text-purple-800"
+                >
+                  --
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-4">
+              <canvas id="cycleChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h2 class="text-2xl font-semibold text-indigo-700 mb-6">
+            Cycle History
+          </h2>
+
+          <div class="mb-6">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="font-medium text-gray-700">Recorded Periods</h3>
+              <button
+                id="clearHistoryBtn"
+                class="text-red-500 text-sm hover:text-red-700"
+              >
+                <i data-feather="trash-2"></i> Clear
+              </button>
+            </div>
+            <div
+              id="periodHistory"
+              class="max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2"
+            >
+              <p class="text-gray-500 text-sm py-4 text-center">
+                No period history recorded yet
+              </p>
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <h3 class="font-medium text-gray-700 mb-2">Cycle Statistics</h3>
+            <div id="statsInfo" class="text-xs text-gray-500 mb-2">
+              Add at least 2 actual periods to see statistics
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-xs text-gray-500">Average Length</p>
+                <p id="avgCycleLength" class="text-lg font-semibold stat-value">
+                  -- days
+                </p>
+              </div>
+              <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-xs text-gray-500">Cycle Variation</p>
+                <p id="cycleVariation" class="text-lg font-semibold stat-value">
+                  -- days
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-medium text-gray-700 mb-2">Prediction Accuracy</h3>
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <p class="text-sm text-blue-600 mb-2">
+                Last prediction was
+                <span id="predictionAccuracy" class="font-semibold">--</span>
+              </p>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  id="accuracyBar"
+                  class="bg-blue-600 h-2.5 rounded-full"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cycle Days Visualization -->
+      <div
+        id="cycleDays"
+        class="mt-12 bg-white rounded-xl shadow-lg p-6 hidden"
+      >
+        <h2 class="text-2xl font-semibold text-indigo-700 mb-6">
+          Your Cycle Breakdown
+        </h2>
+        <div
+          class="grid grid-cols-7 md:grid-cols-14 gap-2"
+          id="cycleDaysGrid"
+        ></div>
+      </div>
+    </div>
+
+    <script>
+      // Initialize feather icons
+      feather.replace();
+
+      // DOM Elements
+      const lastPeriodDateEl = document.getElementById("lastPeriodDate");
+      const cycleLengthEl = document.getElementById("cycleLength");
+      const trackPeriodDateEl = document.getElementById("trackPeriodDate");
+      const addPeriodBtn = document.getElementById("addPeriodBtn");
+      const calculateBtn = document.getElementById("calculateBtn");
+      const saveDataBtn = document.getElementById("saveDataBtn");
+      const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+      const resultsEl = document.getElementById("results");
+      const periodHistoryEl = document.getElementById("periodHistory");
+      const avgCycleLengthEl = document.getElementById("avgCycleLength");
+      const cycleVariationEl = document.getElementById("cycleVariation");
+      const predictionAccuracyEl =
+        document.getElementById("predictionAccuracy");
+      const accuracyBarEl = document.getElementById("accuracyBar");
+      const cycleDaysEl = document.getElementById("cycleDays");
+      const cycleDaysGridEl = document.getElementById("cycleDaysGrid");
+      const nextPeriodEl = document.getElementById("nextPeriod");
+      const fertileWindowEl = document.getElementById("fertileWindow");
+      const ovulationDayEl = document.getElementById("ovulationDay");
+      const statsInfoEl = document.getElementById("statsInfo");
+
+      // Set default date to today
+      const today = new Date();
+      lastPeriodDateEl.valueAsDate = today;
+      trackPeriodDateEl.valueAsDate = today;
+
+      // Load saved data
+      let cycleData = JSON.parse(localStorage.getItem("cycleData")) || {
+        periods: [],
+        predictions: [],
+        calculatedLength: 28,
+      };
+
+      // Update history display
+      function updateHistory() {
+        if (cycleData.periods.length === 0) {
+          periodHistoryEl.innerHTML =
+            '<p class="text-gray-500 text-sm py-4 text-center">No period history recorded yet</p>';
+          return;
+        }
+
+        periodHistoryEl.innerHTML = "";
+        cycleData.periods
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .forEach((period) => {
+            const date = new Date(period.date);
+            const item = document.createElement("div");
+            item.className =
+              "flex justify-between items-center py-2 border-b border-gray-100 last:border-0";
+            item.innerHTML = `
+                    <span>${date.toLocaleDateString()}</span>
+                    <span class="text-sm ${
+                      period.actual ? "text-green-600" : "text-gray-500"
+                    }">
+                        ${period.actual ? "Actual" : "Predicted"}
+                    </span>
+                `;
+            periodHistoryEl.appendChild(item);
+          });
+
+        // Update statistics
+        updateStatistics();
+      }
+
+      // Update statistics
+      function updateStatistics() {
+        // Reset to default values
+        avgCycleLengthEl.textContent = "-- days";
+        cycleVariationEl.textContent = "-- days";
+        avgCycleLengthEl.classList.remove("pulse", "text-green-600");
+        cycleVariationEl.classList.remove("pulse", "text-green-600");
+
+        // Get all actual periods sorted by date
+        const actualPeriods = cycleData.periods
+          .filter((p) => p.actual)
+          .map((p) => new Date(p.date))
+          .sort((a, b) => a - b);
+
+        // Update info text
+        if (actualPeriods.length < 2) {
+          statsInfoEl.textContent = `Add ${
+            2 - actualPeriods.length
+          } more actual period${
+            2 - actualPeriods.length !== 1 ? "s" : ""
+          } to see statistics`;
+          statsInfoEl.classList.add("text-gray-500");
+          statsInfoEl.classList.remove("text-green-600");
+          return;
+        } else {
+          statsInfoEl.textContent = `Calculated from ${actualPeriods.length} actual periods`;
+          statsInfoEl.classList.remove("text-gray-500");
+          statsInfoEl.classList.add("text-green-600");
+        }
+
+        // Calculate cycle lengths (differences between consecutive periods)
+        const cycleLengths = [];
+        for (let i = 1; i < actualPeriods.length; i++) {
+          const diffTime = Math.abs(actualPeriods[i] - actualPeriods[i - 1]);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          cycleLengths.push(diffDays);
+        }
+
+        // Calculate average cycle length
+        const sum = cycleLengths.reduce((a, b) => a + b, 0);
+        const average = sum / cycleLengths.length;
+
+        // Calculate cycle variation (standard deviation)
+        const squareDiffs = cycleLengths.map((length) => {
+          const diff = length - average;
+          return diff * diff;
+        });
+
+        const avgSquareDiff =
+          squareDiffs.reduce((a, b) => a + b, 0) / cycleLengths.length;
+        const variation = Math.sqrt(avgSquareDiff);
+
+        // Update UI with calculated values
+        avgCycleLengthEl.textContent = `${average.toFixed(1)} days`;
+        cycleVariationEl.textContent = `${variation.toFixed(1)} days`;
+
+        // Add visual feedback
+        avgCycleLengthEl.classList.add("text-green-600", "pulse");
+        cycleVariationEl.classList.add("text-green-600", "pulse");
+
+        // Remove animation after 3 seconds
+        setTimeout(() => {
+          avgCycleLengthEl.classList.remove("pulse");
+          cycleVariationEl.classList.remove("pulse");
+        }, 3000);
+
+        // Update prediction accuracy if we have predictions
+        updatePredictionAccuracy();
+
+        // Update cycle length input with calculated average
+        cycleLengthEl.value = Math.round(average);
+      }
+
+      // Update prediction accuracy
+      function updatePredictionAccuracy() {
+        // Reset to default values
+        predictionAccuracyEl.textContent = "--";
+        accuracyBarEl.style.width = "0%";
+
+        // Get all predictions and actual periods
+        const predictions = cycleData.predictions;
+        const actualPeriods = cycleData.periods.filter((p) => p.actual);
+
+        // Need at least one prediction and one actual period to calculate accuracy
+        if (predictions.length === 0 || actualPeriods.length === 0) {
+          return;
+        }
+
+        // Find the most recent prediction with a matching actual period
+        let latestAccuracy = null;
+
+        // Sort predictions by date (newest first)
+        const sortedPredictions = [...predictions].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+
+        // Sort actual periods by date (newest first)
+        const sortedActualPeriods = [...actualPeriods].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+
+        // Try to find a prediction that matches an actual period
+        for (const prediction of sortedPredictions) {
+          const predictedDate = new Date(prediction.predictedNextPeriod);
+
+          // Find the closest actual period to this prediction
+          for (const actualPeriod of sortedActualPeriods) {
+            const actualDate = new Date(actualPeriod.date);
+
+            // Check if this prediction was for this actual period
+            // We'll consider it a match if the dates are within 10 days of each other
+            const diffTime = Math.abs(actualDate - predictedDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 10) {
+              latestAccuracy = {
+                diffDays,
+                early: actualDate < predictedDate,
+                predictionDate: new Date(prediction.date),
+              };
+              break;
+            }
+          }
+
+          if (latestAccuracy) break;
+        }
+
+        // Update UI with accuracy data if found
+        if (latestAccuracy) {
+          const accuracyText = `${latestAccuracy.diffDays} day${
+            latestAccuracy.diffDays !== 1 ? "s" : ""
+          } ${latestAccuracy.early ? "early" : "late"}`;
+          predictionAccuracyEl.textContent = accuracyText;
+
+          // Calculate accuracy percentage (100% if exact, decreasing by 10% per day off)
+          const accuracyPercent = Math.max(
+            0,
+            100 - latestAccuracy.diffDays * 10
+          );
+          accuracyBarEl.style.width = `${accuracyPercent}%`;
+        }
+      }
+
+      // Calculate ovulation and fertile window
+      function calculateCycle() {
+        const lastPeriodDate = new Date(lastPeriodDateEl.value);
+        const cycleLength = parseInt(cycleLengthEl.value);
+
+        if (isNaN(lastPeriodDate.getTime()) || isNaN(cycleLength)) {
+          alert("Please enter valid dates and cycle length");
+          return;
+        }
+
+        // Save this prediction
+        const predictionDate = new Date(lastPeriodDate);
+        predictionDate.setDate(predictionDate.getDate() + cycleLength);
+
+        // Calculate dates
+        const ovulationDate = new Date(lastPeriodDate);
+        ovulationDate.setDate(ovulationDate.getDate() + (cycleLength - 14));
+
+        const fertileStart = new Date(ovulationDate);
+        fertileStart.setDate(fertileStart.getDate() - 5);
+
+        const fertileEnd = new Date(ovulationDate);
+        fertileEnd.setDate(fertileEnd.getDate() + 1);
+
+        const nextPeriod = new Date(lastPeriodDate);
+        nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
+
+        // Update UI
+        nextPeriodEl.textContent = nextPeriod.toLocaleDateString();
+        fertileWindowEl.textContent = `${fertileStart.toLocaleDateString()} - ${fertileEnd.toLocaleDateString()}`;
+        ovulationDayEl.textContent = ovulationDate.toLocaleDateString();
+
+        // Show results
+        resultsEl.classList.remove("hidden");
+
+        // Generate cycle visualization
+        generateCycleVisualization(
+          lastPeriodDate,
+          cycleLength,
+          ovulationDate,
+          fertileStart,
+          fertileEnd,
+          nextPeriod
+        );
+
+        // Update prediction accuracy
+        updatePredictionAccuracy();
+      }
+
+      // Generate cycle visualization
+      function generateCycleVisualization(
+        startDate,
+        length,
+        ovulationDate,
+        fertileStart,
+        fertileEnd,
+        nextPeriod
+      ) {
+        cycleDaysGridEl.innerHTML = "";
+        cycleDaysEl.classList.remove("hidden");
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        for (let day = 1; day <= length; day++) {
+          const currentDate = new Date(startDate);
+          currentDate.setDate(currentDate.getDate() + day - 1);
+
+          const dayEl = document.createElement("div");
+          dayEl.className =
+            "cycle-day text-center p-2 rounded-lg border border-gray-100";
+
+          // Determine day type
+          let dayType = "normal";
+          let bgColor = "bg-white";
+          let textColor = "text-gray-700";
+
+          if (day === 1 || (day === length && length > 1)) {
+            dayType = "period";
+            bgColor = "bg-red-100";
+            textColor = "text-red-700";
+          } else if (currentDate >= fertileStart && currentDate <= fertileEnd) {
+            dayType = "fertile";
+            bgColor = "bg-pink-100";
+            textColor = "text-pink-700";
+          } else if (currentDate.getTime() === ovulationDate.getTime()) {
+            dayType = "ovulation";
+            bgColor = "bg-purple-100";
+            textColor = "text-purple-700";
+          } else if (currentDate.getTime() === today.getTime()) {
+            dayType = "today";
+            bgColor = "bg-indigo-100";
+            textColor = "text-indigo-700";
+          }
+
+          dayEl.className += ` ${bgColor} ${textColor}`;
+
+          dayEl.innerHTML = `
+                    <div class="text-xs font-medium">Day ${day}</div>
+                    <div class="text-xs">${currentDate.toLocaleDateString(
+                      "en-US",
+                      { month: "short", day: "numeric" }
+                    )}</div>
+                    ${
+                      dayType === "today"
+                        ? '<div class="text-xs font-bold mt-1">TODAY</div>'
+                        : ""
+                    }
+                `;
+
+          cycleDaysGridEl.appendChild(dayEl);
+        }
+
+        // Create chart
+        createCycleChart(
+          startDate,
+          length,
+          ovulationDate,
+          fertileStart,
+          fertileEnd
+        );
+      }
+
+      // Create cycle chart
+      function createCycleChart(
+        startDate,
+        length,
+        ovulationDate,
+        fertileStart,
+        fertileEnd
+      ) {
+        const ctx = document.getElementById("cycleChart").getContext("2d");
+
+        // Prepare data
+        const labels = [];
+        const fertilityData = [];
+        const periodData = [];
+
+        for (let day = 0; day < length; day++) {
+          const currentDate = new Date(startDate);
+          currentDate.setDate(currentDate.getDate() + day);
+
+          labels.push(`Day ${day + 1}`);
+
+          // Fertility score (0-1)
+          let fertilityScore = 0;
+          if (currentDate >= fertileStart && currentDate <= fertileEnd) {
+            // Peak fertility around ovulation day
+            const daysFromOvulation = Math.abs(
+              (currentDate - ovulationDate) / (1000 * 60 * 60 * 24)
+            );
+            fertilityScore = Math.max(0, 1 - daysFromOvulation / 3);
+          }
+          fertilityData.push(fertilityScore);
+
+          // Period (first day and last day)
+          periodData.push(day === 0 || day === length - 1 ? 1 : 0);
+        }
+
+        // Destroy previous chart if exists
+        if (window.cycleChart) {
+          window.cycleChart.destroy();
+        }
+
+        window.cycleChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Fertility",
+                data: fertilityData,
+                borderColor: "rgb(219, 39, 119)",
+                backgroundColor: "rgba(219, 39, 119, 0.1)",
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true,
+                yAxisID: "y",
+              },
+              {
+                label: "Period",
+                data: periodData,
+                borderColor: "rgb(239, 68, 68)",
+                backgroundColor: "rgba(239, 68, 68, 0.1)",
+                borderWidth: 2,
+                type: "bar",
+                yAxisID: "y1",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            interaction: {
+              mode: "index",
+              intersect: false,
+            },
+            scales: {
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                min: 0,
+                max: 1,
+                title: {
+                  display: true,
+                  text: "Fertility",
+                },
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                min: 0,
+                max: 1,
+                grid: {
+                  drawOnChartArea: false,
+                },
+                title: {
+                  display: true,
+                  text: "Period",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Event Listeners
+      addPeriodBtn.addEventListener("click", () => {
+        const date = new Date(trackPeriodDateEl.value);
+        if (isNaN(date.getTime())) {
+          alert("Please select a valid date");
+          return;
+        }
+
+        // Check if this date already exists
+        const exists = cycleData.periods.some((p) => {
+          const pDate = new Date(p.date);
+          return pDate.toDateString() === date.toDateString();
+        });
+
+        if (exists) {
+          alert("This date is already recorded");
+          return;
+        }
+
+        // Add to history as an ACTUAL period
+        cycleData.periods.push({
+          date: date.toISOString(),
+          actual: true,
+        });
+
+        // Save to localStorage
+        localStorage.setItem("cycleData", JSON.stringify(cycleData));
+
+        // Update UI
+        updateHistory();
+        trackPeriodDateEl.valueAsDate = new Date();
+
+        // Show confirmation
+        alert("Actual period date added successfully!");
+      });
+
+      calculateBtn.addEventListener("click", calculateCycle);
+
+      saveDataBtn.addEventListener("click", () => {
+        const lastPeriodDate = new Date(lastPeriodDateEl.value);
+        const cycleLength = parseInt(cycleLengthEl.value);
+
+        if (isNaN(lastPeriodDate.getTime()) || isNaN(cycleLength)) {
+          alert("Please calculate first before saving");
+          return;
+        }
+
+        // Save the prediction
+        const nextPeriodDate = new Date(lastPeriodDate);
+        nextPeriodDate.setDate(nextPeriodDate.getDate() + cycleLength);
+
+        cycleData.predictions.push({
+          date: new Date().toISOString(),
+          predictedNextPeriod: nextPeriodDate.toISOString(),
+          cycleLength: cycleLength,
+        });
+
+        // Also save as a predicted period (will be marked as actual when user confirms)
+        cycleData.periods.push({
+          date: nextPeriodDate.toISOString(),
+          actual: false,
+          predictedDate: nextPeriodDate.toISOString(),
+        });
+
+        localStorage.setItem("cycleData", JSON.stringify(cycleData));
+        updateHistory();
+
+        alert(
+          "Prediction saved! Update it to an actual period when your period starts for better future predictions."
+        );
+      });
+
+      clearHistoryBtn.addEventListener("click", () => {
+        if (
+          confirm("Are you sure you want to clear all your period history?")
+        ) {
+          cycleData.periods = [];
+          cycleData.predictions = [];
+          localStorage.setItem("cycleData", JSON.stringify(cycleData));
+          updateHistory();
+        }
+      });
+
+      // Initialize
+      updateHistory();
+
+      // Try to find the most recent period to pre-fill the form
+      if (cycleData.periods.length > 0) {
+        const lastPeriod = cycleData.periods
+          .filter((p) => p.actual)
+          .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+        if (lastPeriod) {
+          lastPeriodDateEl.valueAsDate = new Date(lastPeriod.date);
+
+          // If we have calculated average, use that
+          if (cycleData.calculatedLength) {
+            cycleLengthEl.value = cycleData.calculatedLength;
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
