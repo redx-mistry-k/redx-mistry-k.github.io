@@ -5,66 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Color Guesser</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.iife.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.min.js"></script>
     <style>
+      :root {
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+      }
+      
+      body {
+        transition: background-color 0.5s ease;
+      }
+      
       .color-swatch {
         transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        cursor: pointer;
       }
+      
       .color-swatch:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
       }
+      
+      .color-swatch.selected {
+        box-shadow: 0 0 0 3px white, 0 0 0 6px var(--primary);
+      }
+      
       .correct {
         animation: pulse 0.5s;
       }
+      
       @keyframes pulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(1);
-        }
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
       }
+      
       .incorrect {
         animation: shake 0.5s;
       }
+      
       @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        20%,
-        60% {
-          transform: translateX(-5px);
-        }
-        40%,
-        80% {
-          transform: translateX(5px);
-        }
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-5px); }
+        40%, 80% { transform: translateX(5px); }
+      }
+      
+      .progress-bar {
+        height: 6px;
+        border-radius: 3px;
+        background-color: #e5e7eb;
+        overflow: hidden;
+      }
+      
+      .progress-fill {
+        height: 100%;
+        background-color: var(--primary);
+        transition: width 0.3s ease;
+      }
+      
+      .tooltip {
+        position: relative;
+      }
+      
+      .tooltip .tooltip-text {
+        visibility: hidden;
+        width: 120px;
+        background-color: #1f2937;
+        color: white;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 12px;
+      }
+      
+      .tooltip:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+      }
+      
+      .color-code-display {
+        font-family: monospace;
+        letter-spacing: 1px;
+        background-color: #f3f4f6;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      
+      .fade-in {
+        animation: fadeIn 0.5s;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      .stats-card {
+        background-color: #f9fafb;
+        border-radius: 8px;
+        padding: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background-color: var(--primary);
+        opacity: 0;
+        pointer-events: none;
       }
     </style>
   </head>
-  <body
-    class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4"
-  >
+  <body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-500">
     <div class="max-w-3xl w-full bg-white rounded-xl shadow-lg p-6 md:p-8">
       <header class="text-center mb-8">
         <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-          Guess the Color
+          Color Guesser
         </h1>
         <p class="text-gray-600">Test your color perception skills!</p>
       </header>
 
       <div class="flex flex-col items-center mb-8">
-        <p class="text-xl font-semibold text-gray-700 mb-4" id="colorName">
-          Guess the color with code: Loading...
+        <p class="text-xl font-semibold text-gray-700 mb-2">
+          Guess the color with code:
         </p>
+        <div class="color-code-display text-lg mb-4" id="colorName">
+          Loading...
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <i data-feather="clock" class="w-4 h-4"></i>
+          <span>Time: <span id="timer">10</span>s</span>
+        </div>
+      </div>
+
+      <div class="progress-bar w-full mb-6">
+        <div class="progress-fill" id="timerBar" style="width: 100%"></div>
       </div>
 
       <div
@@ -72,53 +160,98 @@
         id="colorOptions"
       ></div>
 
-      <div class="flex justify-between items-center mb-6">
-        <div class="text-lg font-medium">
-          <span class="text-green-600"
-            >Correct: <span id="correctCount">0</span></span
-          >
-          <span class="mx-2">|</span>
-          <span class="text-gray-700"
-            >Total: <span id="totalCount">0</span></span
-          >
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div class="stats-card">
+          <div class="flex items-center gap-4">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-green-600" id="correctCount">0</div>
+              <div class="text-xs text-gray-500">Correct</div>
+            </div>
+            <div class="h-8 w-px bg-gray-300"></div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-gray-700" id="totalCount">0</div>
+              <div class="text-xs text-gray-500">Total</div>
+            </div>
+            <div class="h-8 w-px bg-gray-300"></div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-blue-600" id="accuracy">0%</div>
+              <div class="text-xs text-gray-500">Accuracy</div>
+            </div>
+          </div>
         </div>
-        <button
-          id="newGameBtn"
-          class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
-        >
-          <i data-feather="refresh-cw" class="w-4 h-4"></i>
-          New Game
-        </button>
-      </div>
-
-      <div class="flex justify-center">
+        
         <div class="flex gap-2">
           <button
-            class="difficulty-btn px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition"
-            data-difficulty="easy"
+            id="newGameBtn"
+            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition"
           >
-            Easy
+            <i data-feather="refresh-cw" class="w-4 h-4"></i>
+            New Game
           </button>
-          <button
-            class="difficulty-btn px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition"
-            data-difficulty="medium"
-          >
-            Medium
-          </button>
-          <button
-            class="difficulty-btn px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition font-semibold bg-blue-100 text-blue-700"
-            data-difficulty="hard"
-          >
-            Hard
-          </button>
+          
+          <div class="tooltip">
+            <button
+              id="hintBtn"
+              class="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg transition"
+            >
+              <i data-feather="help-circle" class="w-4 h-4"></i>
+            </button>
+            <span class="tooltip-text">Get a hint (removes 2 options)</span>
+          </div>
         </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+        <div>
+          <p class="text-sm font-medium text-gray-700 mb-2">Difficulty:</p>
+          <div class="flex gap-2">
+            <button
+              class="difficulty-btn px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition text-sm"
+              data-difficulty="easy"
+            >
+              Easy
+            </button>
+            <button
+              class="difficulty-btn px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 transition text-sm"
+              data-difficulty="medium"
+            >
+              Medium
+            </button>
+            <button
+              class="difficulty-btn px-3 py-1 rounded-md bg-blue-100 text-blue-700 font-medium transition text-sm"
+              data-difficulty="hard"
+            >
+              Hard
+            </button>
+          </div>
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-gray-700 mb-2">Options:</p>
+          <div class="flex gap-2">
+            <label class="flex items-center gap-1 text-sm text-gray-700">
+              <input type="checkbox" id="timerToggle" class="rounded text-blue-600" checked />
+              <span>Timer</span>
+            </label>
+            <label class="flex items-center gap-1 text-sm text-gray-700">
+              <input type="checkbox" id="colorBlindMode" class="rounded text-blue-600" />
+              <span>Color Labels</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center text-xs text-gray-500 mt-4">
+        <p>Score <span id="streak">0</span> in a row for a special surprise!</p>
       </div>
     </div>
 
     <div
       id="feedback"
-      class="fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md shadow-lg hidden"
+      class="fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-md shadow-lg hidden z-50"
     ></div>
+
+    <div id="confetti-container" class="fixed inset-0 pointer-events-none z-40"></div>
 
     <script>
       // Game state
@@ -128,6 +261,11 @@
         difficulty: "hard",
         currentColor: null,
         colorOptions: [],
+        timer: null,
+        timeLeft: 10,
+        hintsUsed: 0,
+        streak: 0,
+        timerEnabled: true
       };
 
       // DOM elements
@@ -135,9 +273,17 @@
       const colorOptionsEl = document.getElementById("colorOptions");
       const correctCountEl = document.getElementById("correctCount");
       const totalCountEl = document.getElementById("totalCount");
+      const accuracyEl = document.getElementById("accuracy");
+      const streakEl = document.getElementById("streak");
       const newGameBtn = document.getElementById("newGameBtn");
+      const hintBtn = document.getElementById("hintBtn");
       const difficultyBtns = document.querySelectorAll(".difficulty-btn");
       const feedbackEl = document.getElementById("feedback");
+      const timerEl = document.getElementById("timer");
+      const timerBarEl = document.getElementById("timerBar");
+      const timerToggle = document.getElementById("timerToggle");
+      const colorBlindMode = document.getElementById("colorBlindMode");
+      const confettiContainer = document.getElementById("confetti-container");
 
       // Initialize game
       document.addEventListener("DOMContentLoaded", () => {
@@ -147,17 +293,17 @@
 
         // Set up event listeners
         newGameBtn.addEventListener("click", startNewRound);
+        hintBtn.addEventListener("click", useHint);
+        timerToggle.addEventListener("change", toggleTimer);
+        colorBlindMode.addEventListener('change', toggleColorLabels);
+        
         difficultyBtns.forEach((btn) => {
           btn.addEventListener("click", () => {
             gameState.difficulty = btn.dataset.difficulty;
             difficultyBtns.forEach((b) =>
-              b.classList.remove(
-                "font-semibold",
-                "bg-blue-100",
-                "text-blue-700"
-              )
+              b.classList.remove("font-medium", "bg-blue-100", "text-blue-700")
             );
-            btn.classList.add("font-semibold", "bg-blue-100", "text-blue-700");
+            btn.classList.add("font-medium", "bg-blue-100", "text-blue-700");
             startNewRound();
           });
         });
@@ -237,20 +383,27 @@
 
       // Start new round
       function startNewRound() {
+        // Clear previous timer
+        if (gameState.timer) {
+          clearInterval(gameState.timer);
+        }
+        
         gameState.currentColor = getRandomColor();
         gameState.colorOptions = generateSimilarColors(
           gameState.currentColor,
           6
         );
         gameState.colorOptions = shuffleArray(gameState.colorOptions);
-
+        gameState.timeLeft = 10;
+        
         renderGame();
+        startTimer();
       }
 
       // Render game UI
       function renderGame() {
         // Show the color code to guess
-        colorNameEl.textContent = `Guess the color with code: ${gameState.currentColor}`;
+        colorNameEl.textContent = gameState.currentColor;
 
         // Clear previous options
         colorOptionsEl.innerHTML = "";
@@ -259,11 +412,19 @@
         gameState.colorOptions.forEach((color) => {
           const colorEl = document.createElement("div");
           colorEl.className =
-            "color-swatch cursor-pointer w-full h-24 rounded-lg flex items-center justify-center";
+            "color-swatch w-full h-24 rounded-lg flex items-center justify-center fade-in";
           colorEl.style.backgroundColor = color;
           colorEl.setAttribute("aria-label", `Color option: ${color}`);
           colorEl.setAttribute("role", "button");
           colorEl.setAttribute("tabindex", "0");
+          
+          // Add color label if color blind mode is enabled
+          if (colorBlindMode.checked) {
+            const label = document.createElement("span");
+            label.className = "text-xs bg-white bg-opacity-70 px-2 py-1 rounded";
+            label.textContent = color;
+            colorEl.appendChild(label);
+          }
 
           colorEl.addEventListener("click", () => handleColorSelection(color));
           colorEl.addEventListener("keypress", (e) => {
@@ -274,17 +435,128 @@
         });
 
         // Update score display
+        updateScoreDisplay();
+      }
+
+      // Update score display
+      function updateScoreDisplay() {
         correctCountEl.textContent = gameState.correctAnswers;
         totalCountEl.textContent = gameState.totalQuestions;
+        
+        // Calculate accuracy
+        const accuracy = gameState.totalQuestions > 0 
+          ? Math.round((gameState.correctAnswers / gameState.totalQuestions) * 100) 
+          : 0;
+        accuracyEl.textContent = `${accuracy}%`;
+        
+        // Update streak
+        streakEl.textContent = gameState.streak;
+      }
+
+      // Start timer
+      function startTimer() {
+        if (!gameState.timerEnabled) return;
+        
+        timerBarEl.style.width = '100%';
+        timerEl.textContent = gameState.timeLeft;
+        
+        gameState.timer = setInterval(() => {
+          gameState.timeLeft--;
+          timerEl.textContent = gameState.timeLeft;
+          timerBarEl.style.width = `${(gameState.timeLeft / 10) * 100}%`;
+          
+          if (gameState.timeLeft <= 0) {
+            clearInterval(gameState.timer);
+            handleTimeUp();
+          }
+        }, 1000);
+      }
+
+      // Handle time up
+      function handleTimeUp() {
+        gameState.totalQuestions++;
+        gameState.streak = 0;
+        
+        showFeedback(
+          `Time's up! It was ${gameState.currentColor}`,
+          "bg-red-100",
+          "text-red-800"
+        );
+        
+        // Highlight correct answer
+        const options = Array.from(colorOptionsEl.children);
+        const correctOption = options.find(
+          (el) => el.style.backgroundColor === gameState.currentColor
+        );
+        if (correctOption) {
+          correctOption.classList.add("correct");
+        }
+        
+        // Update score and start new round after delay
+        updateScoreDisplay();
+        saveScores();
+        
+        setTimeout(startNewRound, 2000);
+      }
+
+      // Toggle timer
+      function toggleTimer() {
+        gameState.timerEnabled = timerToggle.checked;
+        document.querySelector('.progress-bar').classList.toggle('hidden', !gameState.timerEnabled);
+        document.getElementById('timer').classList.toggle('hidden', !gameState.timerEnabled);
+        
+        if (gameState.timerEnabled && gameState.timeLeft > 0) {
+          startTimer();
+        } else if (gameState.timer) {
+          clearInterval(gameState.timer);
+        }
+      }
+
+      // Toggle color labels
+      function toggleColorLabels() {
+        renderGame();
+      }
+
+      // Use hint
+      function useHint() {
+        if (gameState.hintsUsed >= 2) {
+          showFeedback("No hints left!", "bg-yellow-100", "text-yellow-800");
+          return;
+        }
+        
+        // Remove two incorrect options
+        const options = Array.from(colorOptionsEl.children);
+        const incorrectOptions = options.filter(
+          (el) => el.style.backgroundColor !== gameState.currentColor
+        );
+        
+        if (incorrectOptions.length >= 2) {
+          // Remove two random incorrect options
+          for (let i = 0; i < 2; i++) {
+            const randomIndex = Math.floor(Math.random() * incorrectOptions.length);
+            incorrectOptions[randomIndex].style.opacity = "0.3";
+            incorrectOptions[randomIndex].style.pointerEvents = "none";
+            incorrectOptions.splice(randomIndex, 1);
+          }
+          
+          gameState.hintsUsed++;
+          showFeedback("Hint used! 2 options removed", "bg-blue-100", "text-blue-800");
+        }
       }
 
       // Handle color selection
       function handleColorSelection(selectedColor) {
+        // Clear timer
+        if (gameState.timer) {
+          clearInterval(gameState.timer);
+        }
+        
         gameState.totalQuestions++;
 
         if (selectedColor === gameState.currentColor) {
           // Correct answer
           gameState.correctAnswers++;
+          gameState.streak++;
           showFeedback(
             `Correct! It was ${gameState.currentColor}`,
             "bg-green-100",
@@ -299,18 +571,29 @@
           if (correctOption) {
             correctOption.classList.add("correct");
           }
+          
+          // Check for streak achievement
+          if (gameState.streak % 5 === 0) {
+            createConfetti();
+            showFeedback(
+              `${gameState.streak} in a row! Amazing!`,
+              "bg-purple-100",
+              "text-purple-800"
+            );
+          }
 
           // Start new round after delay
-          setTimeout(startNewRound, 1000);
+          setTimeout(startNewRound, 1500);
         } else {
           // Incorrect answer
+          gameState.streak = 0;
           showFeedback(
             `Try again! It was ${gameState.currentColor}`,
             "bg-red-100",
             "text-red-800"
           );
 
-          // Highlight incorrect answer
+          // Highlight incorrect and correct answers
           const options = Array.from(colorOptionsEl.children);
           const selectedOption = options.find(
             (el) => el.style.backgroundColor === selectedColor
@@ -318,14 +601,44 @@
           if (selectedOption) {
             selectedOption.classList.add("incorrect");
           }
+          
+          const correctOption = options.find(
+            (el) => el.style.backgroundColor === gameState.currentColor
+          );
+          if (correctOption) {
+            correctOption.classList.add("correct");
+          }
         }
 
         // Update score display
-        correctCountEl.textContent = gameState.correctAnswers;
-        totalCountEl.textContent = gameState.totalQuestions;
-
-        // Save scores
+        updateScoreDisplay();
         saveScores();
+      }
+
+      // Create confetti effect
+      function createConfetti() {
+        // Clear previous confetti
+        confettiContainer.innerHTML = '';
+        
+        // Create new confetti
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
+          confettiContainer.appendChild(confetti);
+          
+          // Animate confetti
+          anime({
+            targets: confetti,
+            translateY: -100,
+            translateX: Math.random() * 200 - 100,
+            rotate: Math.random() * 360,
+            opacity: [0, 1, 0],
+            duration: 2000,
+            easing: 'easeOutQuad'
+          });
+        }
       }
 
       // Show feedback message
@@ -336,7 +649,7 @@
 
         setTimeout(() => {
           feedbackEl.classList.add("hidden");
-        }, 1500);
+        }, 2000);
       }
 
       // Save scores to localStorage
@@ -346,6 +659,7 @@
           JSON.stringify({
             correctAnswers: gameState.correctAnswers,
             totalQuestions: gameState.totalQuestions,
+            streak: gameState.streak
           })
         );
       }
@@ -357,11 +671,10 @@
           const scores = JSON.parse(savedScores);
           gameState.correctAnswers = scores.correctAnswers || 0;
           gameState.totalQuestions = scores.totalQuestions || 0;
+          gameState.streak = scores.streak || 0;
+          updateScoreDisplay();
         }
       }
-    </script>
-    <script>
-      feather.replace();
     </script>
   </body>
 </html>
