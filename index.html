@@ -1,164 +1,1108 @@
 <!DOCTYPE html>
+
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Krishnaanand's Portfolio - Data Analyst and Web Developer">
-<meta name="keywords" content="Data Analyst, Portfolio, Web Development, Projects">
-<meta name="author" content="Krishnaanand">
-  <title>Portfolio</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css" integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc" crossorigin="anonymous">
-</head>
-<body>
-  <!-- Navbar Section -->
-  <nav class="navbar">
-    <div class="navbar__container">
-      <a href="#home" id="navbar__logo">DA</a>
-      <div class="navbar__toggle" id="mobile-menu">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </div>
-      <ul class="navbar__menu">
-        <li class="navbar__item">
-          <a href="#home" class="navbar__links" id="home-page">Home</a>
-        </li>
-        <li class="navbar__item">
-          <a href="#about" class="navbar__links" id="about-page">About</a>
-        </li>
-        <li class="navbar__item">
-          <a href="#services" class="navbar__links" id="services-page">Projects </a>
-        </li>
-      </ul>
-    </div>
-  </nav>
-
-  <!-- Hero Section -->
-  <div class="hero" id="home">
-    <div class="hero__container">
-      <h1 class="hero__heading">I am <span>Krishnaanand</span></h1>
-      <p class="hero__description">Data Analyst</p>
-      <button class="main__btn"><a href="#">Explore</a></button>
-    </div>
-  </div>
-
-  <!-- About Section -->
-  <div class="main" id="about">
-    <div class="main__container">
-      <div class="main__img--container">
-        <div class="main__img--card"><i class="fas fa-layer-group"></i></div>
-      </div>
-      <div class="main__content">
-        <h1>About me</h1>
-        <p>
-          Hi, I'm Krishnaanand, a passionate Data Analyst with experience in data visualization, machine learning, and web development. I love turning raw data into meaningful insights and creating tools that make life easier. Add me on socials to stay connected!
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Services Section -->
-  <div class="services" id="services">
-    <h1>Our Services</h1>
-    <div class="services__wrapper">
-      <div class="services__card">
-        <h2>Project 1</h2>
-        <p>Alcohol Calendar<br> A fun calendar to track and plan your drinks </p>
-        <div class="services__btn"><a href="tipsy_calendar.html"><button>View</button></a></div>
-      </div>
-      <div class="services__card">
-        <h2>Project 2</h2>
-        <p>Translator (English to Spanish) <br> A simple tool to translate text from English to Spanish.</p>
-        <div class="services__btn"><a href="translator.html"><button>View</button></a></div>
-      </div>
-      <div class="services__card">
-        <h2>Project 3</h2>
-        <p>Delagger <br> A utility to clean up and organize data.</p> 
-        <div class="services__btn"><a href="delag.html"><button>View</button></a></div>
-      </div>
-      <div class="services__card">
-        <h2>Project 4</h2>
-        <p>My Github</p>
-        <div class="services__btn"><a href="https://github.com/redx-mistry-k"><button>View</button></a></div>
-      </div>
-      <div class="services__card">
-        <h2>Project 5</h2>
-        <p>Countdown Timer</p>
-        <div class="services__btn"><a href="countdownTimer/index.html"><button>View</button></a></div>
-      </div>
-      <div class="services__card">
-        <h2>Project 6</h2>
-        <p>Be my Valentine <br> A playful Valentine's Day-themed page.</p>
-        <div class="services__btn"><a href="bemyV/index.html"><button>View</button></a></div>
-      </div>
-       <div class="services__card">
-        <h2>Project 7</h2>
-        <p>7 digits extractor</p>
-        <div class="services__btn"><a href="7digitsextracter.html"><button>View</button></a></div>
-      </div>
-      <div class="services__card">
-        <h2>Project 8</h2>
-        <p>Text to editable table</p>
-        <div class="services__btn"><a href="remit_adv/index.html"><button>View</button></a></div>
-      </div>
-      <div class="services__card">
-        <h2>Project 9</h2>
-        <p>Date 💖 Night <br> A fun date night idea generator.</p>
-        <div class="services__btn"><a href="dateNight/index.html"><button>View</button></a></div>
-      </div>
-    <div class="services__card">
-        <h2>Project 10</h2>
-        <p>Note down the Good things in this year<br> A journaling tool to record positive moments</p>
-        <div class="services__btn"><a href="noteGoodThings/index.html"><button>View</button></a></div>
-      </div>
-  </div>
-
-  <!-- Footer Section -->
-  <div class="footer__container">
-    <div class="footer__links">
-      <div class="footer__link--wrapper">
-        <div class="footer__link--items">
-          <h2>About Me</h2>
-          <a href="/sign__up">How it works</a>
-          <a href="/">Testimonials</a>
-          <a href="/">Terms of Service</a>
-        </div>
-        <div class="footer__link--items">
-          <h2>Contact Us</h2>
-          <a href="/">Contact</a>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Data Science Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.iife.min.js"></script>
+    <style>
+      .gradient-bg {
+        background: linear-gradient(135deg, #1e3a8a 0%, #065f46 100%);
+      }
+      .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .skill-bar {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e5e7eb;
+      }
+      .skill-progress {
+        height: 100%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+      }
+    </style>
+  </head>
+  <body class="font-sans antialiased text-gray-800 bg-gray-50">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white shadow-sm z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <span class="text-xl font-bold text-gray-900">DS Portfolio</span>
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a class="text-gray-900 hover:text-blue-600 transition" href="#home"
+              >Home</a
+            >
+            <a
+              class="text-gray-900 hover:text-blue-600 transition"
+              href="#about"
+              >About</a
+            >
+            <a
+              class="text-gray-900 hover:text-blue-600 transition"
+              href="#projects"
+              >Projects</a
+            >
+            <a
+              class="text-gray-900 hover:text-blue-600 transition"
+              href="#skills"
+              >Skills</a
+            >
+            <a
+              class="text-gray-900 hover:text-blue-600 transition"
+              href="#contact"
+              >Contact</a
+            >
+          </div>
+          <div class="md:hidden flex items-center">
+            <button class="text-gray-900" id="menu-toggle">
+              <i data-feather="menu"></i>
+            </button>
+          </div>
         </div>
       </div>
-      <div class="footer__link--wrapper">
-        <div class="footer__link--items">
-          <h2>Social Media</h2>
-          <a href="https://www.instagram.com/redxmistry">Instagram</a>
-          <a href="https://www.youtube.com/@redxmistry">Youtube</a>
-        </div>
+      <!-- Mobile menu -->
+      <div
+        class="hidden md:hidden bg-white py-2 px-4 shadow-lg"
+        id="mobile-menu"
+      >
+        <a
+          class="block py-2 text-gray-900 hover:text-blue-600 transition"
+          href="#home"
+          >Home</a
+        >
+        <a
+          class="block py-2 text-gray-900 hover:text-blue-600 transition"
+          href="#about"
+          >About</a
+        >
+        <a
+          class="block py-2 text-gray-900 hover:text-blue-600 transition"
+          href="#projects"
+          >Projects</a
+        >
+        <a
+          class="block py-2 text-gray-900 hover:text-blue-600 transition"
+          href="#skills"
+          >Skills</a
+        >
+        <a
+          class="block py-2 text-gray-900 hover:text-blue-600 transition"
+          href="#contact"
+          >Contact</a
+        >
       </div>
-    </div>
-    <section class="social__media">
-      <div class="social__media--wrap">
-        <div class="footer__logo">
-          <a href="/" id="footer__logo">DA</a>
-        </div>
-        <p class="website__rights">© redxmistry 2020. All rights reserved</p>
-        <div class="social__icons">
-          <a href="https://www.instagram.com/redxmistry" class="social__icon--link"><i class="fab fa-instagram"></i></a>
-          <a href="https://www.youtube.com/@redxmistry" class="social__icon--link"><i class="fab fa-youtube"></i></a>
-          <a href="https://www.linkedin.com/in/krishnaanand-v/" class="social__icon--link"><i class="fab fa-linkedin"></i></a>
-          <a href="scan.html">Scan my Socials </a>
+    </nav>
+    <!-- Hero Section -->
+    <section
+      class="gradient-bg text-white pt-32 pb-20 px-4 sm:px-6 lg:px-8"
+      id="home"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="md:flex items-center justify-between">
+          <div class="md:w-1/2 mb-10 md:mb-0" data-aos="fade-right">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+              Hi, I'm Krishnaanand V
+            </h1>
+            <h2 class="text-2xl md:text-3xl font-semibold mb-6">
+              Data Scientist &amp; Analyst
+            </h2>
+            <p class="text-lg mb-8 text-blue-100">
+              Transforming complex data into actionable insights through
+              statistical analysis, machine learning, and compelling
+              visualizations.
+            </p>
+            <div class="flex space-x-4">
+              <a
+                class="bg-white text-blue-800 px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition"
+                href="#projects"
+                >View Projects</a
+              >
+              <a
+                class="border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-blue-800 transition"
+                href="#contact"
+                >Contact Me</a
+              >
+            </div>
+          </div>
+          <div class="md:w-1/2 flex justify-center" data-aos="fade-left">
+            <div class="relative">
+              <div
+                class="absolute -inset-4 bg-blue-400 rounded-2xl opacity-20 blur"
+              ></div>
+              <img
+                alt="Data Visualization"
+                class="relative rounded-2xl shadow-2xl w-full max-w-md"
+                src="http://static.photos/technology/640x360/42"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>
-  </div>
-<script src="app.js"></script>
-  <script>// Add fade-in animation to the hero section
-window.addEventListener('load', () => {
-  const heroSection = document.querySelector('.hero');
-  heroSection.classList.add('visible');
-});
-</script>
-</body>
+    <!-- About Section -->
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-16" data-aos="fade-up">
+          About Me
+        </h2>
+        <div class="md:flex items-center">
+          <div
+            class="md:w-1/3 mb-10 md:mb-0 flex justify-center"
+            data-aos="fade-right"
+          >
+            <div class="relative">
+              <div
+                class="absolute -inset-2 bg-green-200 rounded-full opacity-30 blur"
+              ></div>
+              <img
+                src="http://static.photos/people/640x360/123"
+                alt="Profile"
+                class="relative rounded-full w-64 h-64 object-cover border-4 border-white shadow-lg"
+              />
+            </div>
+          </div>
+          <div class="md:w-2/3 md:pl-16" data-aos="fade-left">
+            <h3 class="text-2xl font-semibold mb-4">
+              My Journey in Data Analysis
+            </h3>
+            <p class="text-gray-700 mb-6 leading-relaxed">
+              A diligent and results-driven professional seeking a challenging
+              data analyst role that utilises existing skills and provides
+              opportunities for further career development. A naturally
+              analytical thinker with a methodical approach to problem solving
+              and outstanding organisational skills, adept at balancing a
+              demanding workload of simultaneous tasks.
+            </p>
+            <p class="text-gray-700 mb-6 leading-relaxed">
+              A strong communicator with excellent collaborative skills and a
+              robust work ethic, eager to influence business decision making
+              through effective data analysis, driving favourable business
+              outcomes.
+            </p>
+            <div class="flex flex-wrap gap-4 mt-8">
+              <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                <i data-feather="award" class="w-5 h-5 mr-2 text-blue-600"></i>
+                <span>MSc in Data Science</span>
+              </div>
+              <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                <i
+                  data-feather="briefcase"
+                  class="w-5 h-5 mr-2 text-blue-600"
+                ></i>
+                <span>Data Analyst Experience</span>
+              </div>
+              <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
+                <i
+                  data-feather="database"
+                  class="w-5 h-5 mr-2 text-blue-600"
+                ></i>
+                <span>Multiple Projects</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Projects Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50" id="projects">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-4" data-aos="fade-up">
+          My Projects
+        </h2>
+        <p
+          class="text-center text-gray-600 mb-16 max-w-2xl mx-auto"
+          data-aos="fade-up"
+        >
+          Explore my data-driven projects showcasing analytical skills and
+          technical expertise
+        </p>
+        <!-- Project Filter -->
+        <div class="flex justify-center mb-12" data-aos="fade-up">
+          <div class="inline-flex rounded-md shadow-sm">
+            <button
+              class="filter-btn px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              data-filter="all"
+              type="button"
+            >
+              All
+            </button>
+            <button
+              class="filter-btn px-4 py-2 text-sm font-medium border-t border-b border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              data-filter="ml"
+              type="button"
+            >
+              Machine Learning
+            </button>
+            <button
+              class="filter-btn px-4 py-2 text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              data-filter="viz"
+              type="button"
+            >
+              Visualization
+            </button>
+            <button
+              class="filter-btn px-4 py-2 text-sm font-medium rounded-r-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+              data-filter="web"
+              type="button"
+            >
+              Web Apps
+            </button>
+          </div>
+        </div>
+        <!-- Projects Grid -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Alcohol Calendar -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="Alcohol Calendar"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/101"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">Alcohol Calendar</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                A fun calendar to track and plan your drinks
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">HTML</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">CSS</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="tipsy_calendar.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- English to Spanish Translator -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            data-aos-delay="100"
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="English to Spanish Translator"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/102"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">English to Spanish Translator</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                A simple tool to translate text from English to Spanish
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">API</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Translation</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="translator.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Delagger -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            data-aos-delay="200"
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="Delagger"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/103"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">Delagger</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                A utility to clean up and organize data
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">Data Processing</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Utility</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="delag.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- My GitHub -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="My GitHub"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/104"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">My GitHub</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                Collection of my coding projects and repositories
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">GitHub</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Portfolio</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Code</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="https://github.com/redx-mistry-k"
+                  target="_blank"
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="github"></i> Code
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Countdown Timer -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            data-aos-delay="100"
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="Countdown Timer"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/105"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">Countdown Timer</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                A customizable countdown timer application
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Timer</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Utility</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="countdownTimer/index.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Be My Valentine -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            data-aos-delay="200"
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="Be My Valentine"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/106"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">Be My Valentine</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                A playful Valentine's Day-themed page
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">HTML</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">CSS</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Interactive</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="bemyV/index.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- 7 Digits Extractor -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="7 Digits Extractor"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/107"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">7 Digits Extractor</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                Tool to extract 7-digit numbers from text
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">Text Processing</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Regex</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="7digitsextracter.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Text to Editable Table -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            data-aos-delay="100"
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="Text to Editable Table"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/108"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">Text to Editable Table</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                Convert text data into interactive editable tables
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">Data Processing</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Table</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="remit_adv/index.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Date Night Generator -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            data-aos-delay="200"
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="Date Night Generator"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/109"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">Date Night Generator</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                A fun date night idea generator
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Random</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Entertainment</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="dateNight/index.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Good Things Journal -->
+          <div
+            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
+            data-aos="fade-up"
+            
+            data-category="web"
+          >
+            <div class="h-48 overflow-hidden">
+              <img
+                alt="Good Things Journal"
+                class="w-full h-full object-cover"
+                src="http://static.photos/technology/640x360/110"
+              />
+            </div>
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold">Good Things Journal</h3>
+                <span
+                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
+                  >Web</span
+                >
+              </div>
+              <p class="text-gray-600 mb-4">
+                A journaling tool to record positive moments
+              </p>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-gray-100 px-2 py-1 text-xs rounded">Journaling</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Personal</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span>
+              </div>
+              <div class="flex space-x-3">
+                <a
+                  class="text-blue-600 hover:text-blue-800 flex items-center"
+                  href="noteGoodThings/index.html"
+                  
+                >
+                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>        </div>
+      </div>
+    </section>
+    <!-- Skills Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white" id="skills">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-4" data-aos="fade-up">
+          My Skills
+        </h2>
+        <p
+          class="text-center text-gray-600 mb-16 max-w-2xl mx-auto"
+          data-aos="fade-up"
+        >
+          Technical expertise across the data science workflow
+        </p>
+        <div class="grid md:grid-cols-2 gap-12">
+          <!-- Technical Skills -->
+          <div data-aos="fade-right">
+            <h3 class="text-xl font-semibold mb-6 flex items-center">
+              <i class="w-6 h-6 mr-2 text-blue-600" data-feather="code"></i>
+              Technical Skills
+            </h3>
+            <div class="space-y-6">
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-medium">Python</span>
+                  <span class="text-gray-600">95%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 95%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-medium">SQL</span>
+                  <span class="text-gray-600">90%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 90%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-medium">R</span>
+                  <span class="text-gray-600">85%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 85%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-medium">Machine Learning</span>
+                  <span class="text-gray-600">92%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 92%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-2">
+                  <span class="font-medium">Data Visualization</span>
+                  <span class="text-gray-600">88%</span>
+                </div>
+                <div class="skill-bar">
+                  <div class="skill-progress" style="width: 88%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Tools & Technologies -->
+          <div data-aos="fade-left">
+            <h3 class="text-xl font-semibold mb-6 flex items-center">
+              <i class="w-6 h-6 mr-2 text-blue-600" data-feather="tool"></i>
+              Tools &amp; Technologies
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <i
+                  class="w-5 h-5 mr-3 text-blue-600"
+                  data-feather="database"
+                ></i>
+                <span>SQL/NoSQL</span>
+              </div>
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <i
+                  class="w-5 h-5 mr-3 text-blue-600"
+                  data-feather="bar-chart-2"
+                ></i>
+                <span>Tableau</span>
+              </div>
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <i class="w-5 h-5 mr-3 text-blue-600" data-feather="cpu"></i>
+                <span>TensorFlow</span>
+              </div>
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <i
+                  class="w-5 h-5 mr-3 text-blue-600"
+                  data-feather="git-branch"
+                ></i>
+                <span>Git</span>
+              </div>
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <i class="w-5 h-5 mr-3 text-blue-600" data-feather="cloud"></i>
+                <span>AWS</span>
+              </div>
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <i class="w-5 h-5 mr-3 text-blue-600" data-feather="box"></i>
+                <span>Docker</span>
+              </div>
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <i class="w-5 h-5 mr-3 text-blue-600" data-feather="layers"></i>
+                <span>Spark</span>
+              </div>
+              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <i
+                  class="w-5 h-5 mr-3 text-blue-600"
+                  data-feather="terminal"
+                ></i>
+                <span>Linux</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Contact Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50" id="contact">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-4" data-aos="fade-up">
+          Get In Touch
+        </h2>
+        <p
+          class="text-center text-gray-600 mb-16 max-w-2xl mx-auto"
+          data-aos="fade-up"
+        >
+          Have a project in mind or want to discuss data solutions? Feel free to
+          reach out!
+        </p>
+        <div class="md:flex">
+          <div class="md:w-1/2 mb-10 md:mb-0" data-aos="fade-right">
+            <form class="space-y-6">
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  for="name"
+                  >Name</label
+                >
+                <input
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  id="name"
+                  name="name"
+                  type="text"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  for="email"
+                  >Email</label
+                >
+                <input
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  id="email"
+                  name="email"
+                  type="email"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  for="subject"
+                  >Subject</label
+                >
+                <input
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  id="subject"
+                  name="subject"
+                  type="text"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                  for="message"
+                  >Message</label
+                >
+                <textarea
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  id="message"
+                  name="message"
+                  rows="5"
+                ></textarea>
+              </div>
+              <button
+                class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition"
+                type="submit"
+              >
+                Send Message
+              </button>
+            </form>
+          </div>
+          <div class="md:w-1/2 md:pl-16" data-aos="fade-left">
+            <div class="bg-white p-8 rounded-xl shadow-md h-full">
+              <h3 class="text-xl font-semibold mb-6">Contact Information</h3>
+              <div class="space-y-6">
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                    <i class="w-5 h-5 text-blue-600" data-feather="mail"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-sm font-medium text-gray-500">Email</h4>
+                    <p class="text-gray-900">vkrishnaanand@icloud.com</p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                    <i class="w-5 h-5 text-blue-600" data-feather="phone"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-sm font-medium text-gray-500">Phone</h4>
+                    <p class="text-gray-900">+91 7299608572</p>
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                    <i class="w-5 h-5 text-blue-600" data-feather="map-pin"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="text-sm font-medium text-gray-500">Location</h4>
+                    <p class="text-gray-900">India</p>
+                  </div>
+                </div>
+              </div>
+              <h3 class="text-xl font-semibold mt-10 mb-6">Connect With Me</h3>
+              <div class="flex space-x-4">
+                <a
+                  class="bg-gray-100 p-3 rounded-full hover:bg-blue-100 transition"
+                  href="https://github.com/redx-mistry-k"
+                >
+                  <i class="w-5 h-5 text-gray-700" data-feather="github"></i>
+                </a>
+                <a
+                  class="bg-gray-100 p-3 rounded-full hover:bg-blue-100 transition"
+                  href="https://www.linkedin.com/in/vkrishnaanand/"
+                >
+                  <i class="w-5 h-5 text-gray-700" data-feather="linkedin"></i>
+                </a>
+
+          
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto">
+        <div class="md:flex md:justify-between">
+          <div class="mb-8 md:mb-0">
+            <h3 class="text-xl font-bold mb-4">Data Science Portfolio</h3>
+            <p class="text-gray-400 max-w-xs">
+              Transforming data into insights that drive business value and
+              innovation.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-8 sm:grid-cols-3">
+            <div>
+              <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">
+                Navigation
+              </h4>
+              <ul class="space-y-2">
+                <li>
+                  <a
+                    class="text-gray-400 hover:text-white transition"
+                    href="#home"
+                    >Home</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-gray-400 hover:text-white transition"
+                    href="#about"
+                    >About</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-gray-400 hover:text-white transition"
+                    href="#projects"
+                    >Projects</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-gray-400 hover:text-white transition"
+                    href="#skills"
+                    >Skills</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-gray-400 hover:text-white transition"
+                    href="#contact"
+                    >Contact</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">
+                Resources
+              </h4>
+              <ul class="space-y-2">
+                <li>
+                  <a class="text-gray-400 hover:text-white transition" href="#"
+                    >Blog</a
+                  >
+                </li>
+                <li>
+                  <a class="text-gray-400 hover:text-white transition" href="#"
+                    >Tutorials</a
+                  >
+                </li>
+                <li>
+                  <a class="text-gray-400 hover:text-white transition" href="#"
+                    >GitHub</a
+                  >
+                </li>
+                <li>
+                  <a class="text-gray-400 hover:text-white transition" href="#"
+                    >Case Studies</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">
+                Legal
+              </h4>
+              <ul class="space-y-2">
+                <li>
+                  <a class="text-gray-400 hover:text-white transition" href="#"
+                    >Privacy Policy</a
+                  >
+                </li>
+                <li>
+                  <a class="text-gray-400 hover:text-white transition" href="#"
+                    >Terms of Service</a
+                  >
+                </li>
+                <li>
+                  <a class="text-gray-400 hover:text-white transition" href="#"
+                    >Cookie Policy</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div
+          class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center"
+        >
+          <p class="text-gray-400 text-sm">
+            © 2023 Data Science Portfolio. All rights reserved.
+          </p>
+          <div class="mt-4 md:mt-0 flex space-x-6">
+            <a class="text-gray-400 hover:text-white transition" href="#">
+              <i class="w-5 h-5" data-feather="instagram"></i>
+            </a>
+            <a
+              class="text-gray-400 hover:text-white transition"
+              href="https://www.linkedin.com/in/vkrishnaanand/"
+            >
+              <i class="w-5 h-5" data-feather="linkedin"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script>
+      // Initialize AOS animation
+      AOS.init({
+        duration: 800,
+        easing: "ease-in-out",
+        once: true,
+      });
+
+      // Mobile menu toggle
+      document
+        .getElementById("menu-toggle")
+        .addEventListener("click", function () {
+          const menu = document.getElementById("mobile-menu");
+          menu.classList.toggle("hidden");
+        });
+
+      // Project filtering
+      document.querySelectorAll(".filter-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          const filter = this.getAttribute("data-filter");
+
+          // Update active button
+          document.querySelectorAll(".filter-btn").forEach((btn) => {
+            btn.classList.remove("bg-blue-600", "text-white");
+            btn.classList.add("bg-white", "text-gray-700");
+          });
+          this.classList.remove("bg-white", "text-gray-700");
+          this.classList.add("bg-blue-600", "text-white");
+
+          // Filter projects
+          document.querySelectorAll(".project-card").forEach((card) => {
+            if (
+              filter === "all" ||
+              card.getAttribute("data-category") === filter
+            ) {
+              card.style.display = "block";
+            } else {
+              card.style.display = "none";
+            }
+          });
+        });
+      });
+
+      // Smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          const targetId = this.getAttribute("href");
+          const targetElement = document.querySelector(targetId);
+
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: "smooth",
+            });
+
+            // Close mobile menu if open
+            const mobileMenu = document.getElementById("mobile-menu");
+            if (!mobileMenu.classList.contains("hidden")) {
+              mobileMenu.classList.add("hidden");
+            }
+          }
+        });
+      });
+
+      // Feather icons replacement
+      feather.replace();
+    </script>
+  </body>
 </html>
