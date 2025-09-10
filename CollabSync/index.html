@@ -300,8 +300,32 @@
           auth
             .signInWithPopup(provider)
             .then((result) => {
-              // User signed in successfully
-              showAppContent();
+              // Add user data to Firestore "users" collection
+              const user = result.user;
+              db.collection("users")
+                .doc(user.uid)
+                .set(
+                  {
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                  },
+                  { merge: true } // Merge to avoid overwriting existing data
+                )
+                .then(() => {
+                  // User signed in and user data saved
+                  showAppContent();
+                })
+                .catch((error) => {
+                  console.error("Error saving user data:", error);
+                  showError(
+                    "User Data Error",
+                    "Failed to save user info. Please try again."
+                  );
+                  showAppContent(); // Still show app, but warn user
+                });
             })
             .catch((error) => {
               // Handle errors here
@@ -319,12 +343,12 @@
               }
 
               showError("Login Error", errorMessage);
-             // Reset button state
+
+              // Reset button state
               button.innerHTML = originalText;
               button.disabled = false;
             });
         });
-
 
       // Show application content after login
       function showAppContent() {
@@ -445,23 +469,13 @@
       }
 
       // Check if user is already logged in
-      auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    // ✅ Save user in Firestore
-    const userRef = doc(db, "users", user.uid);
-    await setDoc(userRef, {
-      name: user.displayName || "Anonymous",
-      email: user.email,
-      createdAt: serverTimestamp(),
-      teamId: "" // optional, can assign later
-    }, { merge: true }); // merge:true prevents overwriting existing fields
-
-    // ✅ Show the app
-    showAppContent();
-  } else {
-    showLogin();
-  }
-});
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          showAppContent();
+        } else {
+          showLogin();
+        }
+      });
     </script>
   </body>
 </html>
