@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CollabSync Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/feather-icons"></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Login Modal -->
+  <div id="login-container" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 w-96 text-center">
+      <h2 class="text-2xl font-bold mb-4">Sign in to CollabSync</h2>
+      <button id="googleSignInBtn" class="w-full flex items-center justify-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+        <i data-feather="log-in"></i> Sign in with Google
+      </button>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden">
+    <header class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Dashboard</h1>
+      <button id="signOutBtn" class="text-red-500 hover:underline">Sign Out</button>
+    </header>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white p-6 rounded-2xl shadow-md">
+        <h2 class="text-xl font-semibold mb-2">Tasks</h2>
+        <p>Here you can manage your tasks.</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-md">
+        <h2 class="text-xl font-semibold mb-2">Projects</h2>
+        <p>Overview of your projects.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBk20vfJ8Wllff0ZUbziLjgEJ3laJ4PVWw",
+      authDomain: "collabsync-redx.firebaseapp.com",
+      projectId: "collabsync-redx",
+      storageBucket: "collabsync-redx.firebasestorage.app",
+      messagingSenderId: "547558846833",
+      appId: "1:547558846833:web:52474d09c930a95e1d86d0",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const loginContainer = document.getElementById('login-container');
+    const mainContent = document.querySelector('main');
+    const signOutBtn = document.getElementById('signOutBtn');
+
+    // Show dashboard after login
+    function showDashboard() {
+      loginContainer.classList.add('hidden');
+      mainContent.classList.remove('hidden');
+    }
+
+    // Show login modal
+    function showLogin() {
+      loginContainer.classList.remove('hidden');
+      mainContent.classList.add('hidden');
+    }
+
+    // Google Sign-In
+    document.getElementById('googleSignInBtn').addEventListener('click', () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(() => showDashboard())
+        .catch(err => {
+          console.error("Login failed:", err);
+          alert("Login failed. Check console for details.");
+        });
+    });
+
+    // Sign Out
+    signOutBtn.addEventListener('click', () => {
+      auth.signOut().then(() => showLogin());
+    });
+
+    // Check auth state on page load
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        showDashboard();
+      } else {
+        showLogin();
+      }
+    });
+
+    feather.replace(); // Initialize Feather icons
+  </script>
+</body>
+</html>
