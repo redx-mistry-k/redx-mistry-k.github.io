@@ -309,8 +309,8 @@
                     uid: user.uid,
                     displayName: user.displayName,
                     email: user.email,
-                    photoURL: user.photoURL,
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    teamId:"team123" // default for all new users
                   },
                   { merge: true } // Merge to avoid overwriting existing data
                 )
