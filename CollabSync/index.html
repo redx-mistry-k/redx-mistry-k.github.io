@@ -445,13 +445,23 @@
       }
 
       // Check if user is already logged in
-      auth.onAuthStateChanged((user) => {
-        if (user) {
-          showAppContent();
-        } else {
-          showLogin();
-        }
-      });
+      auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    // ✅ Save user in Firestore
+    const userRef = doc(db, "users", user.uid);
+    await setDoc(userRef, {
+      name: user.displayName || "Anonymous",
+      email: user.email,
+      createdAt: serverTimestamp(),
+      teamId: "" // optional, can assign later
+    }, { merge: true }); // merge:true prevents overwriting existing fields
+
+    // ✅ Show the app
+    showAppContent();
+  } else {
+    showLogin();
+  }
+});
     </script>
   </body>
 </html>
