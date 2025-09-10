@@ -298,46 +298,32 @@
           const provider = new firebase.auth.GoogleAuthProvider();
 
           auth
-  .signInWithPopup(provider)
-  .then(async (result) => {
-    const user = result.user;
+            .signInWithPopup(provider)
+            .then((result) => {
+              // User signed in successfully
+              showAppContent();
+            })
+            .catch((error) => {
+              // Handle errors here
+              console.error("Error signing in with Google:", error);
 
-    // Create/update user document in Firestore
-    const userRef = db.collection("users").doc(user.uid);
-    const docSnapshot = await userRef.get();
+              let errorMessage = "Login failed. Please try again.";
+              if (error.code === "auth/popup-blocked") {
+                errorMessage =
+                  "Popup blocked by browser. Please allow popups for this site.";
+              } else if (error.code === "auth/popup-closed-by-user") {
+                errorMessage = "Login popup was closed before completion.";
+              } else if (error.code === "auth/unauthorized-domain") {
+                errorMessage =
+                  "This domain is not authorized. Please make sure localhost is added to authorized domains in Firebase Console.";
+              }
 
-    if (!docSnapshot.exists) {
-      await userRef.set({
-        uid: user.uid,
-        email: user.email || "",
-        name: user.displayName || "",
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        teamId: "team123" // or fetch dynamically if you want
-      });
-    }
-
-    showAppContent(); // now safe to show the app
-  })
-  .catch((error) => {
-    console.error("Error signing in with Google:", error);
-
-    let errorMessage = "Login failed. Please try again.";
-    if (error.code === "auth/popup-blocked") {
-      errorMessage =
-        "Popup blocked by browser. Please allow popups for this site.";
-    } else if (error.code === "auth/popup-closed-by-user") {
-      errorMessage = "Login popup was closed before completion.";
-    } else if (error.code === "auth/unauthorized-domain") {
-      errorMessage =
-        "This domain is not authorized. Please make sure localhost is added to authorized domains in Firebase Console.";
-    }
-
-    showError("Login Error", errorMessage);
-
-    // Reset button state
-    button.innerHTML = originalText;
-    button.disabled = false;
-  });
+              showError("Login Error", errorMessage);
+             // Reset button state
+              button.innerHTML = originalText;
+              button.disabled = false;
+            });
+        });
 
 
       // Show application content after login
