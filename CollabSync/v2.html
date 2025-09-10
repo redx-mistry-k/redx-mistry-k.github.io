@@ -3,121 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CollabSync Full Dashboard</title>
+  <title>Kanban Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/feather-icons"></script>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-100">
 
-  <!-- Login Modal -->
-  <div id="login-container" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl p-8 w-96 text-center">
-      <h2 class="text-2xl font-bold mb-4">Sign in to CollabSync</h2>
-      <button id="googleSignInBtn" class="w-full flex items-center justify-center gap-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
-        <i data-feather="log-in"></i> Sign in with Google
-      </button>
+  <!-- Top Navbar -->
+  <nav class="bg-white shadow-md p-4 flex items-center justify-between">
+    <div class="flex items-center space-x-6">
+      <h1 class="text-2xl font-bold text-blue-600">CollabSync</h1>
+      <button class="nav-btn px-3 py-2 font-medium text-gray-700 hover:text-blue-600" data-section="dashboard">Dashboard</button>
+      <button class="nav-btn px-3 py-2 font-medium text-gray-700 hover:text-blue-600" data-section="timeline">Timeline</button>
+      <button class="nav-btn px-3 py-2 font-medium text-gray-700 hover:text-blue-600" data-section="team">Team</button>
+      <button class="nav-btn px-3 py-2 font-medium text-gray-700 hover:text-blue-600" data-section="analytics">Analytics</button>
     </div>
-  </div>
+    <button id="signOutBtn" class="text-red-500 hover:underline">Sign Out</button>
+  </nav>
 
-  <!-- Main Dashboard -->
-  <div id="main-dashboard" class="hidden flex flex-col min-h-screen">
+  <!-- Main Content -->
+  <main class="p-6">
     
-    <!-- Sidebar + Content -->
-    <div class="flex flex-1">
-      
-      <!-- Sidebar -->
-      <aside class="w-64 bg-white border-r p-6 flex flex-col">
-        <h1 class="text-2xl font-bold mb-8">CollabSync</h1>
-        <nav class="flex flex-col gap-4">
-          <button class="nav-btn text-gray-700 hover:text-blue-600 font-semibold" data-section="dashboard">
-            <i data-feather="home"></i> Dashboard
-          </button>
-          <button class="nav-btn text-gray-700 hover:text-blue-600 font-semibold" data-section="timeline">
-            <i data-feather="clock"></i> Timeline
-          </button>
-          <button class="nav-btn text-gray-700 hover:text-blue-600 font-semibold" data-section="team">
-            <i data-feather="users"></i> Team
-          </button>
-          <button class="nav-btn text-gray-700 hover:text-blue-600 font-semibold" data-section="analytics">
-            <i data-feather="bar-chart-2"></i> Analytics
-          </button>
-        </nav>
-        <button id="signOutBtn" class="mt-auto text-red-500 hover:underline">Sign Out</button>
-      </aside>
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section">
+      <h2 class="text-3xl font-bold mb-6">Kanban Board</h2>
 
-      <!-- Content -->
-      <main class="flex-1 p-8 overflow-auto">
-        
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="section">
-          <h2 class="text-3xl font-bold mb-6">Dashboard Overview</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-md">Tasks: 12</div>
-            <div class="bg-white p-6 rounded-2xl shadow-md">Projects: 5</div>
-            <div class="bg-white p-6 rounded-2xl shadow-md">Team Members: 8</div>
-            <div class="bg-white p-6 rounded-2xl shadow-md">Pending Approvals: 3</div>
-          </div>
-        </section>
+      <!-- Add Task -->
+      <div class="mb-6 flex gap-2">
+        <input type="text" id="taskTitle" placeholder="Task title" class="flex-1 p-2 rounded border border-gray-300">
+        <input type="text" id="taskCategory" placeholder="Category/Label" class="p-2 rounded border border-gray-300 w-48">
+        <button id="addTaskBtn" class="bg-blue-500 text-white px-4 rounded hover:bg-blue-600">Add Task</button>
+      </div>
 
-        <!-- Timeline Section -->
-        <section id="timeline" class="section hidden">
-          <h2 class="text-3xl font-bold mb-6">Timeline</h2>
-          <ul class="space-y-4">
-            <li class="bg-white p-4 rounded-2xl shadow-md">Task 1 completed - <span class="text-gray-500">Today</span></li>
-            <li class="bg-white p-4 rounded-2xl shadow-md">Project kickoff - <span class="text-gray-500">Yesterday</span></li>
-            <li class="bg-white p-4 rounded-2xl shadow-md">Meeting with Team - <span class="text-gray-500">2 days ago</span></li>
-          </ul>
-        </section>
+      <!-- Kanban Columns -->
+      <div class="flex gap-6">
+        <!-- To Do -->
+        <div class="bg-gray-100 p-4 rounded-lg flex-1">
+          <h3 class="text-xl font-semibold mb-4">To Do <span id="todoCount" class="text-gray-500">0 tasks</span></h3>
+          <div class="space-y-4" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
 
-        <!-- Team Section -->
-        <section id="team" class="section hidden">
-          <h2 class="text-3xl font-bold mb-6">Team Members</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-md text-center">Alice<br><span class="text-gray-500">Developer</span></div>
-            <div class="bg-white p-6 rounded-2xl shadow-md text-center">Bob<br><span class="text-gray-500">Designer</span></div>
-            <div class="bg-white p-6 rounded-2xl shadow-md text-center">Charlie<br><span class="text-gray-500">Project Manager</span></div>
-          </div>
-        </section>
+        <!-- In Progress -->
+        <div class="bg-gray-100 p-4 rounded-lg flex-1">
+          <h3 class="text-xl font-semibold mb-4">In Progress <span id="inprogressCount" class="text-gray-500">0 tasks</span></h3>
+          <div class="space-y-4" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
 
-        <!-- Analytics Section -->
-        <section id="analytics" class="section hidden">
-          <h2 class="text-3xl font-bold mb-6">Analytics</h2>
-          <div class="bg-white p-6 rounded-2xl shadow-md">
-            <canvas id="analyticsChart"></canvas>
-          </div>
-        </section>
+        <!-- Done -->
+        <div class="bg-gray-100 p-4 rounded-lg flex-1">
+          <h3 class="text-xl font-semibold mb-4">Done <span id="doneCount" class="text-gray-500">0 tasks</span></h3>
+          <div class="space-y-4" id="done" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+      </div>
+    </section>
 
-      </main>
-    </div>
-  </div>
+    <!-- Other sections hidden for now -->
+    <section id="timeline" class="section hidden">
+      <h2 class="text-3xl font-bold mb-6">Timeline</h2>
+      <p>Coming soon...</p>
+    </section>
 
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <section id="team" class="section hidden">
+      <h2 class="text-3xl font-bold mb-6">Team</h2>
+      <p>Coming soon...</p>
+    </section>
+
+    <section id="analytics" class="section hidden">
+      <h2 class="text-3xl font-bold mb-6">Analytics</h2>
+      <p>Coming soon...</p>
+    </section>
+  </main>
 
   <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBk20vfJ8Wllff0ZUbziLjgEJ3laJ4PVWw",
-      authDomain: "collabsync-redx.firebaseapp.com",
-      projectId: "collabsync-redx",
-      storageBucket: "collabsync-redx.firebasestorage.app",
-      messagingSenderId: "547558846833",
-      appId: "1:547558846833:web:52474d09c930a95e1d86d0",
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    const loginContainer = document.getElementById('login-container');
-    const mainDashboard = document.getElementById('main-dashboard');
-    const signOutBtn = document.getElementById('signOutBtn');
-
-    // Show/hide dashboard sections
+    // Nav section switching
     const sections = document.querySelectorAll('.section');
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -126,61 +84,76 @@
       });
     });
 
-    // Google Sign-In
-    document.getElementById('googleSignInBtn').addEventListener('click', () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then(() => showDashboard())
-        .catch(err => {
-          console.error(err);
-          alert("Login failed. Check console for details.");
-        });
+    // Task management
+    const todo = document.getElementById('todo');
+    const inprogress = document.getElementById('inprogress');
+    const done = document.getElementById('done');
+
+    function updateCounts() {
+      document.getElementById('todoCount').innerText = `${todo.children.length} tasks`;
+      document.getElementById('inprogressCount').innerText = `${inprogress.children.length} tasks`;
+      document.getElementById('doneCount').innerText = `${done.children.length} tasks`;
+    }
+
+    function createTask(title, category) {
+      const task = document.createElement('div');
+      task.className = "bg-white p-4 rounded-lg shadow cursor-move hover:bg-gray-50";
+      task.draggable = true;
+      task.ondragstart = drag;
+      task.innerHTML = `<div class="font-semibold">${title}</div><div class="text-sm text-gray-500">${category}</div>`;
+      return task;
+    }
+
+    document.getElementById('addTaskBtn').addEventListener('click', () => {
+      const title = document.getElementById('taskTitle').value.trim();
+      const category = document.getElementById('taskCategory').value.trim();
+      if (!title) return;
+      const task = createTask(title, category || "General");
+      todo.appendChild(task);
+      document.getElementById('taskTitle').value = '';
+      document.getElementById('taskCategory').value = '';
+      updateCounts();
     });
 
-    // Sign Out
-    signOutBtn.addEventListener('click', () => auth.signOut().then(() => showLogin()));
+    // Drag & Drop
+    let draggedTask = null;
 
-    // Auth state check
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        showDashboard();
-      } else {
-        showLogin();
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drag(ev) {
+      draggedTask = ev.target;
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      if (draggedTask) {
+        ev.target.closest('.space-y-4').appendChild(draggedTask);
+        updateCounts();
+        draggedTask = null;
       }
+    }
+
+    // Initialize with sample tasks
+    const initialTasks = [
+      { title: "Design homepage mockup", category: "Design", column: "todo" },
+      { title: "Write project proposal", category: "Documentation", column: "todo" },
+      { title: "Develop authentication API", category: "Backend", column: "inprogress" },
+      { title: "Create user dashboard", category: "Frontend", column: "inprogress" },
+      { title: "Project kickoff meeting", category: "Meeting", column: "done" },
+      { title: "Database schema design", category: "Backend", column: "done" }
+    ];
+
+    initialTasks.forEach(t => {
+      const task = createTask(t.title, t.category);
+      document.getElementById(t.column).appendChild(task);
     });
+    updateCounts();
+  </script>
 
-    function showDashboard() {
-      loginContainer.classList.add('hidden');
-      mainDashboard.classList.remove('hidden');
-    }
-
-    function showLogin() {
-      loginContainer.classList.remove('hidden');
-      mainDashboard.classList.add('hidden');
-    }
-
-    // Initialize Feather icons
+  <script>
     feather.replace();
-
-    // Analytics Chart
-    const ctx = document.getElementById('analyticsChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Tasks', 'Projects', 'Members', 'Approvals'],
-        datasets: [{
-          label: 'Counts',
-          data: [12, 5, 8, 3],
-          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
-        }
-      }
-    });
   </script>
 </body>
 </html>
