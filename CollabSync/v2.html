@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CollabSync Dashboard</title>
+  <title>CollabSync Full Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/feather-icons"></script>
 
@@ -24,27 +24,83 @@
     </div>
   </div>
 
-  <!-- Dashboard Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden">
-    <header class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">Dashboard</h1>
-      <button id="signOutBtn" class="text-red-500 hover:underline">Sign Out</button>
-    </header>
+  <!-- Main Dashboard -->
+  <div id="main-dashboard" class="hidden flex flex-col min-h-screen">
+    
+    <!-- Sidebar + Content -->
+    <div class="flex flex-1">
+      
+      <!-- Sidebar -->
+      <aside class="w-64 bg-white border-r p-6 flex flex-col">
+        <h1 class="text-2xl font-bold mb-8">CollabSync</h1>
+        <nav class="flex flex-col gap-4">
+          <button class="nav-btn text-gray-700 hover:text-blue-600 font-semibold" data-section="dashboard">
+            <i data-feather="home"></i> Dashboard
+          </button>
+          <button class="nav-btn text-gray-700 hover:text-blue-600 font-semibold" data-section="timeline">
+            <i data-feather="clock"></i> Timeline
+          </button>
+          <button class="nav-btn text-gray-700 hover:text-blue-600 font-semibold" data-section="team">
+            <i data-feather="users"></i> Team
+          </button>
+          <button class="nav-btn text-gray-700 hover:text-blue-600 font-semibold" data-section="analytics">
+            <i data-feather="bar-chart-2"></i> Analytics
+          </button>
+        </nav>
+        <button id="signOutBtn" class="mt-auto text-red-500 hover:underline">Sign Out</button>
+      </aside>
 
-    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="bg-white p-6 rounded-2xl shadow-md">
-        <h2 class="text-xl font-semibold mb-2">Tasks</h2>
-        <p>Here you can manage your tasks.</p>
-      </div>
-      <div class="bg-white p-6 rounded-2xl shadow-md">
-        <h2 class="text-xl font-semibold mb-2">Projects</h2>
-        <p>Overview of your projects.</p>
-      </div>
-    </section>
-  </main>
+      <!-- Content -->
+      <main class="flex-1 p-8 overflow-auto">
+        
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section">
+          <h2 class="text-3xl font-bold mb-6">Dashboard Overview</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-md">Tasks: 12</div>
+            <div class="bg-white p-6 rounded-2xl shadow-md">Projects: 5</div>
+            <div class="bg-white p-6 rounded-2xl shadow-md">Team Members: 8</div>
+            <div class="bg-white p-6 rounded-2xl shadow-md">Pending Approvals: 3</div>
+          </div>
+        </section>
+
+        <!-- Timeline Section -->
+        <section id="timeline" class="section hidden">
+          <h2 class="text-3xl font-bold mb-6">Timeline</h2>
+          <ul class="space-y-4">
+            <li class="bg-white p-4 rounded-2xl shadow-md">Task 1 completed - <span class="text-gray-500">Today</span></li>
+            <li class="bg-white p-4 rounded-2xl shadow-md">Project kickoff - <span class="text-gray-500">Yesterday</span></li>
+            <li class="bg-white p-4 rounded-2xl shadow-md">Meeting with Team - <span class="text-gray-500">2 days ago</span></li>
+          </ul>
+        </section>
+
+        <!-- Team Section -->
+        <section id="team" class="section hidden">
+          <h2 class="text-3xl font-bold mb-6">Team Members</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-md text-center">Alice<br><span class="text-gray-500">Developer</span></div>
+            <div class="bg-white p-6 rounded-2xl shadow-md text-center">Bob<br><span class="text-gray-500">Designer</span></div>
+            <div class="bg-white p-6 rounded-2xl shadow-md text-center">Charlie<br><span class="text-gray-500">Project Manager</span></div>
+          </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="section hidden">
+          <h2 class="text-3xl font-bold mb-6">Analytics</h2>
+          <div class="bg-white p-6 rounded-2xl shadow-md">
+            <canvas id="analyticsChart"></canvas>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    // Initialize Firebase
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBk20vfJ8Wllff0ZUbziLjgEJ3laJ4PVWw",
       authDomain: "collabsync-redx.firebaseapp.com",
@@ -58,20 +114,17 @@
     const db = firebase.firestore();
 
     const loginContainer = document.getElementById('login-container');
-    const mainContent = document.querySelector('main');
+    const mainDashboard = document.getElementById('main-dashboard');
     const signOutBtn = document.getElementById('signOutBtn');
 
-    // Show dashboard after login
-    function showDashboard() {
-      loginContainer.classList.add('hidden');
-      mainContent.classList.remove('hidden');
-    }
-
-    // Show login modal
-    function showLogin() {
-      loginContainer.classList.remove('hidden');
-      mainContent.classList.add('hidden');
-    }
+    // Show/hide dashboard sections
+    const sections = document.querySelectorAll('.section');
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        sections.forEach(s => s.classList.add('hidden'));
+        document.getElementById(btn.dataset.section).classList.remove('hidden');
+      });
+    });
 
     // Google Sign-In
     document.getElementById('googleSignInBtn').addEventListener('click', () => {
@@ -79,17 +132,15 @@
       auth.signInWithPopup(provider)
         .then(() => showDashboard())
         .catch(err => {
-          console.error("Login failed:", err);
+          console.error(err);
           alert("Login failed. Check console for details.");
         });
     });
 
     // Sign Out
-    signOutBtn.addEventListener('click', () => {
-      auth.signOut().then(() => showLogin());
-    });
+    signOutBtn.addEventListener('click', () => auth.signOut().then(() => showLogin()));
 
-    // Check auth state on page load
+    // Auth state check
     auth.onAuthStateChanged(user => {
       if (user) {
         showDashboard();
@@ -98,7 +149,38 @@
       }
     });
 
-    feather.replace(); // Initialize Feather icons
+    function showDashboard() {
+      loginContainer.classList.add('hidden');
+      mainDashboard.classList.remove('hidden');
+    }
+
+    function showLogin() {
+      loginContainer.classList.remove('hidden');
+      mainDashboard.classList.add('hidden');
+    }
+
+    // Initialize Feather icons
+    feather.replace();
+
+    // Analytics Chart
+    const ctx = document.getElementById('analyticsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Tasks', 'Projects', 'Members', 'Approvals'],
+        datasets: [{
+          label: 'Counts',
+          data: [12, 5, 8, 3],
+          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
   </script>
 </body>
 </html>
