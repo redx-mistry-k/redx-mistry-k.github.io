@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Clash of Clans Optimizer — Desktop + Mobile</title>
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg-1: #0f1117;
+        --bg-2: #161722;
+        --gold: #ffd166;
+        --elixir: #a86cf5;
+        --emerald: #10ac84;
+        --glass: rgba(255, 255, 255, 0.04);
+        --glass-2: rgba(255, 255, 255, 0.02);
+        --card-blur: 10px;
+        --radius: 14px;
+        --muted: rgba(255, 255, 255, 0.65);
+        --max-card-height: calc(100vh - 320px);
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+        font-family: "Poppins", system-ui, Segoe UI, Roboto, Arial;
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1400px;
+        margin: 18px auto;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      h1 {
+        font-family: "Bangers", cursive;
+        color: var(--gold);
+        font-size: 34px;
+        margin: 0;
+        text-shadow: 0 8px 24px rgba(255, 209, 102, 0.04);
+      }
+      .controls {
+        margin-left: auto;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .tag-input {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 10px 14px;
+        border-radius: 10px;
+        color: var(--muted);
+        min-width: 300px;
+      }
+      .btn {
+        background: linear-gradient(180deg, var(--emerald), #12b88a);
+        border: none;
+        padding: 10px 14px;
+        border-radius: 10px;
+        color: #051018;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      }
+      .btn.secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+        padding: 8px 12px;
+      }
+
+      /* top cards row: player card + time card + village toggle */
+      .top-row {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .top-row-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      @media (min-width: 1000px) {
+        .top-row-inner {
+          flex-direction: row;
+          align-items: start;
+          gap: 18px;
+        }
+      }
+
+      .card {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.015)
+        );
+        backdrop-filter: blur(var(--card-blur));
+        border-radius: var(--radius);
+        padding: 14px;
+        box-shadow: 0 10px 40px rgba(2, 6, 23, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+      }
+
+      .player-card {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .clan-badge {
+        width: 84px;
+        height: 84px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.03);
+      }
+      .th-image {
+        width: 84px;
+        height: 84px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.03);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+      }
+      .player-meta .name {
+        font-family: "Bangers", cursive;
+        color: var(--gold);
+        font-size: 20px;
+        margin: 0;
+      }
+      .player-meta .sub {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 6px;
+      }
+      .stats-grid {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .stat {
+        background: var(--glass);
+        padding: 8px 10px;
+        border-radius: 10px;
+        text-align: center;
+        min-width: 88px;
+      }
+      .stat h4 {
+        margin: 0;
+        color: var(--gold);
+        font-size: 18px;
+      }
+      .stat p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .village-toggle {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .village-toggle button {
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .village-toggle button.active {
+        background: linear-gradient(180deg, var(--gold), #ffdf9e);
+        color: #111;
+        font-weight: 700;
+        border: none;
+      }
+
+      .time-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 18px;
+        border-radius: 12px;
+        min-width: 180px;
+      }
+      .time-value {
+        font-size: 20px;
+        color: var(--gold);
+        font-weight: 700;
+      }
+      .time-label {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      /* main grid: 3 columns for desktop; stacked for mobile */
+      .main-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      @media (min-width: 1000px) {
+        .main-grid {
+          grid-template-columns: 1fr 1fr 1fr;
+          align-items: start;
+        }
+      }
+
+      .panel {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 100%;
+      }
+      .panel-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--gold);
+      }
+      .panel-body {
+        overflow: auto;
+        max-height: var(--max-card-height);
+        padding-right: 6px;
+      }
+      .panel-body::-webkit-scrollbar {
+        width: 8px;
+      }
+      .panel-body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 8px;
+      }
+      .panel.empty .panel-body {
+        min-height: 80px;
+        color: var(--muted);
+      }
+
+      .upgrade-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        border-radius: 10px;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.008),
+          rgba(255, 255, 255, 0.006)
+        );
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+      }
+      .upgrade-item:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 40px rgba(8, 10, 20, 0.6);
+      }
+      .upgrade-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .upgrade-left img {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+      }
+      .upgrade-name {
+        font-weight: 700;
+      }
+      .upgrade-meta {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      .progress-wrap {
+        min-width: 150px;
+        max-width: 260px;
+      }
+      .progress-bar {
+        height: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 10px;
+        margin-top: 6px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        transition: width 900ms cubic-bezier(0.2, 0.9, 0.3, 1);
+      }
+      .progress-fill.troop {
+        background: linear-gradient(90deg, var(--emerald), #2fe0a6);
+      }
+      .progress-fill.hero {
+        background: linear-gradient(90deg, var(--gold), #ffb84d);
+      }
+      .progress-fill.spell {
+        background: linear-gradient(90deg, var(--elixir), #8f5cff);
+      }
+      .progress-fill.eq {
+        background: linear-gradient(90deg, #55a6ff, #7bd0ff);
+      }
+
+      /* fade in */
+      .fade-in {
+        animation: fadeIn 0.36s ease both;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* mobile adjustments */
+      @media (max-width: 999px) {
+        .tag-input {
+          min-width: 160px;
+        }
+        :root {
+          --max-card-height: none;
+        }
+        .clan-badge,
+        .th-image {
+          width: 72px;
+          height: 72px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>CLASH EASY STATS VIEWER</h1>
+        <div class="controls">
+          <input
+            id="playerTag"
+            class="tag-input"
+            placeholder="Enter player tag (e.g., #ABCDEF)"
+          />
+          <button class="btn" onclick="getPlayerData()">Get Stats</button>
+          <button class="btn secondary" onclick="clearView()">Clear</button>
+        </div>
+      </header>
+
+      <!-- Top row: player card + time card + village toggle -->
+      <div class="top-row">
+        <div class="top-row-inner">
+          <div id="playerCard" class="card" style="display: none; flex: 1">
+            <div style="display: flex; gap: 12px; align-items: center">
+              <img id="townhallImg" class="th-image" src="" alt="Town Hall" />
+              <img id="clanBadge" class="clan-badge" src="" alt="Clan Badge" />
+              <div class="player-meta" style="flex: 1">
+                <p class="name" id="playerName">—</p>
+                <p class="sub" id="lastUpdated"></p>
+                <div class="stats-grid">
+                  <div class="stat">
+                    <h4 id="thLevel">0</h4>
+                    <p>Town Hall</p>
+                  </div>
+                  <div class="stat">
+                    <h4 id="xpLevel">0</h4>
+                    <p>XP LEVEL</p>
+                  </div>
+                  <div class="stat">
+                    <h4 id="trophies">0</h4>
+                    <p>Trophies</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: center">
+            <div id="timeCard" class="card time-card" style="display: none">
+              <div class="time-value" id="timeValue">0 days</div>
+              <div class="time-label" id="timeLabel">Estimate to max</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main grid: 3 columns (Troops | Heroes | Spells) -->
+      <div class="main-grid">
+        <div class="card panel" id="troopsPanel" aria-live="polite">
+          <div class="panel-title">⚔️ Troops</div>
+          <div class="panel-body" id="troopList"></div>
+        </div>
+
+        <div class="card panel" id="heroesPanel">
+          <div class="panel-title">👑 Heroes & Equipment</div>
+          <div class="panel-body" id="heroList"></div>
+        </div>
+
+        <div class="card panel" id="spellsPanel">
+          <div class="panel-title">✨ Spells</div>
+          <div class="panel-body" id="spellList"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /************************************************************************
+       * IMAGE MAP (keep existing asset names). Fallbacks: assets/default.png
+       ************************************************************************/
+      const IMAGE_MAP = {
+        Barbarian: "assets/Barbarian.png",
+        Archer: "assets/Archer.png",
+        Giant: "assets/Giant.png",
+        Goblin: "assets/Goblin.png",
+        "Wall Breaker": "assets/Wall_Breaker.png",
+        Balloon: "assets/Balloon.png",
+        Wizard: "assets/Wizard.png",
+        Healer: "assets/Healer.png",
+        Dragon: "assets/Dragon.png",
+        "P.E.K.K.A": "assets/p.e.k.k.a.png",
+        "Baby Dragon": "assets/Baby_Dragon.png",
+        Miner: "assets/Miner.png",
+        Yeti: "assets/Yeti.png",
+        Valkyrie: "assets/valkyrie.png",
+        Minion: "assets/minion.png",
+        "Hog Rider": "assets/Hog_Rider.png",
+        "Ice Golem": "assets/Ice_Golem.png",
+        Witch: "assets/Witch.png",
+        "Lava Hound": "assets/Lava_Hound.png",
+        Bowler: "assets/Bowler.png",
+        Headhunter: "assets/Headhunter.png",
+        Golem: "assets/Golem.png",
+        "battle machine": "assets/Battle_Machine.png",
+        "Dragon Rider": "assets/Dragon_Rider.png",
+        "Root Rider": "assets/Root_Rider.png",
+        "Electro Titan": "assets/Electro_Titan.png",
+        Thrower: "assets/Thrower.png",
+        "Battle Blimp": "assets/Battle_Blimp.png",
+        "battle drill": "assets/Battle_Drill.png",
+        "Electro Dragon": "assets/Electro_Dragon.png",
+        "Lightning Spell": "assets/Lightning_Spell.png",
+        "Healing Spell": "assets/Healing_Spell.png",
+        "Rage Spell": "assets/Rage_Spell.png",
+        "Jump Spell": "assets/Jump_Spell.png",
+        "Earthquake Spell": "assets/Earthquake_Spell.png",
+        "Haste Spell": "assets/Haste_Spell.png",
+        "Poison Spell": "assets/Poison_Spell.png",
+        "Freeze Spell": "assets/Freeze_Spell.png",
+        "Skeleton Spell": "assets/Skeleton_Spell.png",
+        "Bat Spell": "assets/Bat_Spell.png",
+        "Invisibility Spell": "assets/Invisibility_Spell.png",
+        "Clone Spell": "assets/Clone_Spell.png",
+        "Recall Spell": "assets/Recall_Spell.png",
+        "Barbarian King": "assets/Barbarian_King.png",
+        "Archer Queen": "assets/Archer_Queen.png",
+        "Grand Warden": "assets/Grand_Warden.png",
+        "Royal Champion": "assets/Royal_Champion.png",
+        "Minion Prince": "assets/Minion_Prince.png",
+        "Barbarian Puppet": "assets/Barbarian_Puppet.png",
+        "Rage Vial": "assets/Rage_Vial.png",
+        "Earthquake Boots": "assets/Earthquake_Boots.png",
+        "Life Gem": "assets/Life_Gem.png",
+        "Rage Gem": "assets/Rage_Gem.png",
+        Fireball: "assets/Fireball_equipment.png",
+        "Eternal Tome": "assets/Eternal_Tome.png",
+        "Invisibility Vial": "assets/Invisibility_Vial.png",
+        "Royal Gem": "assets/Royal_Gem.png",
+        "Seeking Shield": "assets/Seeking_Shield.png",
+        "Dark Orb": "assets/Dark_Orb.png",
+        "Henchmen Puppet": "assets/Henchmen_Puppet.png",
+        Vampstache: "assets/Vampstache.png",
+        "Healer Puppet": "assets/Healer_Puppet.png",
+        "Rocket Spear": "assets/Rocket_Spear.png",
+        "Electro Boots": "assets/Electro_Boots.png",
+        "Log Launcher": "assets/Log_Launcher.png",
+        "Apprentice Warden": "assets/Apprentice_Warden.png",
+        "Overgrowth Spell": "assets/Overgrowth_Spell.png",
+        "Archer Puppet": "assets/Archer_Puppet.png",
+        "Giant Arrow": "assets/Giant_Arrow.png",
+        "Frozen Arrow": "assets/Frozen_Arrow.png",
+        "Giant Gauntlet": "assets/Giant_Gauntlet.png",
+        "Healing Tome": "assets/Healing_Tome.png",
+        "Wall Wrecker": "assets/Wall_Wrecker.png",
+        "Stone Slammer": "assets/Stone_Slammer.png",
+        "Siege Barracks": "assets/Siege_Barracks.png",
+        "Meteor Staff": "assets/Meteor_Staff.png",
+        "Raged Barbarian": "assets/Raged_Barbarian.png",
+        "Sneaky Archer": "assets/Sneaky_Archer.png",
+        "Beta Minion": "assets/Beta_Minion.png",
+        "Boxer Giant": "assets/Boxer_Giant.png",
+        Bomber: "assets/Bomber.png",
+        "Cannon Cart": "assets/Cannon_Cart.png",
+        "Night Witch": "assets/Night_Witch.png",
+        "Battle Machine": "assets/Battle_Machine.png",
+
+        // HERO PETS
+        "L.A.S.S.I": "assets/L.A.S.S.I.png",
+        "Electro Owl": "assets/Electro_Owl.png",
+        "Mighty Yak": "assets/Mighty.png",
+        Unicorn: "assets/Unicorn.png",
+        Frosty: "assets/Frosty.png",
+        Diggy: "assets/Diggy.png",
+        "Poison Lizard": "assets/Poison_Lizard.png",
+        Phoenix: "assets/Phoenix.png",
+        "Spirit Fox": "assets/Spirit_Fox.png",
+        "Angry Jelly": "assets/Angry_Jelly.png",
+        Sneezy: "assets/Sneezy.png",
+
+        // SUPER TROOPS
+        "Super Barbarian": "assets/Super_Barbarian.png",
+        "Super Archer": "assets/Super_Archer.png",
+        "Super Giant": "assets/Super_Giant.png",
+        "Sneaky Goblin": "assets/sneaky_Goblin.png",
+        "Super Valkyrie": "assets/Super_Valkyrie.png",
+        "Super Minion": "assets/Super_Minion.png",
+        "Super Hog Rider": "assets/Super_Hog_Rider.png",
+        "Super Wall Breaker": "assets/Super_Wall_Breaker.png",
+        "Rocket Balloon": "assets/rocket_Balloon.png",
+        "Super Wizard": "assets/Super_Wizard.png",
+        "Super Witch": "assets/Super_Witch.png",
+        "Super Bowler": "assets/Super_Bowler.png",
+        "Ice Hound": "assets/Ice_Hound.png",
+        "Super Dragon": "assets/Super_Dragon.png",
+        "Inferno Dragon": "assets/inferno_Dragon.png",
+        "Super Miner": "assets/Super_Miner.png",
+        "Super Yeti": "assets/Super_Yeti.png",
+      };
+
+      /************************************************************************
+       * SUPER TROOP / SPECIAL NAMES BLACKLIST — hide these
+       ************************************************************************/
+      const SPECIAL_EXCLUDE = new Set([
+        "inferno dragon",
+        "rocket balloon",
+        "sneaky goblin",
+        "ice hound",
+        "inferno_dragon",
+        "super barbarian",
+        "super archer",
+        "super giant",
+        "super witch",
+        "super dragon",
+        "super minion",
+        "super valkyrie",
+        "super hog rider",
+        "super bowler",
+        "super wizard",
+        "rocket_balloon",
+        "sneaky_goblin",
+        "Battle Machine",
+      ]);
+
+      function isSuperOrSpecial(name) {
+        if (!name) return false;
+        const n = String(name).trim().toLowerCase();
+        if (n.startsWith("super ")) return true;
+        if (SPECIAL_EXCLUDE.has(n)) return true;
+        if (n.includes("super-") || n.includes("super_")) return true;
+        return false;
+      }
+
+      function isBuilderBaseTroopOrHero(village) {
+        if (!village) return false;
+        const n = String(village).trim().toLowerCase();
+        if (n === "builderbase") return true;
+        if (n.startsWith("builder ")) return true;
+        if (n.includes("builder-") || n.includes("builder_")) return true;
+        return false;
+      }
+
+      /************************************************************************
+       * TH_MAX_LEVELS mapping loader:
+       * If you have the full mapping set earlier as window.TH_MAX_LEVELS, we'll use it.
+       * If not present we fall back to item.maxLevel or item.level.
+       ************************************************************************/
+      const TH_MAX_LEVELS = (function () {
+        // minimal mapping used for demonstration - extend as required
+        return {
+          // HEROES
+          "Barbarian King": {
+            7: 10,
+            8: 20,
+            9: 30,
+            10: 40,
+            11: 50,
+            12: 65,
+            13: 75,
+            14: 85,
+            15: 90,
+            16: 95,
+            17: 100,
+          },
+          "Archer Queen": {
+            9: 30,
+            10: 40,
+            11: 50,
+            12: 65,
+            13: 75,
+            14: 85,
+            15: 90,
+            16: 95,
+            17: 100,
+          },
+          "Minion Prince": {
+            9: 10,
+            10: 20,
+            11: 30,
+            12: 40,
+            13: 50,
+            14: 60,
+            15: 70,
+            16: 80,
+            17: 90,
+          },
+          "Grand Warden": {
+            11: 20,
+            12: 40,
+            13: 50,
+            14: 60,
+            15: 65,
+            16: 70,
+            17: 75,
+          },
+          "Royal Champion": { 13: 25, 14: 30, 15: 40, 16: 45, 17: 50 },
+
+          // Hero EQUIPMENT
+          "Barbarian Puppet": { 7: 1, 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Rage Vial": { 7: 1, 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Earthquake Boots": { 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Dark Orb": { 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Henchmen Puppet": { 8: 9, 10: 12, 12: 15, 14: 18 },
+          Vampstache: { 10: 9, 12: 15, 14: 18 },
+          "Giant Gauntlet": { 8: 12, 10: 15, 12: 18, 14: 21, 15: 24, 16: 27 },
+          "Rocket Spear": { 9: 12, 10: 15, 12: 18, 14: 21, 15: 24, 16: 27 },
+          "Electro Boots": { 10: 12, 10: 15, 12: 18, 14: 21, 15: 24, 16: 27 },
+
+          "Archer Puppet": { 9: 1, 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Invisibility Vial": { 9: 1, 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Giant Arrow": { 9: 9, 10: 12, 12: 15, 14: 18 },
+          "Healer Puppet": { 12: 9, 14: 18 },
+          "Frozen Arrow": { 8: 12, 10: 15, 12: 18, 14: 21, 15: 24, 16: 27 },
+
+          "Eternal Tome": { 11: 1, 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Life Gem": { 11: 1, 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Rage Gem": { 11: 12, 12: 15, 14: 18 },
+          "Healing Tome": { 11: 12, 12: 15, 14: 18 },
+          Fireball: { 8: 12, 10: 15, 12: 18, 14: 21, 15: 24, 16: 27 },
+
+          "Royal Gem": { 13: 1, 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Seeking Shield": { 13: 1, 8: 9, 10: 12, 12: 15, 14: 18 },
+          "Hog Rider Puppet": { 14: 18 },
+          "Haste Vial": { 15: 18 },
+
+          // PETS
+          "L.A.S.S.I": { 14: 10, 15: 15 },
+          "Electro Owl": { 14: 10, 15: 10, 16: 15 },
+          "Mighty Yak": { 14: 10, 15: 15 },
+          Unicorn: { 14: 10, 15: 10, 16: 10, 17: 15 },
+          Frosty: { 15: 10, 16: 10, 17: 15 },
+          Diggy: { 15: 10 },
+          "Poison Lizard": { 15: 10 },
+          Phoenix: { 15: 10 },
+          "Spirit Fox": { 16: 10 },
+          "Angry Jelly": { 16: 10 },
+          Sneezy: { 17: 10 },
+
+          // ARMY
+          Barbarian: {
+            1: 1,
+            2: 1,
+            3: 2,
+            4: 2,
+            5: 3,
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 7,
+            11: 8,
+            12: 9,
+            13: 9,
+            14: 10,
+            15: 11,
+            16: 12,
+          },
+          Archer: {
+            1: 1,
+            2: 1,
+            3: 2,
+            4: 2,
+            5: 3,
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 7,
+            11: 8,
+            12: 9,
+            13: 9,
+            14: 10,
+            15: 11,
+            16: 12,
+            17: 13,
+          },
+          Giant: {
+            1: 1,
+            2: 1,
+            3: 1,
+            4: 2,
+            5: 2,
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 7,
+            11: 8,
+            12: 9,
+            13: 10,
+            14: 10,
+            15: 11,
+            16: 12,
+            17: 13,
+          },
+          Goblin: {
+            2: 1,
+            3: 2,
+            4: 2,
+            5: 3,
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 7,
+            11: 7,
+            12: 8,
+            13: 8,
+            14: 8,
+            15: 9,
+          },
+          "Wall Breaker": {
+            3: 1,
+            4: 2,
+            5: 2,
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 5,
+            10: 6,
+            11: 7,
+            12: 8,
+            13: 9,
+            14: 10,
+            15: 11,
+            16: 12,
+            17: 13,
+          },
+          Balloon: {
+            4: 2,
+            5: 2,
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 6,
+            11: 7,
+            12: 8,
+            13: 9,
+            14: 10,
+            15: 10,
+            16: 11,
+            17: 12,
+          },
+          Wizard: {
+            5: 2,
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 7,
+            11: 8,
+            12: 9,
+            13: 10,
+            14: 10,
+            15: 11,
+            16: 12,
+            17: 13,
+          },
+          Healer: {
+            6: 1,
+            7: 2,
+            8: 3,
+            9: 4,
+            10: 4,
+            11: 5,
+            12: 5,
+            13: 6,
+            14: 7,
+            15: 8,
+            16: 9,
+            17: 10,
+          },
+          Dragon: {
+            7: 2,
+            8: 3,
+            9: 4,
+            10: 5,
+            11: 6,
+            12: 7,
+            13: 8,
+            14: 9,
+            15: 10,
+            16: 11,
+            17: 12,
+          },
+          "P.E.K.K.A": {
+            8: 3,
+            9: 4,
+            10: 5,
+            11: 7,
+            12: 8,
+            13: 9,
+            14: 9,
+            15: 10,
+            16: 11,
+            17: 12,
+          },
+          "Baby Dragon": {
+            9: 2,
+            10: 4,
+            11: 5,
+            12: 6,
+            13: 7,
+            14: 8,
+            15: 9,
+            16: 10,
+            17: 11,
+          },
+          Miner: { 10: 3, 11: 5, 12: 6, 13: 7, 14: 8, 15: 9, 16: 10, 17: 11 },
+          "Electro Dragon": { 11: 2, 12: 3, 13: 4, 14: 5, 15: 6, 16: 7, 17: 8 },
+          Yeti: { 12: 2, 13: 3, 14: 4, 15: 5, 16: 6, 17: 7 },
+          "Dragon Rider": { 13: 2, 14: 3, 15: 3, 16: 4, 17: 5 },
+          "Electro Titan": { 14: 2, 15: 3, 16: 4 },
+          "Root Rider": { 15: 2, 16: 3 },
+          Thrower: { 16: 2, 17: 3 },
+          Minion: {
+            7: 2,
+            8: 4,
+            9: 5,
+            10: 6,
+            11: 7,
+            12: 8,
+            13: 9,
+            14: 10,
+            15: 11,
+            16: 12,
+            17: 13,
+          },
+          "Hog Rider": {
+            7: 2,
+            8: 4,
+            9: 5,
+            10: 6,
+            11: 7,
+            12: 9,
+            13: 10,
+            14: 10,
+            15: 12,
+            16: 13,
+            17: 14,
+          },
+          Valkyrie: {
+            8: 2,
+            9: 4,
+            10: 5,
+            11: 6,
+            12: 7,
+            13: 8,
+            14: 9,
+            15: 10,
+            16: 11,
+          },
+          Golem: {
+            8: 2,
+            9: 4,
+            10: 5,
+            11: 7,
+            12: 9,
+            13: 10,
+            14: 11,
+            15: 12,
+            16: 13,
+            17: 14,
+          },
+          Witch: { 9: 2, 10: 3, 11: 4, 12: 5, 13: 5, 14: 5, 15: 6, 16: 7 },
+          "Lava Hound": { 9: 2, 10: 3, 11: 4, 12: 5, 13: 6, 14: 7 },
+          Bowler: { 10: 2, 11: 3, 12: 4, 13: 5, 14: 6, 15: 7, 16: 8, 17: 9 },
+          "Ice Golem": { 11: 3, 12: 5, 13: 5, 14: 6, 15: 7, 16: 8, 17: 9 },
+          Headhunter: { 12: 2, 13: 3 },
+          "Apprentice Warden": { 13: 2, 14: 3, 15: 4 },
+          Druid: { 14: 2, 15: 3, 16: 4, 17: 5 },
+          Furnace: { 15: 2, 16: 3, 17: 4 },
+
+          //super troops
+          "Super Barbarian": { 11: 8, 12: 9, 13: 10, 14: 11, 15: 11, 16: 12 },
+          "Super Archer": { 11: 8, 12: 9, 13: 10, 14: 11, 15: 11, 16: 12 },
+          "Super Giant": { 11: 9, 12: 10, 13: 11, 14: 12, 15: 12, 16: 13 },
+          "Sneaky Goblin": { 11: 7, 12: 8, 13: 9, 14: 10, 15: 10, 16: 11 },
+          "Super Wall Breaker": { 11: 6, 12: 7, 13: 8, 14: 9, 15: 9, 16: 10 },
+          "Rocket Balloon": { 11: 6, 12: 7, 13: 8, 14: 9, 15: 9, 16: 10 },
+          "Super Wizard": { 12: 9, 13: 10, 14: 11, 15: 11, 16: 12 },
+          "Inferno Dragon": { 11: 4, 12: 5, 13: 6, 14: 7, 15: 7, 16: 8 },
+          "Super Minion": { 11: 7, 12: 8, 13: 9, 14: 10, 15: 10, 16: 11 },
+          "Super Valkyrie": { 12: 6, 13: 7, 14: 8, 15: 8, 16: 9 },
+          "Super Witch": { 12: 3, 13: 4, 14: 5, 15: 5, 16: 6 },
+          "Ice Hound": { 12: 3, 13: 4, 14: 5, 15: 5, 16: 6 },
+          "Super Bowler": { 12: 3, 13: 4, 14: 5, 15: 5, 16: 6 },
+          "Super Dragon": { 13: 5, 14: 6, 15: 6, 16: 7 },
+          "Super Miner": { 14: 5, 15: 5, 16: 6 },
+          "Super Hog Rider": { 14: 6, 15: 6, 16: 7 },
+
+          // SPELLS
+          "Lightning Spell": {
+            5: 4,
+            6: 4,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 7,
+            11: 8,
+            12: 9,
+            13: 9,
+            14: 9,
+            15: 10,
+            16: 11,
+            17: 12,
+          },
+          "Healing Spell": {
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 7,
+            11: 7,
+            12: 7,
+            13: 8,
+            14: 8,
+            15: 9,
+            16: 10,
+            17: 11,
+          },
+          "Rage Spell": { 7: 4, 8: 5, 9: 5, 10: 5, 11: 5, 12: 6 },
+          "Jump Spell": { 9: 2, 10: 3, 11: 3, 12: 3, 13: 4, 14: 4, 15: 5 },
+          "Freeze Spell": { 9: 2, 10: 5, 11: 6, 12: 7 },
+          "Clone Spell": { 10: 3, 11: 5, 12: 5, 13: 6, 14: 7, 15: 8 },
+          "Invisibility Spell": { 11: 2, 12: 3, 13: 4 },
+          "Recall Spell": { 13: 2, 14: 3, 15: 4, 16: 5, 17: 6 },
+          "Revive Spell": { 15: 2, 16: 3, 17: 4 },
+          "Poison Spell": {
+            8: 2,
+            9: 3,
+            10: 4,
+            11: 5,
+            12: 6,
+            13: 7,
+            14: 8,
+            15: 9,
+            16: 10,
+            17: 11,
+          },
+          "Earthquake Spell": { 8: 2, 9: 3, 10: 4, 11: 5 },
+          "Haste Spell": {
+            9: 2,
+            10: 4,
+            11: 5,
+            12: 5,
+            13: 5,
+            14: 5,
+            15: 5,
+            16: 5,
+            17: 6,
+          },
+          "Skeleton Spell": { 10: 3, 11: 4, 12: 6, 13: 7, 14: 7, 15: 8 },
+          "Bat Spell": {
+            10: 3,
+            11: 4,
+            12: 5,
+            13: 5,
+            14: 5,
+            15: 6,
+            16: 6,
+            17: 7,
+          },
+          "Overgrowth Spell": { 12: 2, 13: 2, 14: 3, 15: 3, 16: 4 },
+          "Ice Block": { 14: 2, 15: 3, 16: 4, 17: 5 },
+
+          // SIEGE MACHINES
+          "Wall Wrecker": { 12: 3, 13: 4, 14: 4, 15: 5 },
+          "Battle Blimp": { 12: 3, 13: 4, 14: 4, 15: 5 },
+          "Stone Slammer": { 12: 3, 13: 4, 14: 4, 15: 5 },
+          "Siege Barracks": { 13: 3, 14: 4, 15: 4, 16: 5 },
+          "Log Launcher": { 13: 3, 14: 4, 15: 4, 16: 5 },
+          "Flame Flinger": { 14: 4, 15: 4, 16: 4 },
+          "Battle Drill": { 15: 4, 16: 4, 17: 5 },
+          "Troop Launcher": { 16: 3, 17: 4 },
+
+          // RESOURCE BUILDINGS
+          "Gold Mine": {
+            1: 2,
+            2: 4,
+            3: 6,
+            4: 8,
+            5: 10,
+            6: 10,
+            7: 11,
+            8: 12,
+            9: 12,
+            10: 13,
+            11: 14,
+            12: 15,
+            13: 15,
+            14: 16,
+          },
+          "Elixir Collector": {
+            1: 2,
+            2: 4,
+            3: 6,
+            4: 8,
+            5: 10,
+            6: 10,
+            7: 11,
+            8: 12,
+            9: 12,
+            10: 13,
+            11: 14,
+            12: 15,
+            13: 15,
+            14: 16,
+          },
+          "Gold Storage": {
+            1: 1,
+            2: 3,
+            3: 6,
+            4: 8,
+            5: 9,
+            6: 10,
+            7: 11,
+            8: 11,
+            9: 11,
+            10: 11,
+            11: 12,
+            12: 13,
+            13: 14,
+            14: 15,
+            15: 16,
+            16: 17,
+            17: 18,
+          },
+          "Elixir Storage": {
+            1: 1,
+            2: 3,
+            3: 6,
+            4: 8,
+            5: 9,
+            6: 10,
+            7: 11,
+            8: 11,
+            9: 11,
+            10: 11,
+            11: 12,
+            12: 13,
+            13: 14,
+            14: 15,
+            15: 16,
+            16: 17,
+            17: 18,
+          },
+          "Dark Elixir Drill": {
+            7: 3,
+            8: 3,
+            9: 6,
+            10: 7,
+            11: 8,
+            12: 9,
+            13: 9,
+            14: 10,
+          },
+          "Dark Elixir Storage": {
+            7: 2,
+            8: 4,
+            9: 6,
+            10: 6,
+            11: 6,
+            12: 7,
+            13: 8,
+            14: 9,
+            15: 10,
+            16: 11,
+            17: 12,
+          },
+          "Clan Castle": {
+            2: 1,
+            3: 1,
+            4: 2,
+            5: 2,
+            6: 3,
+            7: 3,
+            8: 4,
+            9: 5,
+            10: 6,
+            11: 7,
+            12: 8,
+            13: 9,
+            14: 10,
+            15: 11,
+            16: 12,
+            17: 13,
+          },
+
+          // ARMY BUILDINGS
+          "Army Camp": {
+            1: 1,
+            2: 2,
+            3: 3,
+            4: 4,
+            5: 5,
+            6: 6,
+            7: 6,
+            8: 6,
+            9: 7,
+            10: 8,
+            11: 9,
+            12: 10,
+            13: 11,
+            14: 11,
+            15: 12,
+            16: 12,
+            17: 13,
+          },
+          Barracks: {
+            1: 3,
+            2: 4,
+            3: 5,
+            4: 6,
+            5: 7,
+            6: 8,
+            7: 9,
+            8: 10,
+            9: 11,
+            10: 12,
+            11: 13,
+            12: 14,
+            13: 15,
+            14: 16,
+            15: 17,
+            16: 18,
+          },
+          "Dark Barracks": {
+            7: 2,
+            8: 4,
+            9: 6,
+            10: 7,
+            11: 8,
+            12: 9,
+            13: 10,
+            14: 11,
+            15: 12,
+          },
+          Laboratory: {
+            3: 1,
+            4: 2,
+            5: 3,
+            6: 4,
+            7: 5,
+            8: 6,
+            9: 7,
+            10: 8,
+            11: 9,
+            12: 10,
+            13: 11,
+            14: 12,
+            15: 13,
+            16: 14,
+            17: 15,
+          },
+          "Spell Factory": {
+            5: 1,
+            6: 2,
+            7: 3,
+            8: 3,
+            9: 4,
+            10: 5,
+            11: 6,
+            12: 6,
+            13: 7,
+            14: 7,
+            15: 8,
+          },
+          "Hero Hall": {
+            7: 1,
+            8: 2,
+            9: 3,
+            10: 4,
+            11: 5,
+            12: 6,
+            13: 7,
+            14: 8,
+            15: 9,
+            16: 10,
+            17: 11,
+          },
+          "Hero Banner": { 7: 1, 8: 1, 9: 2, 10: 2, 11: 3, 12: 3, 13: 4 },
+          "Dark Spell Factory": {
+            8: 2,
+            9: 4,
+            10: 5,
+            11: 5,
+            12: 6,
+            13: 6,
+            14: 7,
+          },
+          Blacksmith: {
+            8: 1,
+            9: 2,
+            10: 3,
+            11: 4,
+            12: 5,
+            13: 6,
+            14: 7,
+            15: 8,
+            16: 9,
+          },
+          Workshop: { 12: 3, 13: 5, 14: 6, 15: 7, 16: 8 },
+          "Pet House": { 14: 4, 15: 8, 16: 10, 17: 11 },
+
+          // DEFENSIVE BUILDINGS
+          Cannon: {
+            1: 2,
+            2: 3,
+            3: 4,
+            4: 5,
+            5: 6,
+            6: 7,
+            7: 8,
+            8: 10,
+            9: 11,
+            10: 13,
+            11: 15,
+            12: 17,
+            13: 19,
+            14: 20,
+            15: 21,
+          },
+          "Archer Tower": {
+            2: 2,
+            3: 3,
+            4: 4,
+            5: 6,
+            6: 7,
+            7: 8,
+            8: 10,
+            9: 11,
+            10: 13,
+            11: 15,
+            12: 17,
+            13: 19,
+            14: 20,
+            15: 21,
+          },
+          Mortar: {
+            3: 1,
+            4: 2,
+            5: 3,
+            6: 4,
+            7: 5,
+            8: 6,
+            9: 7,
+            10: 8,
+            11: 10,
+            12: 12,
+            13: 13,
+            14: 14,
+            15: 15,
+            16: 16,
+            17: 17,
+          },
+          "Air Defense": {
+            4: 2,
+            5: 3,
+            6: 4,
+            7: 5,
+            8: 6,
+            9: 7,
+            10: 8,
+            11: 9,
+            12: 10,
+            13: 11,
+            14: 12,
+            15: 13,
+            16: 14,
+            17: 15,
+          },
+          "Wizard Tower": {
+            5: 2,
+            6: 3,
+            7: 4,
+            8: 6,
+            9: 7,
+            10: 9,
+            11: 10,
+            12: 11,
+            13: 13,
+            14: 14,
+            15: 15,
+            16: 16,
+            17: 17,
+          },
+          "Air Sweeper": { 6: 2, 7: 3, 8: 4, 9: 5, 10: 6, 11: 7 },
+          "Hidden Tesla": {
+            7: 3,
+            8: 6,
+            9: 7,
+            10: 8,
+            11: 9,
+            12: 10,
+            13: 12,
+            14: 13,
+            15: 14,
+            16: 15,
+            17: 16,
+          },
+          "Bomb Tower": {
+            8: 2,
+            9: 3,
+            10: 4,
+            11: 6,
+            12: 7,
+            13: 8,
+            14: 9,
+            15: 10,
+            16: 11,
+            17: 12,
+          },
+          "X-Bow": {
+            9: 3,
+            10: 4,
+            11: 5,
+            12: 6,
+            13: 8,
+            14: 9,
+            15: 10,
+            16: 11,
+            17: 12,
+          },
+          "Inferno Tower": {
+            10: 3,
+            11: 5,
+            12: 6,
+            13: 7,
+            14: 8,
+            15: 9,
+            16: 10,
+            17: 11,
+          },
+          "Eagle Artillery": { 11: 2, 12: 3, 13: 4, 14: 5, 15: 6, 16: 7 },
+          Scattershot: { 13: 2, 14: 3, 15: 4, 16: 5, 17: 6 },
+          "Builders Hut": {
+            1: 1,
+            2: 1,
+            3: 1,
+            4: 1,
+            5: 1,
+            6: 1,
+            7: 1,
+            8: 1,
+            9: 1,
+            10: 1,
+            11: 1,
+            12: 1,
+            13: 1,
+            14: 4,
+            15: 5,
+            16: 6,
+            17: 7,
+          },
+          "Spell Tower": { 15: 3 },
+          Monolith: { 15: 2, 16: 3, 17: 4 },
+          "Multi-Archer Tower": { 16: 2, 17: 3 },
+          "Ricochet Cannon": { 16: 2, 17: 3 },
+          "Multi-Gear Tower": { 17: 2 },
+          Firespitter: { 17: 2 },
+          Walls: {
+            2: 2,
+            3: 3,
+            4: 4,
+            5: 5,
+            6: 6,
+            7: 7,
+            8: 8,
+            9: 10,
+            10: 11,
+            11: 12,
+            12: 13,
+            13: 14,
+            14: 15,
+            15: 16,
+            16: 17,
+            17: 18,
+          },
+          "Giga Tesla TH12": { 12: 1 },
+          "Giga Tesla TH13": { 13: 1 },
+          "Giga Inferno TH14": { 14: 1 },
+          "Giga Inferno TH15": { 15: 1 },
+          "Giga Inferno TH16": { 16: 1 },
+          "Inferno Artillery TH17": { 17: 5 },
+
+          // TRAPS
+          Bomb: {
+            3: 2,
+            4: 2,
+            5: 3,
+            6: 3,
+            7: 4,
+            8: 5,
+            9: 6,
+            10: 7,
+            11: 8,
+            12: 8,
+            13: 9,
+            14: 10,
+            15: 11,
+            16: 12,
+            17: 13,
+          },
+          "Spring Trap": { 4: 1, 5: 1, 6: 1, 7: 2, 8: 3, 9: 4, 10: 5 },
+          "Giant Bomb": {
+            6: 2,
+            7: 2,
+            8: 3,
+            9: 3,
+            10: 4,
+            11: 5,
+            12: 5,
+            13: 7,
+            14: 8,
+            15: 9,
+            16: 10,
+            17: 11,
+          },
+          "Air Bomb": {
+            5: 2,
+            6: 2,
+            7: 3,
+            8: 3,
+            9: 4,
+            10: 4,
+            11: 5,
+            12: 6,
+            13: 8,
+            14: 9,
+            15: 10,
+            16: 11,
+            17: 12,
+          },
+          "Seeking Air Mine": {
+            7: 1,
+            8: 1,
+            9: 2,
+            10: 3,
+            11: 3,
+            12: 3,
+            13: 4,
+            14: 4,
+            15: 5,
+            16: 6,
+            17: 7,
+          },
+          "Skeleton Traps": { 8: 2, 9: 3, 10: 4 },
+          "Tornado Trap": { 11: 2, 12: 3 },
+          "Giga Bomb": { 17: 3 },
+        };
+      })();
+
+      function getTHBasedMaxLevel(itemName, playerTH) {
+        if (!itemName) return null;
+        // attempt exact name match first
+        let itemData = TH_MAX_LEVELS[itemName];
+        // try case-insensitive and normalized variants
+        if (!itemData) {
+          itemData =
+            TH_MAX_LEVELS[itemName.toLowerCase()] ||
+            TH_MAX_LEVELS[itemName.replace(/\s+/g, " ")];
+        }
+        if (itemData) {
+          let th = playerTH;
+          while (th > 0 && !itemData[th]) th--;
+          return th > 0 ? itemData[th] : null;
+        }
+        return null;
+      }
+
+      /************************************************************************
+       * Town Hall image selection:
+       * - If there is a sublevel/weapon level field, we attempt to build filename: `${th}.${sub}.png`
+       * - Otherwise show `${th}.png`
+       * The images are expected to be in the same directory as this HTML (per your note),
+       * so we reference relative filenames like `./14.1.png` or `./16.png`.
+       ************************************************************************/
+      function getTownhallFilename(data) {
+        const th =
+          data?.townHallLevel ||
+          data?.townHall ||
+          data?.thLevel ||
+          data?.townhallLevel;
+        if (!th) return null;
+        // possible sublevel/weapon fields
+        const subCandidates = [
+          "townHallWeaponLevel",
+          "townHallWeapon",
+          "weaponLevel",
+          "gigaLevel",
+          "townHallUpgradeLevel",
+          "thWeaponLevel",
+          "townHallExtra",
+          "townHallLevelExtra",
+        ];
+        let sub = null;
+        for (const k of subCandidates) {
+          if (typeof data[k] !== "undefined" && data[k] !== null) {
+            sub = data[k];
+            break;
+          }
+        }
+        // Some APIs use object: data.townHall?.weaponLevel or similar
+        if (!sub && data.townHall && typeof data.townHall === "object") {
+          if (typeof data.townHall.weaponLevel !== "undefined")
+            sub = data.townHall.weaponLevel;
+        }
+        if (sub !== null && String(sub).length) {
+          // normalize numeric-ish to integer/float form (e.g., 1 -> 1)
+          const subStr = String(sub)
+            .replace(/[^\d.]/g, "")
+            .trim();
+          return `${th}.${subStr}.png`;
+        }
+        // default
+        return `${th}.png`;
+      }
+
+      /************************************************************************
+       * UI helpers
+       ************************************************************************/
+      function clearView() {
+        document.getElementById("troopList").innerHTML = "";
+        document.getElementById("heroList").innerHTML = "";
+        document.getElementById("spellList").innerHTML = "";
+        document.getElementById("playerCard").style.display = "none";
+        document.getElementById("timeCard").style.display = "none";
+        hideStatus();
+      }
+
+      function showLoading(message) {
+        const loader = `<div style="text-align:center;padding:18px;color:var(--gold)"><div style="margin:6px auto;width:36px;height:36px;border:4px solid rgba(255,255,255,0.06);border-top:4px solid var(--gold);border-radius:50%;animation:spin 1s linear infinite"></div><div style="margin-top:10px">${message}</div></div>`;
+        document.getElementById("troopList").innerHTML = loader;
+        document.getElementById("heroList").innerHTML = loader;
+        document.getElementById("spellList").innerHTML = loader;
+        document.getElementById("playerCard").style.display = "none";
+        document.getElementById("timeCard").style.display = "none";
+        hideStatus();
+      }
+
+      function showStatus(message, retryFn) {
+        const statusCard = document.getElementById("villageToggle"); // reuse top control area for visible message
+        // We will display an in-page toast under the toggle — but for simplicity use alertish area on bottom of screen
+        const existing = document.getElementById("statusToast");
+        if (existing) existing.remove();
+        const toast = document.createElement("div");
+        toast.id = "statusToast";
+        toast.className = "card";
+        toast.style.marginTop = "6px";
+        toast.style.textAlign = "center";
+        toast.innerHTML = `<div style="color:var(--muted)">${message}</div>`;
+        if (retryFn) {
+          const b = document.createElement("button");
+          b.className = "btn";
+          b.style.marginTop = "10px";
+          b.textContent = "Retry";
+          b.onclick = retryFn;
+          toast.appendChild(b);
+        }
+        document.querySelector(".container").appendChild(toast);
+        setTimeout(() => {
+          try {
+            toast.style.opacity = "1";
+          } catch (e) {}
+        }, 10);
+      }
+
+      function hideStatus() {
+        const existing = document.getElementById("statusToast");
+        if (existing) existing.remove();
+      }
+
+      /************************************************************************
+       * API fetch + render pipeline
+       ************************************************************************/
+      let currentPlayerData = null;
+      let currentVillage = "home"; // 'home' or 'builderBase'
+
+      async function getPlayerData() {
+        const tagInput = document.getElementById("playerTag");
+        let tag = tagInput.value.trim();
+        if (!tag) return showStatus("Please enter a player tag");
+        if (!tag.startsWith("#")) tag = "#" + tag;
+
+        // remove any prior toast
+        hideStatus();
+        showLoading("Fetching player data...");
+        try {
+          const res = await fetch(`/api/player/${encodeURIComponent(tag)}`);
+          if (!res.ok) throw new Error(`API ${res.status}`);
+          const data = await res.json();
+          if (data.reason === "notFound") throw new Error("Player not found");
+
+          currentPlayerData = data;
+          // default to home village if available; but keep toggle state
+          if (!data.builderHallLevel && !data.builderBase) {
+            currentVillage = "home";
+            document.getElementById("homeBtn").classList.add("active");
+            document.getElementById("bbBtn").classList.remove("active");
+          }
+          renderAll(data);
+        } catch (err) {
+          console.error(err);
+          showStatus(err.message || "Error fetching data", () =>
+            getPlayerData()
+          );
+        }
+      }
+
+      function switchVillage(v) {
+        if (v !== "home" && v !== "builderBase") return;
+        currentVillage = v;
+        document
+          .getElementById("homeBtn")
+          .classList.toggle("active", v === "home");
+        document
+          .getElementById("bbBtn")
+          .classList.toggle("active", v === "builderBase");
+        if (currentPlayerData) renderAll(currentPlayerData);
+      }
+
+      function renderAll(data) {
+        renderPlayerCard(data);
+        renderUpgrades(data);
+        hideStatus();
+      }
+
+      function renderPlayerCard(data) {
+        // Set townhall image based on TH level
+        document.getElementById("townhallImg").src = `/assets/${
+          data.townHallLevel || "unknown"
+        }.png`;
+
+        document.getElementById("clanBadge").src =
+          data.clan?.badgeUrls?.medium || "";
+        document.getElementById("playerName").textContent =
+          data.name || "Unknown";
+        const ts = data.timestamp ? new Date(data.timestamp * 1000) : null;
+        document.getElementById("lastUpdated").textContent = ts
+          ? `Last updated: ${ts.toLocaleString()}`
+          : "";
+        document.getElementById("thLevel").textContent =
+          data.townHallLevel || 0;
+        document.getElementById("xpLevel").textContent =
+          data.expLevel || data.experienceLevel || data.level || 0;
+        document.getElementById("trophies").textContent = data.trophies || 0;
+
+        // show cards
+        document.getElementById("playerCard").style.display = "block";
+
+        // estimate time
+        const timeData = calculateTimeToMax(data);
+        document.getElementById("timeValue").textContent = formatTime(
+          timeData.totalDays
+        );
+        document.getElementById(
+          "timeLabel"
+        ).textContent = `${timeData.totalUpgrades} upgrades remaining`;
+        document.getElementById("timeCard").style.display = "flex";
+      }
+
+      function calculateTimeToMax(playerData) {
+        // rough estimator: consider selected village only
+        let totalDays = 0,
+          totalUpgrades = 0;
+        const listCats =
+          currentVillage === "home"
+            ? ["troops", "heroes", "spells"]
+            : [
+                "builderTroops",
+                "builderHeroes",
+                "builderSpells",
+                "builderBuildings",
+              ];
+        listCats.forEach((cat) => {
+          (playerData[cat] || []).forEach((item) => {
+            if (!item || !item.name) return;
+            if (isSuperOrSpecial(item.name)) return;
+            const thMax =
+              getTHBasedMaxLevel(item.name, playerData.townHallLevel) ||
+              item.maxLevel ||
+              item.level ||
+              0;
+            if (thMax && item.level < thMax) {
+              const need = thMax - item.level;
+              totalUpgrades += need;
+              totalDays += need * 2; // rough 2 days per upgrade
+            }
+          });
+        });
+        return { totalDays: Math.round(totalDays), totalUpgrades };
+      }
+
+      function formatTime(days) {
+        if (!days) return "0 days";
+        if (days >= 365) {
+          const y = Math.floor(days / 365);
+          const r = days % 365;
+          return `${y}y ${r}d`;
+        }
+        if (days >= 30) {
+          const m = Math.floor(days / 30);
+          const r = days % 30;
+          return `${m}mo ${r}d`;
+        }
+        return `${days} day${days !== 1 ? "s" : ""}`;
+      }
+
+      /************************************************************************
+       * Render functions for panels
+       ************************************************************************/
+      function renderUpgrades(data) {
+        // pick lists by village
+        const troopListEl = document.getElementById("troopList");
+        const heroListEl = document.getElementById("heroList");
+        const spellListEl = document.getElementById("spellList");
+        troopListEl.innerHTML = "";
+        heroListEl.innerHTML = "";
+        spellListEl.innerHTML = "";
+
+        // decide arrays based on village
+        const troopsArr =
+          currentVillage === "home"
+            ? data.troops || []
+            : data.builderTroops || data.bbTroops || []; // try common names
+        const heroesArr =
+          currentVillage === "home"
+            ? data.heroes || []
+            : data.builderHeroes || [];
+        const spellsArr =
+          currentVillage === "home"
+            ? data.spells || []
+            : data.builderSpells || [];
+
+        // filter out super/special
+        const troops = troopsArr.filter(
+          (t) =>
+            t &&
+            t.name &&
+            !isSuperOrSpecial(t.name) &&
+            !isBuilderBaseTroopOrHero(t.village)
+        );
+        const heroes = heroesArr.filter(
+          (h) =>
+            h &&
+            h.name &&
+            !isSuperOrSpecial(h.name) &&
+            !isBuilderBaseTroopOrHero(h.village)
+        );
+        const spells = spellsArr.filter(
+          (s) => s && s.name && !isSuperOrSpecial(s.name)
+        );
+
+        // helper maker
+        function makeItemDOM(item, category) {
+          const wrapper = document.createElement("div");
+          wrapper.className = "upgrade-item fade-in";
+          const left = document.createElement("div");
+          left.className = "upgrade-left";
+          const img = document.createElement("img");
+          img.src = IMAGE_MAP[item.name] || "assets/default.png";
+          img.alt = item.name || "";
+          left.appendChild(img);
+          const metaWrap = document.createElement("div");
+          const nameDiv = document.createElement("div");
+          nameDiv.className = "upgrade-name";
+          nameDiv.textContent = item.name || "Unknown";
+          const thMax =
+            getTHBasedMaxLevel(item.name, data.townHallLevel) ||
+            item.maxLevel ||
+            item.level ||
+            0;
+          const metaDiv = document.createElement("div");
+          metaDiv.className = "upgrade-meta";
+          metaDiv.textContent = `Level ${item.level} • Townhall capacity Max level: ${thMax}`;
+          metaWrap.appendChild(nameDiv);
+          metaWrap.appendChild(metaDiv);
+          left.appendChild(metaWrap);
+
+          const right = document.createElement("div");
+          right.className = "progress-wrap";
+          const label = document.createElement("div");
+          label.style.cssText =
+            "display:flex;justify-content:flex-end;font-size:13px;color:var(--muted)";
+          label.textContent = `${item.level}/${thMax}`;
+          const bar = document.createElement("div");
+          bar.className = "progress-bar";
+          const fill = document.createElement("div");
+          fill.className =
+            "progress-fill " +
+            (category === "troop"
+              ? "troop"
+              : category === "hero"
+              ? "hero"
+              : "spell");
+          const percent =
+            thMax > 0
+              ? Math.min(100, Math.round((item.level / thMax) * 100))
+              : 100;
+          fill.setAttribute("data-percent", percent);
+          bar.appendChild(fill);
+          right.appendChild(label);
+          right.appendChild(bar);
+
+          wrapper.appendChild(left);
+          wrapper.appendChild(right);
+          return wrapper;
+        }
+
+        // populate troops
+        if (troops.length === 0) {
+          troopListEl.innerHTML = `<div style="color:var(--muted);padding:12px">No regular troops found for this village</div>`;
+        } else {
+          troops.forEach((t) =>
+            troopListEl.appendChild(makeItemDOM(t, "troop"))
+          );
+        }
+
+        // populate heroes + equipment nested
+        if (heroes.length === 0) {
+          heroListEl.innerHTML = `<div style="color:var(--muted);padding:12px">No heroes found for this village</div>`;
+        } else {
+          heroes.forEach((h) => {
+            heroListEl.appendChild(makeItemDOM(h, "hero"));
+            if (
+              h.equipment &&
+              Array.isArray(h.equipment) &&
+              h.equipment.length > 0
+            ) {
+              h.equipment.forEach((eq) => {
+                if (!eq.name) return;
+                if (isSuperOrSpecial(eq.name)) return;
+                const eqMaxTH =
+                  getTHBasedMaxLevel(eq.name, data.townHallLevel) ||
+                  eq.maxLevel ||
+                  18;
+                const eqPercent = Math.min(
+                  100,
+                  Math.round((eq.level / eqMaxTH) * 100)
+                );
+                const eqEl = document.createElement("div");
+                eqEl.className = "upgrade-item fade-in";
+                eqEl.style.marginLeft = "52px";
+                eqEl.innerHTML = `
+                <div class="upgrade-left">
+                  <img src="${
+                    IMAGE_MAP[eq.name] || "assets/default.png"
+                  }" alt="${eq.name}">
+                  <div>
+                    <div class="upgrade-name">${eq.name}</div>
+                    <div class="upgrade-meta">Level ${
+                      eq.level
+                    } • Townhall capacity Max level: ${eqMaxTH} • Abs Max ${
+                  eq.maxLevel || 18
+                }</div>
+                  </div>
+                </div>
+                <div style="min-width:120px;max-width:260px">
+                  <div style="display:flex;justify-content:flex-end;font-size:13px;color:var(--muted)">${
+                    eq.level
+                  }/${eqMaxTH}</div>
+                  <div class="progress-bar"><div class="progress-fill eq" data-percent="${eqPercent}"></div></div>
+                </div>
+              `;
+                heroListEl.appendChild(eqEl);
+              });
+            }
+          });
+        }
+
+        // populate spells
+        if (spells.length === 0) {
+          spellListEl.innerHTML = `<div style="color:var(--muted);padding:12px">No spells found for this village</div>`;
+        } else {
+          spells.forEach((s) =>
+            spellListEl.appendChild(makeItemDOM(s, "spell"))
+          );
+        }
+
+        // animate bars
+        requestAnimationFrame(() => animateAllProgressBars());
+      }
+
+      function animateAllProgressBars() {
+        document.querySelectorAll(".progress-fill").forEach((el) => {
+          const pct = el.getAttribute("data-percent") || 0;
+          el.style.width = "0%";
+          setTimeout(() => (el.style.width = pct + "%"), 60);
+        });
+      }
+
+      // enter key support
+      document.getElementById("playerTag").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") getPlayerData();
+      });
+
+      // expose helpers for debugging if needed
+      window.__COC = { getPlayerData, switchVillage };
+
+      /************************************************************************
+       * Note on Town Hall images:
+       * - This code looks for files like "./16.png" or "./14.1.png" relative to this HTML.
+       * - You said the townhall images are in the same directory named as numbers (1.png etc).
+       * - If your images are in a folder (e.g., "assets/townhalls/14.1.png"), replace code:
+       *     document.getElementById('townhallImg').src = './' + thFilename;
+       *   with the correct folder prefix:
+       *     document.getElementById('townhallImg').src = 'assets/townhalls/' + thFilename;
+       *
+       * I left it as './' so it matches "same directory" per your instruction.
+       ************************************************************************/
+    </script>
+  </body>
+</html>
