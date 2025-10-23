@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Clash of Clans Village Overview</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #181d24;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 1250px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #222831;
+        border-radius: 14px;
+        box-shadow: 0 4px 24px #0005;
+      }
+      h2 {
+        margin-top: 16px;
+        margin-bottom: 22px;
+        letter-spacing: 2px;
+        color: #12c9a1;
+        text-align: center;
+      }
+      .json-input-section {
+        margin-bottom: 30px;
+        text-align: center;
+      }
+      textarea {
+        width: 90%;
+        min-height: 120px;
+        font-family: "Courier New", monospace;
+        font-size: 1em;
+        border-radius: 7px;
+        padding: 12px;
+        margin-bottom: 13px;
+        background: #222;
+        color: #eee;
+        border: 1.5px solid #2ed573;
+        box-sizing: border-box;
+        resize: vertical;
+      }
+      .btn {
+        background: #12c9a1;
+        color: #fff;
+        border: none;
+        padding: 10px 28px;
+        border-radius: 8px;
+        font-size: 1.07em;
+        font-weight: bold;
+        cursor: pointer;
+        margin-bottom: 7px;
+        transition: background 0.18s;
+      }
+      .btn:hover {
+        background: #0bb39c;
+      }
+      .error-msg {
+        color: #ff5959;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      /* Section Tabs */
+      .tab-section {
+        margin-bottom: 32px;
+        text-align: center;
+      }
+      .tab-btn {
+        background: #263238;
+        color: #c7c7c7;
+        border: none;
+        padding: 8px 22px;
+        margin-right: 7px;
+        font-size: 1em;
+        border-radius: 8px 8px 0 0;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-weight: bold;
+        outline: none;
+      }
+      .tab-btn.active,
+      .tab-btn:hover {
+        background: #12c9a1;
+        color: #fff;
+      }
+      .data-section {
+        display: none;
+        margin-top: 10px;
+        min-height: 150px;
+      }
+      .data-section.active {
+        display: block;
+      }
+      .building-list,
+      .trap-list,
+      .unit-list,
+      .hero-list,
+      .spell-list,
+      .pet-list,
+      .equipment-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        justify-content: center;
+        margin-top: 22px;
+      }
+      .info-card {
+        background: #263238;
+        border-radius: 12px;
+        width: 180px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 2px 12px #0002;
+        transition: transform 0.15s;
+      }
+      .info-card:hover {
+        transform: scale(1.05);
+      }
+      .info-img {
+        background: #12161c;
+        border-radius: 8px;
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-bottom: 10px;
+        border: 2px solid #444;
+      }
+      .info-title {
+        font-weight: bold;
+        margin-top: 8px;
+        font-size: 1.1em;
+        color: #f8a92a;
+        text-align: center;
+      }
+      .info-detail {
+        margin-top: 8px;
+        font-size: 1em;
+      }
+      .maxed {
+        color: #35ff64;
+        font-weight: bold;
+      }
+      .not-maxed {
+        color: #ffad1f;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Clash of Clans Village Overview</h2>
+      <div class="json-input-section">
+        <p>Paste your Clash of Clans JSON data below:</p>
+        <textarea
+          id="jsonArea"
+          placeholder="Paste your COC JSON here"
+        ></textarea
+        ><br />
+        <button class="btn" onclick="processJSON()">Display Info</button>
+        <div id="errorMsg" class="error-msg"></div>
+      </div>
+      <!-- Tabs -->
+      <div class="tab-section">
+        <button
+          class="tab-btn active"
+          data-tab="buildings"
+          onclick="showTab('buildings')"
+        >
+          Buildings
+        </button>
+        <button class="tab-btn" data-tab="traps" onclick="showTab('traps')">
+          Traps
+        </button>
+        <button class="tab-btn" data-tab="units" onclick="showTab('units')">
+          Units
+        </button>
+        <button class="tab-btn" data-tab="heroes" onclick="showTab('heroes')">
+          Heroes
+        </button>
+        <button class="tab-btn" data-tab="spells" onclick="showTab('spells')">
+          Spells
+        </button>
+        <button
+          class="tab-btn"
+          data-tab="equipment"
+          onclick="showTab('equipment')"
+        >
+          Equipment
+        </button>
+      </div>
+      <!-- Data Sections -->
+      <div class="data-section active" id="buildingsSection">
+        <div class="building-list" id="buildingList"></div>
+      </div>
+      <div class="data-section" id="trapsSection">
+        <div class="trap-list" id="trapList"></div>
+      </div>
+      <div class="data-section" id="unitsSection">
+        <div class="unit-list" id="unitList"></div>
+      </div>
+      <div class="data-section" id="heroesSection">
+        <div class="hero-list" id="heroList"></div>
+      </div>
+      <div class="data-section" id="spellsSection">
+        <div class="spell-list" id="spellList"></div>
+      </div>
+      <div class="data-section" id="equipmentSection">
+        <div class="equipment-list" id="equipmentList"></div>
+      </div>
+    </div>
+    <script>
+      // Metadata: Name and Max Level dictionaries (use image files as ID.png)
+      // Building Names (expand/update as per game data)
+      const buildingInfo = {
+        1000008: "Town Hall",
+        1000000: "Cannon",
+        1000001: "Inferno Tower",
+        1000002: "Mortar",
+        1000072: "Spell Tower",
+        1000070: "Blacksmith",
+        1000003: "Air Defense",
+        1000004: "Wizard Tower",
+        1000005: "Air Sweeper",
+        1000006: "Hidden Tesla",
+        1000007: "Bomb Tower",
+        1000009: "Archer Tower",
+        1000010: "Wall",
+        1000011: "Eagle Artillery",
+        1000012: "Scattershot",
+        1000013: "X-Bow",
+        1000014: "Monolith",
+        1000015: "Builder Hut",
+        1000019: "Spell Tower",
+        1000020: "Pet House",
+        1000021: "Workshop",
+        1000023: "Clan Castle",
+        1000024: "Laboratory",
+        1000026: "Gold Storage",
+        1000027: "Elixir Storage",
+        1000028: "Dark Elixir Storage",
+        1000029: "Dark Barracks",
+        1000032: "Barracks",
+        1000035: "Army Camp",
+        1000036: "Dark Spell Factory",
+        1000040: "Spell Factory",
+        // Add all unique data IDs from game as needed!
+      };
+      const trapInfo = {
+        12000000: "Bomb",
+        12000001: "Spring Trap",
+        12000002: "Air Bomb",
+        12000005: "Giant Bomb",
+        12000006: "Seeking Air Mine",
+        12000008: "Skeleton Trap",
+        12000010: "Tornado Trap",
+        12000011: "N/A",
+      };
+      // Units
+      const unitInfo = {
+        4000000: "Barbarian",
+        4000001: "Archer",
+        4000002: "Giant",
+        4000003: "Goblin",
+        4000004: "Wall Breaker",
+        4000005: "Balloon",
+        4000006: "Wizard",
+        4000007: "Healer",
+        4000008: "Dragon",
+        4000009: "P.E.K.K.A",
+        4000010: "Baby Dragon",
+        4000011: "Miner",
+        4000012: "Electro Dragon",
+        4000013: "Yeti",
+        4000015: "Minion",
+        4000017: "Ice Golem",
+        4000022: "Super Barbarian",
+        4000023: "Super Archer",
+        4000031: "Beta Minion",
+        4000032: "Bomber",
+        4000033: "Drop Ship",
+        4000034: "Super Pekka",
+        4000035: "Hog Glider",
+        4000037: "Cannon Cart",
+        4000041: "Night Witch",
+      };
+      // Heroes
+      const heroInfo = {
+        28000000: "Barbarian King",
+        28000001: "Archer Queen",
+        28000002: "Grand Warden",
+        28000004: "Royal Champion",
+        28000006: "Minion Prince",
+        28000003: "Battle Machine",
+      };
+      // Spells
+      const spellInfo = {
+        26000000: "Lightning Spell",
+        26000001: "Healing Spell",
+        26000002: "Rage Spell",
+        26000003: "Jump Spell",
+        26000005: "Freeze Spell",
+        26000009: "Clone Spell",
+        26000010: "Invisibility Spell",
+        26000011: "Poison Spell",
+        26000016: "Earthquake Spell",
+        26000017: "Haste Spell",
+        26000028: "Bat Spell",
+      };
+      // Equipment
+      const equipmentInfo = {
+        90000000: "Sword of Righteousness",
+        90000001: "Shield of Fortitude",
+        90000002: "Helmet of Valor",
+        90000003: "Boots of Swiftness",
+        90000004: "Magic Cloak",
+        90000005: "Ring of Strength",
+        // Add more equipment names by code
+      };
+      // Helpers for max levels (set for TH13, change as needed)
+      const maxLevels = {
+        1000000: 19,
+        1000001: 20,
+        1000002: 13,
+        1000003: 11,
+        1000004: 12,
+        1000005: 7,
+        1000006: 11,
+        1000007: 9,
+        1000008: 13,
+        1000009: 7,
+        1000010: 15,
+        1000011: 5,
+        1000012: 2,
+        1000013: 8,
+        1000014: 1,
+        1000015: 5,
+        1000019: 3,
+        1000020: 7,
+        1000021: 4,
+        1000023: 9,
+        1000024: 12,
+        1000026: 14,
+        1000027: 14,
+        1000028: 9,
+        1000029: 8,
+        1000032: 15,
+        1000035: 11,
+        1000036: 7,
+        1000040: 7,
+        // ...and so on for other buildings you wish to show
+      };
+
+      function showTab(tab) {
+        document.querySelectorAll(".tab-btn").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.tab === tab);
+        });
+        document.querySelectorAll(".data-section").forEach((sec) => {
+          sec.classList.remove("active");
+        });
+        document.getElementById(tab + "Section").classList.add("active");
+      }
+
+      // Main render functions for each card type
+      function renderList(
+        listId,
+        items,
+        metaDict,
+        imgPath,
+        showLevel = true,
+        showCount = true,
+        maxLevelDict = null
+      ) {
+        const listElem = document.getElementById(listId);
+        listElem.innerHTML = "";
+        items.forEach((item) => {
+          const name = metaDict[item.data] || item.data;
+          let maxLevel = maxLevelDict ? maxLevelDict[item.data] : null;
+          let isMaxed = showLevel && maxLevel ? item.lvl == maxLevel : false;
+          // handle count if exists
+          let count = item.cnt !== undefined ? item.cnt : 1;
+          for (let i = 1; i <= count; ++i) {
+            const div = document.createElement("div");
+            div.className = "info-card";
+            div.innerHTML = `
+        <img src="${imgPath}${item.data}.png" class="info-img" alt="${name}">
+        <div class="info-title">${name}${
+              showCount && count > 1
+                ? ` <span style="font-size:0.9em">#${i}</span>`
+                : ""
+            }</div>
+        ${
+          showLevel && item.lvl !== undefined
+            ? `<div class="info-detail">Level: <span class="${
+                isMaxed ? "maxed" : "not-maxed"
+              }">${item.lvl}</span>${
+                maxLevel
+                  ? ` <small style="color:#aaa">/ ${maxLevel}</small>`
+                  : ""
+              }</div>`
+            : ""
+        }
+        ${
+          item.timer !== undefined
+            ? `<div class="info-detail" style="color:#42cbff;font-size:0.97em;">Upgrade: ${formatTimer(
+                item.timer
+              )}</div>`
+            : ""
+        }
+      `;
+            listElem.appendChild(div);
+          }
+        });
+      }
+
+      function formatTimer(secs) {
+        if (!secs || secs < 1) return "";
+        const d = Math.floor(secs / 86400),
+          h = Math.floor((secs % 86400) / 3600),
+          m = Math.floor((secs % 3600) / 60);
+        let parts = [];
+        if (d) parts.push(d + "d");
+        if (h) parts.push(h + "h");
+        if (m) parts.push(m + "m");
+        return parts.join(" ");
+      }
+
+      function renderBuildings(data) {
+        renderList(
+          "buildingList",
+          data.buildings,
+          buildingInfo,
+          "img/buildings/",
+          true,
+          true,
+          maxLevels
+        );
+      }
+      function renderTraps(data) {
+        const all = [].concat(data.traps || [], data.traps2 || []);
+        renderList("trapList", all, trapInfo, "img/traps/", true, true);
+      }
+      function renderUnits(data) {
+        const all = [].concat(data.units || [], data.units2 || []);
+        renderList("unitList", all, unitInfo, "img/units/", true, false);
+      }
+      function renderHeroes(data) {
+        const all = [].concat(data.heroes || [], data.heroes2 || []);
+        renderList("heroList", all, heroInfo, "img/heroes/", true, false);
+      }
+      function renderSpells(data) {
+        renderList(
+          "spellList",
+          data.spells,
+          spellInfo,
+          "img/spells/",
+          true,
+          false
+        );
+      }
+      function renderEquipment(data) {
+        renderList(
+          "equipmentList",
+          data.equipment || [],
+          equipmentInfo,
+          "img/equipment/",
+          true,
+          false
+        );
+      }
+
+      function processJSON() {
+        const area = document.getElementById("jsonArea");
+        const error = document.getElementById("errorMsg");
+        error.textContent = "";
+        let json;
+        try {
+          json = JSON.parse(area.value.trim());
+        } catch (e) {
+          error.textContent = "Invalid JSON, please check your data!";
+          clearAllSections();
+          return;
+        }
+        if (!json.buildings || !Array.isArray(json.buildings)) {
+          error.textContent = "No buildings data found in your JSON!";
+          clearAllSections();
+          return;
+        }
+        renderBuildings(json);
+        renderTraps(json);
+        renderUnits(json);
+        renderHeroes(json);
+        renderSpells(json);
+        renderEquipment(json);
+        showTab("buildings");
+      }
+
+      function clearAllSections() {
+        document.getElementById("buildingList").innerHTML = "";
+        document.getElementById("trapList").innerHTML = "";
+        document.getElementById("unitList").innerHTML = "";
+        document.getElementById("heroList").innerHTML = "";
+        document.getElementById("spellList").innerHTML = "";
+        document.getElementById("equipmentList").innerHTML = "";
+      }
+
+      // Default: show buildings on startup
+      showTab("buildings");
+    </script>
+  </body>
+</html>
