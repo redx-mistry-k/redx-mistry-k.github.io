@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clash of Clans Building & Hero Time Calculator</title>
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        --primary: #4a6fa5;
+        --secondary: #ffcc00;
+        --dark: #2c3e50;
+        --light: #ecf0f1;
+        --danger: #e74c3c;
+        --success: #2ecc71;
+        --boost: #f39c12;
+        --hero: #9b59b6;
+      }
+
+      body {
+        background-color: #f5f7fa;
+        color: var(--dark);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .clash-header {
+        background: linear-gradient(135deg, var(--primary), var(--dark));
+        color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .calculator-card,
+      .results-card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: none;
+      }
+
+      .type-selector {
+        display: flex;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .type-option {
+        flex: 1;
+        text-align: center;
+        padding: 12px;
+        background-color: white;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+      }
+
+      .type-option.active {
+        background-color: var(--primary);
+        color: white;
+      }
+
+      .type-option:not(.active):hover {
+        background-color: #f0f0f0;
+      }
+
+      .boost-label {
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        color: var(--boost);
+      }
+
+      .boost-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background-color: var(--boost);
+        color: white;
+        border-radius: 50%;
+        margin-right: 8px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .result-card {
+        background: var(--light);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .hero-card {
+        border-left: 4px solid var(--hero);
+      }
+
+      .time-display {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--primary);
+        margin: 10px 0;
+      }
+
+      .boosted-time {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--boost);
+        margin: 10px 0;
+      }
+
+      .time-saved {
+        color: var(--success);
+        font-weight: 600;
+        margin-top: 5px;
+      }
+
+      .progress-bar-custom {
+        height: 10px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 10px 0;
+      }
+
+      .progress-custom {
+        height: 100%;
+        background-color: var(--primary);
+        border-radius: 5px;
+        transition: width 0.5s ease;
+      }
+
+      .hero-progress {
+        background-color: var(--hero);
+      }
+
+      .building-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .building-icon {
+        width: 50px;
+        height: 50px;
+        background-color: var(--secondary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-weight: bold;
+        color: var(--dark);
+      }
+
+      .hero-icon {
+        background-color: var(--hero);
+        color: white;
+      }
+
+      .comparison {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        border-top: 1px dashed #ccc;
+        padding-top: 10px;
+      }
+
+      .time-column {
+        flex: 1;
+        text-align: center;
+      }
+
+      .time-column h4 {
+        margin-bottom: 5px;
+        color: var(--dark);
+      }
+
+      .time-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      .normal-time {
+        color: var(--primary);
+      }
+
+      .boosted-time-value {
+        color: var(--boost);
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .btn-primary:hover {
+        background-color: #3a5a8a;
+        border-color: #3a5a8a;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(74, 111, 165, 0.25);
+      }
+
+      .form-check-input:checked {
+        background-color: var(--boost);
+        border-color: var(--boost);
+      }
+
+      .form-check-input:focus {
+        border-color: var(--boost);
+        box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.25);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container py-4">
+      <header class="clash-header p-4 mb-4 text-center">
+        <h1 class="display-4 fw-bold">
+          Clash of Clans Building & Hero Time Calculator
+        </h1>
+        <p class="lead mb-0">
+          Calculate the time required to upgrade your buildings and heroes
+        </p>
+      </header>
+
+      <div class="row">
+        <div class="col-lg-6 mb-4">
+          <div class="calculator-card card h-100">
+            <div class="card-body">
+              <div class="type-selector">
+                <div class="type-option active" data-type="building">
+                  Buildings
+                </div>
+                <div class="type-option" data-type="hero">Heroes</div>
+              </div>
+
+              <div class="mb-3" id="building-group">
+                <label for="building" class="form-label fw-bold"
+                  >Select Building</label
+                >
+                <select class="form-select" id="building">
+                  <option value="">-- Choose a building --</option>
+                  <option value="Cannon">Cannon</option>
+                  <option value="Archer Tower">Archer Tower</option>
+                  <option value="Mortor">Mortar</option>
+                </select>
+                <div
+                  class="text-danger mt-1"
+                  id="building-error"
+                  style="display: none"
+                >
+                  Please select a building
+                </div>
+              </div>
+
+              <div class="mb-3" id="hero-group" style="display: none">
+                <label for="hero" class="form-label fw-bold">Select Hero</label>
+                <select class="form-select" id="hero">
+                  <option value="">-- Choose a hero --</option>
+                  <option value="Battle Machine">Battle Machine</option>
+                  <option value="Battle Copter">Battle Copter</option>
+                </select>
+                <div
+                  class="text-danger mt-1"
+                  id="hero-error"
+                  style="display: none"
+                >
+                  Please select a hero
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="current-level" class="form-label fw-bold"
+                  >Current Level</label
+                >
+                <select class="form-select" id="current-level">
+                  <option value="">-- Select current level --</option>
+                </select>
+                <div
+                  class="text-danger mt-1"
+                  id="current-level-error"
+                  style="display: none"
+                >
+                  Please select current level
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="desired-level" class="form-label fw-bold"
+                  >Desired Level</label
+                >
+                <select class="form-select" id="desired-level">
+                  <option value="">-- Select desired level --</option>
+                </select>
+                <div
+                  class="text-danger mt-1"
+                  id="desired-level-error"
+                  style="display: none"
+                >
+                  Please select desired level
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="builder-boost"
+                  />
+                  <label
+                    class="form-check-label boost-label"
+                    for="builder-boost"
+                  >
+                    <span class="boost-icon">%</span>
+                    Builder Boost (Gold Pass) - 20% Time Reduction
+                  </label>
+                </div>
+              </div>
+
+              <button class="btn btn-primary btn-lg w-100" id="calculate-btn">
+                Calculate Upgrade Time
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="results-card card h-100">
+            <div class="card-body">
+              <h2 class="card-title h4 mb-4 text-primary border-bottom pb-2">
+                Results
+              </h2>
+              <div id="results-container">
+                <div class="result-card">
+                  <div class="building-info">
+                    <div class="building-icon" id="building-icon">?</div>
+                    <div>
+                      <h3 id="building-name" class="h5 mb-1">
+                        Select a building or hero
+                      </h3>
+                      <p id="building-range" class="text-muted mb-0">
+                        Level 1 to Level 20
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between mb-2 fw-bold">
+                    <span id="current-level-display">Level 1</span>
+                    <span id="desired-level-display">Level 20</span>
+                  </div>
+
+                  <div class="progress-bar-custom">
+                    <div
+                      class="progress-custom"
+                      id="progress-bar"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+
+                  <div class="time-display" id="total-time">
+                    0 days 0 hours 0 minutes
+                  </div>
+                  <div
+                    class="boosted-time"
+                    id="boosted-time"
+                    style="display: none"
+                  >
+                    0 days 0 hours 0 minutes
+                  </div>
+                  <div class="time-saved" id="time-saved" style="display: none">
+                    Time saved: 0 days 0 hours 0 minutes
+                  </div>
+
+                  <div
+                    class="comparison"
+                    id="time-comparison"
+                    style="display: none"
+                  >
+                    <div class="time-column">
+                      <h4 class="h6">Normal Time</h4>
+                      <div class="time-value normal-time" id="normal-time">
+                        0d 0h 0m
+                      </div>
+                    </div>
+                    <div class="time-column">
+                      <h4 class="h6">With Boost</h4>
+                      <div
+                        class="time-value boosted-time-value"
+                        id="boosted-time-compact"
+                      >
+                        0d 0h 0m
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="details mt-3 text-muted">
+                    <p id="total-cost" class="mb-1">Total Cost: 0</p>
+                    <p id="level-count" class="mb-1">Number of upgrades: 0</p>
+                    <p id="town-hall" class="mb-0">Town Hall Required: -</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="text-center mt-4 pt-3 text-muted border-top">
+        <p class="mb-0">
+          This material is unofficial and is not endorsed by Supercell. For more
+          information see Supercell's Fan Content Policy:
+          www.supercell.com/fan-content-policy | Data based on game information
+        </p>
+      </footer>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      // Building data from the CSV
+      const buildingData = {
+        Cannon: [
+          { level: 1, buildTime: 0.00005787037037, cost: 250, townHall: 1 },
+          { level: 2, buildTime: 0.0003472222222, cost: 1000, townHall: 1 },
+          { level: 3, buildTime: 0.001388888889, cost: 4000, townHall: 2 },
+          { level: 4, buildTime: 0.01388888889, cost: 16000, townHall: 3 },
+          { level: 5, buildTime: 0.02083333333, cost: 50000, townHall: 4 },
+          { level: 6, buildTime: 0.04166666667, cost: 60000, townHall: 5 },
+          { level: 7, buildTime: 0.08333333333, cost: 100000, townHall: 6 },
+          { level: 8, buildTime: 0.125, cost: 160000, townHall: 7 },
+          { level: 9, buildTime: 0.1458333333, cost: 250000, townHall: 8 },
+          { level: 10, buildTime: 0.1666666667, cost: 330000, townHall: 8 },
+          { level: 11, buildTime: 0.1875, cost: 500000, townHall: 9 },
+          { level: 12, buildTime: 0.2083333333, cost: 600000, townHall: 10 },
+          { level: 13, buildTime: 0.25, cost: 660000, townHall: 10 },
+          { level: 14, buildTime: 0.3333333333, cost: 1000000, townHall: 11 },
+          { level: 15, buildTime: 0.4166666667, cost: 1200000, townHall: 11 },
+          { level: 16, buildTime: 0.4583333333, cost: 1300000, townHall: 12 },
+          { level: 17, buildTime: 0.5, cost: 1500000, townHall: 12 },
+          { level: 18, buildTime: 0.6666666667, cost: 1800000, townHall: 13 },
+          { level: 19, buildTime: 0.8333333333, cost: 2000000, townHall: 13 },
+          { level: 20, buildTime: 1, cost: 2600000, townHall: 14 },
+          { level: 21, buildTime: 1.5, cost: 3000000, townHall: 15 },
+        ],
+        "Archer Tower": [
+          { level: 1, buildTime: 0.0001736111111, cost: 1000, townHall: 2 },
+          { level: 2, buildTime: 0.001388888889, cost: 2000, townHall: 2 },
+          { level: 3, buildTime: 0.01388888889, cost: 5000, townHall: 3 },
+          { level: 4, buildTime: 0.04166666667, cost: 20000, townHall: 4 },
+          { level: 5, buildTime: 0.0625, cost: 70000, townHall: 5 },
+          { level: 6, buildTime: 0.08333333333, cost: 80000, townHall: 5 },
+          { level: 7, buildTime: 0.125, cost: 150000, townHall: 6 },
+          { level: 8, buildTime: 0.1666666667, cost: 200000, townHall: 7 },
+          { level: 9, buildTime: 0.2083333333, cost: 400000, townHall: 8 },
+          { level: 10, buildTime: 0.25, cost: 460000, townHall: 8 },
+          { level: 11, buildTime: 0.2916666667, cost: 600000, townHall: 9 },
+          { level: 12, buildTime: 0.3333333333, cost: 700000, townHall: 10 },
+          { level: 13, buildTime: 0.4166666667, cost: 1000000, townHall: 10 },
+          { level: 14, buildTime: 0.4583333333, cost: 1100000, townHall: 11 },
+          { level: 15, buildTime: 0.5, cost: 1300000, townHall: 11 },
+          { level: 16, buildTime: 0.6666666667, cost: 1600000, townHall: 12 },
+          { level: 17, buildTime: 0.8333333333, cost: 1800000, townHall: 12 },
+          { level: 18, buildTime: 1, cost: 2000000, townHall: 13 },
+          { level: 19, buildTime: 1.25, cost: 2200000, townHall: 13 },
+          { level: 20, buildTime: 1.5, cost: 3000000, townHall: 14 },
+          { level: 21, buildTime: 2, cost: 4000000, townHall: 15 },
+        ],
+        Mortor: [
+          { level: 1, buildTime: 0.02083333333, cost: 5000, townHall: 3 },
+          { level: 2, buildTime: 0.04166666667, cost: 25000, townHall: 4 },
+          { level: 3, buildTime: 0.08333333333, cost: 90000, townHall: 5 },
+          { level: 4, buildTime: 0.125, cost: 180000, townHall: 6 },
+          { level: 5, buildTime: 0.25, cost: 300000, townHall: 7 },
+          { level: 6, buildTime: 0.3333333333, cost: 500000, townHall: 8 },
+          { level: 7, buildTime: 0.5, cost: 900000, townHall: 9 },
+          { level: 8, buildTime: 0.75, cost: 1200000, townHall: 10 },
+          { level: 9, buildTime: 0.8333333333, cost: 1600000, townHall: 11 },
+          { level: 10, buildTime: 1, cost: 1800000, townHall: 11 },
+          { level: 11, buildTime: 1.25, cost: 2300000, townHall: 12 },
+          { level: 12, buildTime: 1.5, cost: 2400000, townHall: 12 },
+          { level: 13, buildTime: 2, cost: 2800000, townHall: 13 },
+          { level: 14, buildTime: 2.5, cost: 4300000, townHall: 14 },
+          { level: 15, buildTime: 3, cost: 5000000, townHall: 15 },
+          { level: 16, buildTime: 4, cost: 7000000, townHall: 16 },
+          { level: 17, buildTime: 14.5, cost: 19500000, townHall: 17 },
+        ],
+      };
+
+      // Hero data from the CSV
+      const heroData = {
+        "Battle Machine": [
+          { level: 1, buildTime: 0.5, cost: 900000, builderHall: 5 },
+          { level: 2, buildTime: 0.5, cost: 1000000, builderHall: 5 },
+          { level: 3, buildTime: 0.5, cost: 1100000, builderHall: 5 },
+          { level: 4, buildTime: 1, cost: 1200000, builderHall: 5 },
+          { level: 5, buildTime: 1, cost: 1300000, builderHall: 5 },
+          { level: 6, buildTime: 1.5, cost: 1500000, builderHall: 6 },
+          { level: 7, buildTime: 1.5, cost: 1600000, builderHall: 6 },
+          { level: 8, buildTime: 2, cost: 1700000, builderHall: 6 },
+          { level: 9, buildTime: 2, cost: 1800000, builderHall: 6 },
+          { level: 10, buildTime: 2.5, cost: 1900000, builderHall: 6 },
+          { level: 11, buildTime: 2.5, cost: 2100000, builderHall: 7 },
+          { level: 12, buildTime: 3, cost: 2200000, builderHall: 7 },
+          { level: 13, buildTime: 3, cost: 2300000, builderHall: 7 },
+          { level: 14, buildTime: 3.5, cost: 2400000, builderHall: 7 },
+          { level: 15, buildTime: 3.5, cost: 2500000, builderHall: 7 },
+          { level: 16, buildTime: 4, cost: 2600000, builderHall: 7 },
+          { level: 17, buildTime: 4, cost: 2700000, builderHall: 7 },
+          { level: 18, buildTime: 4, cost: 2800000, builderHall: 7 },
+          { level: 19, buildTime: 4, cost: 2900000, builderHall: 7 },
+          { level: 20, buildTime: 4, cost: 3000000, builderHall: 7 },
+          { level: 21, buildTime: 5, cost: 3100000, builderHall: 8 },
+          { level: 22, buildTime: 5, cost: 3200000, builderHall: 8 },
+          { level: 23, buildTime: 5, cost: 3300000, builderHall: 8 },
+          { level: 24, buildTime: 5, cost: 3400000, builderHall: 8 },
+          { level: 25, buildTime: 5, cost: 3500000, builderHall: 8 },
+          { level: 26, buildTime: 6, cost: 3600000, builderHall: 9 },
+          { level: 27, buildTime: 6, cost: 3700000, builderHall: 9 },
+          { level: 28, buildTime: 6, cost: 3800000, builderHall: 9 },
+          { level: 29, buildTime: 6, cost: 3900000, builderHall: 9 },
+          { level: 30, buildTime: 6, cost: 4000000, builderHall: 9 },
+          { level: 31, buildTime: 7, cost: 4100000, builderHall: 10 },
+          { level: 32, buildTime: 7, cost: 4200000, builderHall: 10 },
+          { level: 33, buildTime: 7, cost: 4300000, builderHall: 10 },
+          { level: 34, buildTime: 7, cost: 4400000, builderHall: 10 },
+          { level: 35, buildTime: 7, cost: 4500000, builderHall: 10 },
+        ],
+        "Battle Copter": [
+          { level: 15, buildTime: 0, cost: 2500000, builderHall: 8 },
+          { level: 16, buildTime: 5, cost: 2600000, builderHall: 8 },
+          { level: 17, buildTime: 5, cost: 2700000, builderHall: 8 },
+          { level: 18, buildTime: 5, cost: 2800000, builderHall: 8 },
+          { level: 19, buildTime: 5, cost: 2900000, builderHall: 8 },
+          { level: 20, buildTime: 5, cost: 3000000, builderHall: 8 },
+          { level: 21, buildTime: 5, cost: 3100000, builderHall: 8 },
+          { level: 22, buildTime: 5, cost: 3200000, builderHall: 8 },
+          { level: 23, buildTime: 5, cost: 3300000, builderHall: 8 },
+          { level: 24, buildTime: 5, cost: 3400000, builderHall: 8 },
+          { level: 25, buildTime: 5, cost: 3500000, builderHall: 8 },
+          { level: 26, buildTime: 6, cost: 3600000, builderHall: 9 },
+          { level: 27, buildTime: 6, cost: 3700000, builderHall: 9 },
+          { level: 28, buildTime: 6, cost: 3800000, builderHall: 9 },
+          { level: 29, buildTime: 6, cost: 3900000, builderHall: 9 },
+          { level: 30, buildTime: 6, cost: 4000000, builderHall: 9 },
+          { level: 31, buildTime: 7, cost: 4100000, builderHall: 10 },
+          { level: 32, buildTime: 7, cost: 4200000, builderHall: 10 },
+          { level: 33, buildTime: 7, cost: 4300000, builderHall: 10 },
+          { level: 34, buildTime: 7, cost: 4400000, builderHall: 10 },
+          { level: 35, buildTime: 7, cost: 4500000, builderHall: 10 },
+        ],
+      };
+
+      // DOM elements
+      const typeOptions = document.querySelectorAll(".type-option");
+      const buildingSelect = document.getElementById("building");
+      const heroSelect = document.getElementById("hero");
+      const buildingGroup = document.getElementById("building-group");
+      const heroGroup = document.getElementById("hero-group");
+      const currentLevelSelect = document.getElementById("current-level");
+      const desiredLevelSelect = document.getElementById("desired-level");
+      const builderBoostCheckbox = document.getElementById("builder-boost");
+      const calculateBtn = document.getElementById("calculate-btn");
+      const buildingIcon = document.getElementById("building-icon");
+      const buildingName = document.getElementById("building-name");
+      const buildingRange = document.getElementById("building-range");
+      const currentLevelDisplay = document.getElementById(
+        "current-level-display"
+      );
+      const desiredLevelDisplay = document.getElementById(
+        "desired-level-display"
+      );
+      const progressBar = document.getElementById("progress-bar");
+      const totalTimeDisplay = document.getElementById("total-time");
+      const boostedTimeDisplay = document.getElementById("boosted-time");
+      const timeSavedDisplay = document.getElementById("time-saved");
+      const timeComparison = document.getElementById("time-comparison");
+      const normalTimeDisplay = document.getElementById("normal-time");
+      const boostedTimeCompactDisplay = document.getElementById(
+        "boosted-time-compact"
+      );
+      const totalCostDisplay = document.getElementById("total-cost");
+      const levelCountDisplay = document.getElementById("level-count");
+      const townHallDisplay = document.getElementById("town-hall");
+
+      // Error elements
+      const buildingError = document.getElementById("building-error");
+      const heroError = document.getElementById("hero-error");
+      const currentLevelError = document.getElementById("current-level-error");
+      const desiredLevelError = document.getElementById("desired-level-error");
+
+      // Current selection state
+      let currentType = "building";
+
+      // Type selector event listeners
+      typeOptions.forEach((option) => {
+        option.addEventListener("click", function () {
+          // Update active state
+          typeOptions.forEach((opt) => opt.classList.remove("active"));
+          this.classList.add("active");
+
+          // Update current type
+          currentType = this.getAttribute("data-type");
+
+          // Show/hide appropriate selectors
+          if (currentType === "building") {
+            buildingGroup.style.display = "block";
+            heroGroup.style.display = "none";
+            buildingSelect.value = "";
+            heroSelect.value = "";
+          } else {
+            buildingGroup.style.display = "none";
+            heroGroup.style.display = "block";
+            buildingSelect.value = "";
+            heroSelect.value = "";
+          }
+
+          // Reset level selects
+          currentLevelSelect.innerHTML =
+            '<option value="">-- Select current level --</option>';
+          desiredLevelSelect.innerHTML =
+            '<option value="">-- Select desired level --</option>';
+
+          // Reset results
+          resetResults();
+          buildingIcon.textContent = "?";
+          buildingName.textContent = "Select a building or hero";
+          buildingRange.textContent = "Level 1 to Level 20";
+        });
+      });
+
+      // Populate building select options
+      buildingSelect.addEventListener("change", function () {
+        const selectedBuilding = this.value;
+
+        // Reset errors
+        hideErrors();
+
+        if (selectedBuilding) {
+          // Update building icon and name
+          buildingIcon.textContent = selectedBuilding.charAt(0);
+          buildingName.textContent = selectedBuilding;
+          buildingIcon.classList.remove("hero-icon");
+          progressBar.classList.remove("hero-progress");
+
+          // Get building data
+          const building = buildingData[selectedBuilding];
+          const maxLevel = building.length;
+
+          // Update building range
+          buildingRange.textContent = `Level 1 to Level ${maxLevel}`;
+
+          // Clear and populate level selects
+          populateLevelSelects(maxLevel);
+        } else {
+          // Reset everything if no building selected
+          resetSelection();
+        }
+      });
+
+      // Populate hero select options
+      heroSelect.addEventListener("change", function () {
+        const selectedHero = this.value;
+
+        // Reset errors
+        hideErrors();
+
+        if (selectedHero) {
+          // Update building icon and name
+          buildingIcon.textContent = selectedHero.charAt(0);
+          buildingName.textContent = selectedHero;
+          buildingIcon.classList.add("hero-icon");
+          progressBar.classList.add("hero-progress");
+
+          // Get hero data
+          const hero = heroData[selectedHero];
+          const minLevel = hero[0].level;
+          const maxLevel = hero[hero.length - 1].level;
+
+          // Update building range
+          buildingRange.textContent = `Level ${minLevel} to Level ${maxLevel}`;
+
+          // Clear and populate level selects
+          populateLevelSelects(maxLevel, minLevel);
+        } else {
+          // Reset everything if no hero selected
+          resetSelection();
+        }
+      });
+
+      // Calculate button click event
+      calculateBtn.addEventListener("click", function () {
+        // Validate inputs
+        if (!validateInputs()) {
+          return;
+        }
+
+        const currentLevel = parseInt(currentLevelSelect.value);
+        const desiredLevel = parseInt(desiredLevelSelect.value);
+        const hasBuilderBoost = builderBoostCheckbox.checked;
+
+        let selectedItem, data;
+
+        if (currentType === "building") {
+          selectedItem = buildingSelect.value;
+          data = buildingData[selectedItem];
+        } else {
+          selectedItem = heroSelect.value;
+          data = heroData[selectedItem];
+        }
+
+        // Calculate results
+        calculateUpgradeTime(
+          selectedItem,
+          currentLevel,
+          desiredLevel,
+          hasBuilderBoost,
+          data
+        );
+      });
+
+      // Validate form inputs
+      function validateInputs() {
+        let isValid = true;
+
+        // Reset errors
+        hideErrors();
+
+        if (currentType === "building" && !buildingSelect.value) {
+          buildingError.style.display = "block";
+          isValid = false;
+        }
+
+        if (currentType === "hero" && !heroSelect.value) {
+          heroError.style.display = "block";
+          isValid = false;
+        }
+
+        if (!currentLevelSelect.value) {
+          currentLevelError.style.display = "block";
+          isValid = false;
+        }
+
+        if (!desiredLevelSelect.value) {
+          desiredLevelError.style.display = "block";
+          isValid = false;
+        }
+
+        if (currentLevelSelect.value && desiredLevelSelect.value) {
+          const currentLevel = parseInt(currentLevelSelect.value);
+          const desiredLevel = parseInt(desiredLevelSelect.value);
+
+          if (currentLevel >= desiredLevel) {
+            desiredLevelError.textContent =
+              "Desired level must be higher than current level";
+            desiredLevelError.style.display = "block";
+            isValid = false;
+          }
+        }
+
+        return isValid;
+      }
+
+      // Hide all error messages
+      function hideErrors() {
+        buildingError.style.display = "none";
+        heroError.style.display = "none";
+        currentLevelError.style.display = "none";
+        desiredLevelError.style.display = "none";
+        desiredLevelError.textContent = "Please select desired level";
+      }
+
+      // Populate level selects
+      function populateLevelSelects(maxLevel, minLevel = 1) {
+        currentLevelSelect.innerHTML =
+          '<option value="">-- Select current level --</option>';
+        desiredLevelSelect.innerHTML =
+          '<option value="">-- Select desired level --</option>';
+
+        for (let i = minLevel; i <= maxLevel; i++) {
+          const option1 = document.createElement("option");
+          option1.value = i;
+          option1.textContent = `Level ${i}`;
+          currentLevelSelect.appendChild(option1);
+
+          const option2 = document.createElement("option");
+          option2.value = i;
+          option2.textContent = `Level ${i}`;
+          desiredLevelSelect.appendChild(option2);
+        }
+      }
+
+      // Calculate upgrade time
+      function calculateUpgradeTime(
+        item,
+        currentLevel,
+        desiredLevel,
+        hasBuilderBoost,
+        data
+      ) {
+        let totalTime = 0;
+        let totalCost = 0;
+        let maxHall = 0;
+
+        // Sum up time and cost for each level from current to desired
+        for (let i = currentLevel; i < desiredLevel; i++) {
+          // Find the data for this level
+          const levelData = data.find((d) => d.level === i);
+          if (levelData) {
+            totalTime += levelData.buildTime;
+            totalCost += levelData.cost;
+
+            // Track the highest hall requirement
+            const hallLevel = levelData.townHall || levelData.builderHall;
+            if (hallLevel > maxHall) {
+              maxHall = hallLevel;
+            }
+          }
+        }
+
+        // Calculate boosted time if applicable
+        let boostedTime = totalTime;
+        let timeSaved = 0;
+
+        if (hasBuilderBoost) {
+          boostedTime = totalTime * 0.8; // 20% reduction
+          timeSaved = totalTime - boostedTime;
+        }
+
+        // Update UI with results
+        updateResults(
+          item,
+          currentLevel,
+          desiredLevel,
+          totalTime,
+          boostedTime,
+          timeSaved,
+          totalCost,
+          maxHall,
+          hasBuilderBoost,
+          data
+        );
+      }
+
+      // Update results in the UI
+      function updateResults(
+        item,
+        currentLevel,
+        desiredLevel,
+        totalTime,
+        boostedTime,
+        timeSaved,
+        totalCost,
+        maxHall,
+        hasBuilderBoost,
+        data
+      ) {
+        // Update level displays
+        currentLevelDisplay.textContent = `Level ${currentLevel}`;
+        desiredLevelDisplay.textContent = `Level ${desiredLevel}`;
+
+        // Update progress bar
+        const maxLevel = data.length;
+        const progressPercentage = ((desiredLevel - 1) / (maxLevel - 1)) * 100;
+        progressBar.style.width = `${progressPercentage}%`;
+
+        // Format and display times
+        const normalTimeString = formatTime(totalTime);
+        const boostedTimeString = formatTime(boostedTime);
+        const timeSavedString = formatTime(timeSaved);
+
+        // Show/hide elements based on builder boost
+        if (hasBuilderBoost) {
+          totalTimeDisplay.textContent = `Normal: ${normalTimeString}`;
+          boostedTimeDisplay.textContent = `With Boost: ${boostedTimeString}`;
+          boostedTimeDisplay.style.display = "block";
+          timeSavedDisplay.textContent = `Time saved: ${timeSavedString}`;
+          timeSavedDisplay.style.display = "block";
+          timeComparison.style.display = "flex";
+
+          // Update comparison section
+          normalTimeDisplay.textContent = formatTimeCompact(totalTime);
+          boostedTimeCompactDisplay.textContent =
+            formatTimeCompact(boostedTime);
+        } else {
+          totalTimeDisplay.textContent = normalTimeString;
+          boostedTimeDisplay.style.display = "none";
+          timeSavedDisplay.style.display = "none";
+          timeComparison.style.display = "none";
+        }
+
+        // Update other details
+        totalCostDisplay.textContent = `Total Cost: ${formatNumber(totalCost)}`;
+        levelCountDisplay.textContent = `Number of upgrades: ${
+          desiredLevel - currentLevel
+        }`;
+
+        // Update hall requirement text based on type
+        if (currentType === "building") {
+          townHallDisplay.textContent = `Town Hall Required: ${maxHall}`;
+        } else {
+          townHallDisplay.textContent = `Builder Hall Required: ${maxHall}`;
+        }
+      }
+
+      // Reset results display
+      function resetResults() {
+        currentLevelDisplay.textContent = "Level 1";
+        desiredLevelDisplay.textContent = "Level 20";
+        progressBar.style.width = "0%";
+        totalTimeDisplay.textContent = "0 days 0 hours 0 minutes";
+        boostedTimeDisplay.style.display = "none";
+        timeSavedDisplay.style.display = "none";
+        timeComparison.style.display = "none";
+        totalCostDisplay.textContent = "Total Cost: 0";
+        levelCountDisplay.textContent = "Number of upgrades: 0";
+        townHallDisplay.textContent = "Town Hall Required: -";
+      }
+
+      // Reset selection
+      function resetSelection() {
+        buildingIcon.textContent = "?";
+        buildingName.textContent = "Select a building or hero";
+        buildingRange.textContent = "Level 1 to Level 20";
+        buildingIcon.classList.remove("hero-icon");
+        progressBar.classList.remove("hero-progress");
+        currentLevelSelect.innerHTML =
+          '<option value="">-- Select current level --</option>';
+        desiredLevelSelect.innerHTML =
+          '<option value="">-- Select desired level --</option>';
+        resetResults();
+      }
+
+      // Format time in days, hours, minutes
+      function formatTime(totalTime) {
+        const totalDays = Math.floor(totalTime);
+        const remainingHours = (totalTime - totalDays) * 24;
+        const totalHours = Math.floor(remainingHours);
+        const totalMinutes = Math.round((remainingHours - totalHours) * 60);
+
+        let timeString = "";
+        if (totalDays > 0) {
+          timeString += `${totalDays} day${totalDays > 1 ? "s" : ""} `;
+        }
+        if (totalHours > 0) {
+          timeString += `${totalHours} hour${totalHours > 1 ? "s" : ""} `;
+        }
+        if (totalMinutes > 0 || (totalDays === 0 && totalHours === 0)) {
+          timeString += `${totalMinutes} minute${totalMinutes > 1 ? "s" : ""}`;
+        }
+
+        return timeString.trim();
+      }
+
+      // Format time in compact form (for comparison section)
+      function formatTimeCompact(totalTime) {
+        const totalDays = Math.floor(totalTime);
+        const remainingHours = (totalTime - totalDays) * 24;
+        const totalHours = Math.floor(remainingHours);
+        const totalMinutes = Math.round((remainingHours - totalHours) * 60);
+
+        return `${totalDays}d ${totalHours}h ${totalMinutes}m`;
+      }
+
+      // Format large numbers with commas
+      function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+    </script>
+  </body>
+</html>
