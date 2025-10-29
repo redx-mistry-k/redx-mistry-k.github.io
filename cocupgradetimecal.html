@@ -822,7 +822,7 @@
         // Sum up time and cost for each level from current to desired
         for (let i = currentLevel; i < desiredLevel; i++) {
           // Find the data for this level
-          const levelData = data.find((d) => d.level === i);
+          const levelData = data.find((d) => d.level === i+1);
           if (levelData) {
             totalTime += levelData.buildTime;
             totalCost += levelData.cost;
