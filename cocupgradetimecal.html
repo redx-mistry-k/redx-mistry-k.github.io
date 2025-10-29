@@ -383,6 +383,10 @@
                   <div class="time-saved" id="time-saved" style="display: none">
                     Time saved: 0 days 0 hours 0 minutes
                   </div>
+                  <div class="time-saved" id="cost-saved" style="display: none">
+                    Cost saved: 0
+                  </div>
+
 
                   <div
                     class="comparison"
@@ -591,6 +595,7 @@
       const totalTimeDisplay = document.getElementById("total-time");
       const boostedTimeDisplay = document.getElementById("boosted-time");
       const timeSavedDisplay = document.getElementById("time-saved");
+      const costSavedDisplay = document.getElementById("cost-saved");
       const timeComparison = document.getElementById("time-comparison");
       const normalTimeDisplay = document.getElementById("normal-time");
       const boostedTimeCompactDisplay = document.getElementById(
@@ -838,10 +843,12 @@
         // Calculate boosted time if applicable
         let boostedTime = totalTime;
         let timeSaved = 0;
+        let costSaved = 0;
 
         if (hasBuilderBoost) {
           boostedTime = totalTime * 0.8; // 20% reduction
           timeSaved = totalTime - boostedTime;
+          totalCost = totalCost * 0.8;
         }
 
         // Update UI with results
@@ -893,6 +900,9 @@
           boostedTimeDisplay.style.display = "block";
           timeSavedDisplay.textContent = `Time saved: ${timeSavedString}`;
           timeSavedDisplay.style.display = "block";
+          const costSaved = totalCost / 0.8 * 0.2; // original - discounted
+          costSavedDisplay.textContent = `Cost saved: ${formatNumber(costSaved)}`;
+          costSavedDisplay.style.display = "block";
           timeComparison.style.display = "flex";
 
           // Update comparison section
@@ -903,6 +913,7 @@
           totalTimeDisplay.textContent = normalTimeString;
           boostedTimeDisplay.style.display = "none";
           timeSavedDisplay.style.display = "none";
+          costSavedDisplay.style.display = "none";
           timeComparison.style.display = "none";
         }
 
