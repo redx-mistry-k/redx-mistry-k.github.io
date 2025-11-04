@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Crack the Code — 4‑digit Mastermind</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        --bg1: #0f172a;
+        --bg2: #0b1220;
+        --accent: #7c3aed;
+        --accent-2: #06b6d4;
+        --glass: rgba(255, 255, 255, 0.06);
+        --muted: rgba(255, 255, 255, 0.6);
+        --success: #22c55e;
+        --warn: #f59e0b;
+        --danger: #ef4444;
+        --player1: #7c3aed;
+        --player2: #06b6d4;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(
+            1000px 600px at 10% 10%,
+            rgba(124, 58, 237, 0.12),
+            transparent
+          ),
+          radial-gradient(
+            800px 500px at 90% 90%,
+            rgba(6, 182, 212, 0.09),
+            transparent
+          ),
+          linear-gradient(180deg, var(--bg1), var(--bg2));
+        color: #e6eef8;
+        -webkit-font-smoothing: antialiased;
+        padding: 32px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 920px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 10px 30px rgba(2, 6, 23, 0.6);
+        backdrop-filter: blur(8px);
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 20px;
+        align-items: start;
+      }
+
+      header {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 20px;
+        box-shadow: 0 6px 18px rgba(12, 10, 40, 0.6);
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0;
+      }
+      p.lead {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .play-area {
+        padding: 12px;
+      }
+      .panel {
+        background: var(--glass);
+        border-radius: 12px;
+        padding: 18px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 14px;
+      }
+      input[type="text"],
+      input[type="password"] {
+        appearance: none;
+        border: 0;
+        outline: 0;
+        padding: 14px 16px;
+        border-radius: 10px;
+        font-size: 18px;
+        width: 220px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        color: inherit;
+        box-shadow: inset 0 -2px 8px rgba(2, 6, 23, 0.5);
+        letter-spacing: 6px;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+      input[type="text"]:focus,
+      input[type="password"]:focus {
+        box-shadow: 0 0 0 2px var(--accent),
+          inset 0 -2px 8px rgba(2, 6, 23, 0.5);
+      }
+      button {
+        border: 0;
+        cursor: pointer;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: white;
+        box-shadow: 0 8px 20px rgba(7, 9, 30, 0.6);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(7, 9, 30, 0.8);
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+      }
+      .btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-1px);
+      }
+
+      .meta {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .hint {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .history {
+        margin-top: 14px;
+        max-height: 380px;
+        overflow: auto;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.01),
+          transparent
+        );
+        animation: slideIn 0.3s ease-out;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .guess-num {
+        font-family: monospace;
+        font-weight: 700;
+        letter-spacing: 6px;
+      }
+      .badge {
+        padding: 6px 8px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 13px;
+        transition: all 0.3s ease;
+      }
+      .badge.good {
+        background: rgba(34, 197, 94, 0.12);
+        color: var(--success);
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .badge.warn {
+        background: rgba(245, 158, 11, 0.08);
+        color: var(--warn);
+      }
+      .badge.bad {
+        background: rgba(239, 68, 68, 0.06);
+        color: var(--danger);
+      }
+
+      .footer-ctrls {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .reveal {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .centered {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Two-player mode styles */
+      .player-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .toggle-label {
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.1);
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      input:checked + .toggle-slider {
+        background-color: var(--accent);
+      }
+      input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+      }
+      .player-indicator {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        align-items: center;
+      }
+      .player-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+        transition: all 0.3s ease;
+      }
+      .player-badge.active {
+        box-shadow: 0 0 0 2px;
+      }
+      .player-badge.player1 {
+        background-color: rgba(124, 58, 237, 0.2);
+        color: var(--player1);
+      }
+      .player-badge.player2 {
+        background-color: rgba(6, 182, 212, 0.2);
+        color: var(--player2);
+      }
+      .player-stats {
+        display: flex;
+        gap: 15px;
+        margin-top: 10px;
+      }
+      .player-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .player-stat.active {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .player-stat-value {
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .player-stat-label {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .code-box {
+        font-family: monospace;
+        font-size: 28px;
+        letter-spacing: 10px;
+        transition: all 0.5s ease;
+      }
+      .code-box.revealed {
+        animation: revealCode 1s ease-out;
+      }
+      @keyframes revealCode {
+        0% {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Setup phase styles */
+      .setup-phase {
+        animation: fadeIn 0.5s ease-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .setup-instruction {
+        margin-bottom: 15px;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        font-size: 14px;
+      }
+      .setup-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .setup-input-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .setup-label {
+        min-width: 100px;
+        font-weight: 600;
+      }
+      .setup-input {
+        flex: 1;
+      }
+      .setup-btn {
+        margin-top: 15px;
+      }
+
+      /* small screens */
+      @media (max-width: 880px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+        .right-column {
+          order: -1;
+        }
+      }
+
+      /* Add these styles to the existing CSS */
+
+      /* Mobile-specific fixes */
+      @media (max-width: 768px) {
+        body {
+          padding: 16px;
+          align-items: flex-start;
+          overflow-y: auto;
+        }
+
+        .container {
+          grid-template-columns: 1fr;
+          gap: 16px;
+          padding: 20px;
+          margin-top: 0;
+          margin-bottom: 20px;
+        }
+
+        /* Reorder sections for mobile */
+        .play-area {
+          order: 1; /* Game form comes first */
+        }
+
+        .right-column {
+          order: 2; /* Game tips comes second */
+        }
+
+        /* Move feedback section to appear after game tips */
+        .play-area section:last-child {
+          order: 3; /* Feedback section comes after game tips */
+        }
+
+        header {
+          flex-direction: column;
+          text-align: center;
+          gap: 8px;
+        }
+
+        .logo {
+          width: 48px;
+          height: 48px;
+          font-size: 16px;
+        }
+
+        h1 {
+          font-size: 18px;
+        }
+
+        .input-row {
+          flex-direction: column;
+          gap: 10px;
+          align-items: stretch;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+          width: 100%;
+          font-size: 16px; /* Prevents zoom on iOS */
+          padding: 12px 14px;
+        }
+
+        .btn-primary,
+        .btn-ghost {
+          padding: 14px 16px;
+          font-size: 16px;
+        }
+
+        .meta {
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .player-toggle {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .player-indicator {
+          justify-content: center;
+        }
+
+        .player-stats {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .setup-input-group {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+
+        .setup-label {
+          min-width: auto;
+        }
+
+        .setup-input {
+          width: 100%;
+        }
+
+        .footer-ctrls {
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .history {
+          max-height: 300px;
+        }
+
+        .code-box {
+          font-size: 20px;
+          letter-spacing: 6px;
+        }
+
+        /* Fix for the game status area */
+        #gamePhase > div:first-child {
+          flex-direction: column;
+          gap: 12px;
+          align-items: flex-start;
+        }
+
+        #gamePhase > div:first-child > div:last-child {
+          text-align: left;
+        }
+      }
+
+      /* Extra small devices */
+      @media (max-width: 480px) {
+        body {
+          padding: 12px;
+        }
+
+        .container {
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .panel {
+          padding: 14px;
+        }
+
+        .code-box {
+          font-size: 18px;
+          letter-spacing: 4px;
+        }
+
+        .guess-num {
+          font-size: 14px;
+          letter-spacing: 4px;
+        }
+      }
+
+      /* Fix for landscape orientation on mobile */
+      @media (max-height: 500px) and (orientation: landscape) {
+        body {
+          padding: 10px;
+          align-items: flex-start;
+        }
+
+        .container {
+          max-height: 90vh;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .history {
+          max-height: 150px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" role="main" aria-labelledby="title">
+      <div class="play-area">
+        <header>
+          <div class="logo">CTC</div>
+          <div>
+            <h1 id="title">Crack the Code</h1>
+            <p class="lead">
+              Guess the secret 4‑digit code. Get feedback: how many digits are
+              correct and how many are in the right position.
+            </p>
+          </div>
+        </header>
+
+        <section class="panel" aria-label="game panel">
+          <div class="player-toggle">
+            <span class="toggle-label">Two-Player Mode</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="twoPlayerToggle" />
+              <span class="toggle-slider"></span> </label
+            ><span class="toggle-label"
+              >Switch here to start single or two-player mode</span
+            >
+          </div>
+
+          <div
+            id="playerIndicator"
+            class="player-indicator"
+            style="display: none"
+          >
+            <div class="player-badge player1 active" id="player1Badge">
+              Player 1
+            </div>
+            <div class="player-badge player2" id="player2Badge">Player 2</div>
+          </div>
+
+          <!-- Setup Phase (shown only in two-player mode) -->
+          <div id="setupPhase" class="setup-phase" style="display: none">
+            <div class="setup-instruction">
+              <strong>Setup Phase</strong>
+              <p style="margin: 8px 0 0; color: var(--muted); font-size: 13px">
+                Each player will set a secret code for the other player to
+                guess. The codes will be hidden from view.
+              </p>
+            </div>
+
+            <div class="setup-inputs">
+              <div class="setup-input-group">
+                <div class="setup-label">Player 1 Code:</div>
+                <input
+                  type="password"
+                  id="player1Code"
+                  class="setup-input"
+                  maxlength="4"
+                  placeholder="****"
+                  aria-label="Player 1 secret code"
+                />
+              </div>
+              <div class="setup-input-group">
+                <div class="setup-label">Player 2 Code:</div>
+                <input
+                  type="password"
+                  id="player2Code"
+                  class="setup-input"
+                  maxlength="4"
+                  placeholder="****"
+                  aria-label="Player 2 secret code"
+                />
+              </div>
+            </div>
+
+            <button id="startGameBtn" class="btn-primary setup-btn">
+              Start Game
+            </button>
+          </div>
+
+          <!-- Game Phase (shown after setup) -->
+          <div id="gamePhase" style="display: none">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+              "
+            >
+              <div>
+                <strong id="status">New game — good luck!</strong>
+                <div class="meta">
+                  <div id="attempts">Attempts: 0</div>
+                  <div id="best">Best: —</div>
+                </div>
+              </div>
+              <div style="text-align: right">
+                <div class="hint">Four digits (0–9). Repeats allowed.</div>
+                <div class="reveal" id="revealHint">
+                  Tip: you can reveal the code if you want to stop the game.
+                </div>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <input
+                id="guessInput"
+                type="text"
+                inputmode="numeric"
+                maxlength="4"
+                placeholder="____"
+                aria-label="Enter 4-digit guess"
+              />
+              <button id="guessBtn" class="btn-primary">Guess</button>
+              <button id="newBtn" class="btn-ghost">New Game</button>
+            </div>
+
+            <div class="player-stats" id="playerStats" style="display: none">
+              <div class="player-stat active" id="player1Stat">
+                <div class="player-stat-value">0</div>
+                <div class="player-stat-label">Player 1</div>
+              </div>
+              <div class="player-stat" id="player2Stat">
+                <div class="player-stat-value">0</div>
+                <div class="player-stat-label">Player 2</div>
+              </div>
+            </div>
+
+            <div class="footer-ctrls">
+              <button id="revealBtn" class="btn-ghost">Reveal Code</button>
+              <button id="clearBtn" class="btn-ghost">Clear History</button>
+            </div>
+
+            <div class="history" id="history" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section style="margin-top: 14px">
+          <div class="panel">
+            <strong>How feedback works</strong>
+            <p style="margin: 8px 0; color: var(--muted); font-size: 13px">
+              When you guess, you'll see two numbers: how many digits from your
+              guess appear anywhere in the secret code (digits correct), and how
+              many of those digits are also in the right position (positions
+              correct).
+            </p>
+
+            <ul
+              style="margin: 6px 0 0 16px; color: var(--muted); font-size: 13px"
+            >
+              <li>
+                <strong>Example:</strong> Secret is <code>4562</code>, you guess
+                <code>4251</code> → 3 digits correct (4,5,2) and 1 position
+                correct (4 in first place).
+              </li>
+              <li>
+                Guess <code>2654</code> → 4 digits correct but 0 positions
+                correct.
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <aside class="right-column">
+        <div
+          class="panel centered"
+          style="flex-direction: column; gap: 10px; padding: 20px"
+        >
+          <div style="font-size: 12px; color: var(--muted)">
+            Current Player's Code:
+          </div>
+          <div id="codeBox" class="code-box">• • • •</div>
+          <div
+            style="font-size: 13px; color: var(--muted); text-align: center"
+            id="codeHint"
+          >
+            (Hidden while playing — click <strong>Reveal Code</strong> to show
+            it.)
+          </div>
+        </div>
+
+        <div class="panel">
+          <strong>Game tips</strong>
+          <ol style="margin-top: 8px; color: var(--muted); font-size: 13px">
+            <li>
+              Start with a guess containing distinct digits to learn which
+              digits are present.
+            </li>
+            <li>
+              Use the feedback to permute digits and find correct positions.
+            </li>
+            <li>
+              Repeats are allowed — algorithm accounts for duplicates correctly.
+            </li>
+          </ol>
+        </div>
+
+        <div class="panel centered" style="padding: 12px">
+          <div style="font-size: 13px; color: var(--muted)">
+            Made with ❤️ — try to crack it in as few tries as possible!
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <script>
+      (function () {
+        // game state
+        let secret = randomCode();
+        let player1Secret = "";
+        let player2Secret = "";
+        let attempts = 0;
+        let best = null;
+        let isTwoPlayerMode = false;
+        let currentPlayer = 1;
+        let player1Attempts = 0;
+        let player2Attempts = 0;
+        let gamePhase = "setup"; // 'setup' or 'playing'
+
+        const historyEl = document.getElementById("history");
+        const attemptsEl = document.getElementById("attempts");
+        const bestEl = document.getElementById("best");
+        const statusEl = document.getElementById("status");
+        const codeBox = document.getElementById("codeBox");
+        const codeHint = document.getElementById("codeHint");
+        const twoPlayerToggle = document.getElementById("twoPlayerToggle");
+        const playerIndicator = document.getElementById("playerIndicator");
+        const player1Badge = document.getElementById("player1Badge");
+        const player2Badge = document.getElementById("player2Badge");
+        const playerStats = document.getElementById("playerStats");
+        const player1Stat = document.getElementById("player1Stat");
+        const player2Stat = document.getElementById("player2Stat");
+        const setupPhase = document.getElementById("setupPhase");
+        const gamePhaseEl = document.getElementById("gamePhase");
+        const player1CodeInput = document.getElementById("player1Code");
+        const player2CodeInput = document.getElementById("player2Code");
+        const startGameBtn = document.getElementById("startGameBtn");
+
+        const guessInput = document.getElementById("guessInput");
+        const guessBtn = document.getElementById("guessBtn");
+        const newBtn = document.getElementById("newBtn");
+        const revealBtn = document.getElementById("revealBtn");
+        const clearBtn = document.getElementById("clearBtn");
+
+        // initialize
+        updateMeta();
+        hideSecret();
+        guessInput.focus();
+
+        function randomCode() {
+          // produce 4-digit string, digits 0-9, repeats allowed
+          let s = "";
+          for (let i = 0; i < 4; i++)
+            s += String(Math.floor(Math.random() * 10));
+          return s;
+        }
+
+        function hideSecret() {
+          codeBox.textContent = "• • • •";
+          codeBox.classList.remove("revealed");
+        }
+
+        function showSecret() {
+          codeBox.textContent = secret.split("").join(" ");
+          codeBox.classList.add("revealed");
+        }
+
+        function updateMeta() {
+          attemptsEl.textContent = "Attempts: " + attempts;
+          bestEl.textContent = best === null ? "—" : best + " tries";
+
+          if (isTwoPlayerMode) {
+            player1Stat.querySelector(".player-stat-value").textContent =
+              player1Attempts;
+            player2Stat.querySelector(".player-stat-value").textContent =
+              player2Attempts;
+          }
+        }
+
+        function validateGuess(g) {
+          if (!/^[0-9]{4}$/.test(g)) return "Enter exactly 4 digits (0–9).";
+          return null;
+        }
+
+        function validateCode(g) {
+          if (!/^[0-9]{4}$/.test(g)) return "Enter exactly 4 digits (0–9).";
+          return null;
+        }
+
+        function analyze(guess, targetCode) {
+          // digits correct (accounting duplicates) and positions correct
+          const codeCounts = Array(10).fill(0);
+          const guessCounts = Array(10).fill(0);
+          for (const d of targetCode) codeCounts[Number(d)]++;
+          for (const g of guess) guessCounts[Number(g)]++;
+          let digitsCorrect = 0;
+          for (let i = 0; i < 10; i++)
+            digitsCorrect += Math.min(codeCounts[i], guessCounts[i]);
+          let positionsCorrect = 0;
+          for (let i = 0; i < 4; i++)
+            if (targetCode[i] === guess[i]) positionsCorrect++;
+          return { digitsCorrect, positionsCorrect };
+        }
+
+        function addHistory(guess, res, player = null) {
+          const row = document.createElement("div");
+          row.className = "row";
+
+          // Add player indicator in two-player mode
+          if (isTwoPlayerMode && player) {
+            row.style.borderLeft = `4px solid ${
+              player === 1 ? "var(--player1)" : "var(--player2)"
+            }`;
+          }
+
+          const left = document.createElement("div");
+          left.style.display = "flex";
+          left.style.flexDirection = "column";
+
+          const guessNum = document.createElement("div");
+          guessNum.className = "guess-num";
+          guessNum.textContent = guess;
+
+          const small = document.createElement("div");
+          small.style.fontSize = "12px";
+          small.style.color = "var(--muted)";
+
+          // Add player info in two-player mode
+          let playerInfo = "";
+          if (isTwoPlayerMode && player) {
+            playerInfo = ` (Player ${player})`;
+          }
+
+          small.textContent =
+            res.digitsCorrect === 4 && res.positionsCorrect === 4
+              ? `Exact match!${playerInfo}`
+              : `${res.digitsCorrect} digits correct • ${res.positionsCorrect} in correct position${playerInfo}`;
+
+          left.appendChild(guessNum);
+          left.appendChild(small);
+
+          const right = document.createElement("div");
+          const badge = document.createElement("div");
+          badge.className = "badge";
+
+          if (res.positionsCorrect === 4 && res.digitsCorrect === 4) {
+            badge.className += " good";
+            badge.textContent = "Cracked!";
+          } else if (res.digitsCorrect >= 3) {
+            badge.className += " warn";
+            badge.textContent = `${res.digitsCorrect} ✓`;
+          } else {
+            badge.className += " bad";
+            badge.textContent = `${res.digitsCorrect} ✕`;
+          }
+
+          right.appendChild(badge);
+          row.appendChild(left);
+          row.appendChild(right);
+          historyEl.prepend(row);
+        }
+
+        function switchPlayer() {
+          currentPlayer = currentPlayer === 1 ? 2 : 1;
+
+          // Update UI indicators
+          if (currentPlayer === 1) {
+            player1Badge.classList.add("active");
+            player2Badge.classList.remove("active");
+            player1Stat.classList.add("active");
+            player2Stat.classList.remove("active");
+          } else {
+            player2Badge.classList.add("active");
+            player1Badge.classList.remove("active");
+            player2Stat.classList.add("active");
+            player1Stat.classList.remove("active");
+          }
+
+          // Update secret code for the current player
+          secret = currentPlayer === 1 ? player2Secret : player1Secret;
+          hideSecret();
+
+          statusEl.textContent = `Player ${currentPlayer}'s turn to guess`;
+        }
+
+        function handleGuess() {
+          const raw = guessInput.value.trim();
+          const err = validateGuess(raw);
+          if (err) {
+            alert(err);
+            guessInput.focus();
+            return;
+          }
+
+          // Determine which secret code to check against
+          const targetCode = isTwoPlayerMode
+            ? currentPlayer === 1
+              ? player2Secret
+              : player1Secret
+            : secret;
+
+          const res = analyze(raw, targetCode);
+
+          attempts++;
+
+          // Track attempts per player in two-player mode
+          if (isTwoPlayerMode) {
+            if (currentPlayer === 1) {
+              player1Attempts++;
+            } else {
+              player2Attempts++;
+            }
+          }
+
+          addHistory(raw, res, isTwoPlayerMode ? currentPlayer : null);
+          updateMeta();
+
+          if (res.digitsCorrect === 4 && res.positionsCorrect === 4) {
+            if (isTwoPlayerMode) {
+              statusEl.textContent = `Player ${currentPlayer} cracked it in ${
+                currentPlayer === 1 ? player1Attempts : player2Attempts
+              } tries — well done!`;
+            } else {
+              statusEl.textContent = `You cracked it in ${attempts} ${
+                attempts === 1 ? "try" : "tries"
+              } — well done!`;
+            }
+
+            showSecret();
+
+            // Update best score
+            if (best === null || attempts < best) best = attempts;
+            updateMeta();
+          } else {
+            statusEl.textContent = `${res.digitsCorrect} digit(s) correct — ${res.positionsCorrect} in right position`;
+
+            // Switch player in two-player mode if not solved
+            if (isTwoPlayerMode) {
+              switchPlayer();
+            }
+          }
+
+          guessInput.value = "";
+          guessInput.focus();
+        }
+
+        function toggleTwoPlayerMode() {
+          isTwoPlayerMode = twoPlayerToggle.checked;
+
+          if (isTwoPlayerMode) {
+            playerIndicator.style.display = "flex";
+            playerStats.style.display = "flex";
+            setupPhase.style.display = "block";
+            gamePhaseEl.style.display = "none";
+            gamePhase = "setup";
+            currentPlayer = 1;
+            player1Attempts = 0;
+            player2Attempts = 0;
+            updateMeta();
+            statusEl.textContent = "Setup phase - enter secret codes";
+            codeHint.textContent = "(Codes will be hidden from view)";
+          } else {
+            playerIndicator.style.display = "none";
+            playerStats.style.display = "none";
+            setupPhase.style.display = "none";
+            gamePhaseEl.style.display = "block";
+            gamePhase = "playing";
+            statusEl.textContent = "New game — good luck!";
+            codeHint.textContent =
+              "(Hidden while playing — click Reveal Code to show it.)";
+            secret = randomCode();
+            hideSecret();
+          }
+        }
+
+        function startTwoPlayerGame() {
+          const p1Code = player1CodeInput.value.trim();
+          const p2Code = player2CodeInput.value.trim();
+
+          const err1 = validateCode(p1Code);
+          const err2 = validateCode(p2Code);
+
+          if (err1) {
+            alert(`Player 1 code: ${err1}`);
+            player1CodeInput.focus();
+            return;
+          }
+
+          if (err2) {
+            alert(`Player 2 code: ${err2}`);
+            player2CodeInput.focus();
+            return;
+          }
+
+          player1Secret = p1Code;
+          player2Secret = p2Code;
+          secret = player2Secret; // Player 1 starts guessing Player 2's code
+
+          setupPhase.style.display = "none";
+          gamePhaseEl.style.display = "block";
+          gamePhase = "playing";
+
+          player1CodeInput.value = "";
+          player2CodeInput.value = "";
+
+          statusEl.textContent = "Player 1's turn to guess";
+          hideSecret();
+          guessInput.focus();
+        }
+
+        guessBtn.addEventListener("click", handleGuess);
+        guessInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") handleGuess();
+        });
+
+        newBtn.addEventListener("click", function () {
+          if (isTwoPlayerMode && gamePhase === "playing") {
+            // In two-player mode, go back to setup
+            setupPhase.style.display = "block";
+            gamePhaseEl.style.display = "none";
+            gamePhase = "setup";
+            statusEl.textContent = "Setup phase - enter new secret codes";
+          } else {
+            // In single-player mode, generate new random code
+            secret = randomCode();
+            attempts = 0;
+            player1Attempts = 0;
+            player2Attempts = 0;
+            currentPlayer = 1;
+            historyEl.innerHTML = "";
+            statusEl.textContent = "New game — good luck!";
+            hideSecret();
+            updateMeta();
+            guessInput.value = "";
+            guessInput.focus();
+          }
+
+          // Reset player UI
+          if (isTwoPlayerMode) {
+            player1Badge.classList.add("active");
+            player2Badge.classList.remove("active");
+            player1Stat.classList.add("active");
+            player2Stat.classList.remove("active");
+          }
+        });
+
+        revealBtn.addEventListener("click", function () {
+          const ok = confirm(
+            "Reveal the secret code? This will end the current round."
+          );
+          if (!ok) return;
+          showSecret();
+          statusEl.textContent =
+            "Code revealed — start a new game to play again.";
+        });
+
+        clearBtn.addEventListener("click", function () {
+          historyEl.innerHTML = "";
+          attempts = 0;
+          player1Attempts = 0;
+          player2Attempts = 0;
+          updateMeta();
+          statusEl.textContent = isTwoPlayerMode
+            ? "Player 1's turn"
+            : "History cleared — keep guessing!";
+          guessInput.focus();
+          hideSecret();
+        });
+
+        twoPlayerToggle.addEventListener("change", toggleTwoPlayerMode);
+        startGameBtn.addEventListener("click", startTwoPlayerGame);
+
+        // small accessibility: prevent non-digits in input
+        guessInput.addEventListener("input", function (e) {
+          this.value = this.value.replace(/[^0-9]/g, "").slice(0, 4);
+        });
+        player1CodeInput.addEventListener("input", function (e) {
+          this.value = this.value.replace(/[^0-9]/g, "").slice(0, 4);
+        });
+        player2CodeInput.addEventListener("input", function (e) {
+          this.value = this.value.replace(/[^0-9]/g, "").slice(0, 4);
+        });
+
+        // expose for debugging in console
+        window._ctc = {
+          getSecret: () => secret,
+          setSecret: (s) => {
+            if (/^[0-9]{4}$/.test(s)) {
+              secret = s;
+              hideSecret();
+              alert("Secret set");
+            } else alert("invalid");
+          },
+          getPlayerSecrets: () => ({
+            player1: player1Secret,
+            player2: player2Secret,
+          }),
+        };
+      })();
+    </script>
+  </body>
+</html>
