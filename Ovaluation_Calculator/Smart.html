@@ -284,29 +284,62 @@
       // Update history display
       function updateHistory() {
         if (cycleData.periods.length === 0) {
-          periodHistoryEl.innerHTML =
-            '<p class="text-gray-500 text-sm py-4 text-center">No period history recorded yet</p>';
-          return;
-        }
+    periodHistoryEl.innerHTML =
+      '<p class="text-gray-500 text-sm py-4 text-center">No period history recorded yet</p>';
+    return;
+  }
 
-        periodHistoryEl.innerHTML = "";
-        cycleData.periods
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .forEach((period) => {
-            const date = new Date(period.date);
-            const item = document.createElement("div");
-            item.className =
-              "flex justify-between items-center py-2 border-b border-gray-100 last:border-0";
-            item.innerHTML = `
-                    <span>${date.toLocaleDateString()}</span>
-                    <span class="text-sm ${
-                      period.actual ? "text-green-600" : "text-gray-500"
-                    }">
-                        ${period.actual ? "Actual" : "Predicted"}
-                    </span>
-                `;
-            periodHistoryEl.appendChild(item);
-          });
+  periodHistoryEl.innerHTML = "";
+
+  // Sort by newest first
+  cycleData.periods
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .forEach((period, index) => {
+      const date = new Date(period.date);
+      const item = document.createElement("div");
+      item.className =
+        "flex justify-between items-center py-2 border-b border-gray-100 last:border-0";
+
+      // Unique ID for deletion
+      const recordId = `${period.date}-${period.actual}`;
+
+      item.innerHTML = `
+        <div>
+          <span class="font-medium">${date.toLocaleDateString()}</span>
+          <span class="ml-2 text-sm ${
+            period.actual ? "text-green-600" : "text-gray-500"
+          }">${period.actual ? "Actual" : "Predicted"}</span>
+        </div>
+        <button 
+          data-id="${recordId}"
+          class="delete-period text-red-500 hover:text-red-700 transition text-sm flex items-center"
+        >
+          <i data-feather="trash-2" class="w-4 h-4 mr-1"></i> Delete
+        </button>
+      `;
+
+      periodHistoryEl.appendChild(item);
+    });
+
+  // Re-activate feather icons
+  feather.replace();
+
+  // Add delete button functionality
+  document.querySelectorAll(".delete-period").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const recordId = e.currentTarget.getAttribute("data-id");
+      if (confirm("Are you sure you want to delete this record?")) {
+        // Remove matching record
+        cycleData.periods = cycleData.periods.filter(
+          (p) => `${p.date}-${p.actual}` !== recordId
+        );
+
+        // Save to localStorage and refresh
+        localStorage.setItem("cycleData", JSON.stringify(cycleData));
+        updateHistory();
+      }
+    });
+  });
 
         // Update statistics
         updateStatistics();
@@ -786,3 +819,4 @@
     </script>
   </body>
 </html>
+
