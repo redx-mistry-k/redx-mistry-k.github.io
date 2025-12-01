@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>No-Sugar Day Tracker</title>
+<style>
+  :root{
+    --bg:#071026;
+    --card:#0b1220;
+    --muted:#9aa7bf;
+    --accent1:#7dd3fc;
+    --accent2:#60a5fa;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --glass: rgba(255,255,255,0.03);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;margin:0;padding:0;background:linear-gradient(180deg,#07102a 0%, #031026 100%);color:#e9f6ff;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px;}
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;
+  }
+  .title{display:flex;gap:12px;align-items:center}
+  .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#04263a;font-size:18px;box-shadow:0 8px 24px rgba(2,10,20,0.6)}
+  h1{margin:0;font-size:18px}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:nowrap}
+  .stat{background:var(--card);padding:10px 12px;border-radius:10px;min-width:96px;text-align:center;box-shadow:inset 0 -1px 0 rgba(255,255,255,0.02)}
+  .num{font-size:17px;font-weight:700}
+  .label{font-size:12px;color:var(--muted);margin-top:4px}
+  .actions button{background:linear-gradient(180deg,var(--accent1),var(--accent2));border:0;padding:9px 12px;border-radius:10px;color:#04263a;font-weight:700;cursor:pointer}
+  main{display:flex;gap:14px;align-items:flex-start}
+  .calendar-wrap{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;box-shadow:0 12px 36px rgba(0,0,0,0.6);max-height:72vh;overflow:auto}
+  .months{display:flex;gap:12px;flex-wrap:nowrap;padding-bottom:18px;overflow-x:auto}
+  .month{min-width:300px;background:var(--glass);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+  .month h3{margin:0 0 10px 0;font-size:14px;color:var(--accent2)}
+  .weekdays{display:flex;gap:6px;margin-bottom:6px}
+  .weekdays div{flex:1;text-align:center;font-size:11px;color:var(--muted)}
+  .grid{display:flex;flex-wrap:wrap;gap:8px}
+  .day{
+    width:calc((100% - 6*8px)/7);
+    border-radius:10px;padding:10px 8px;min-height:68px;
+    display:flex;flex-direction:column;justify-content:space-between;border:1px dashed rgba(255,255,255,0.02);cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, background .12s ease;position:relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .day:active{transform:translateY(1px)}
+  .day.disabled{opacity:.35;cursor:not-allowed}
+  .date{font-size:14px;font-weight:700}
+  .note{font-size:11px;color:var(--muted)}
+  .day.marked{background:linear-gradient(180deg, rgba(34,197,94,0.12), rgba(34,197,94,0.06));border:1px solid rgba(34,197,94,0.14);box-shadow:0 8px 20px rgba(34,197,94,0.04)}
+  .badge{position:absolute;right:8px;top:8px;background:rgba(0,0,0,0.28);padding:4px 8px;border-radius:999px;font-size:11px;color:#bffadf}
+  .right-panel{width:300px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+  .panel h4{margin:0 0 10px 0}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .item{background:rgba(255,255,255,0.02);padding:10px;border-radius:8px;font-size:13px}
+  .footer{margin-top:12px;font-size:12px;color:var(--muted)}
+  .toast{position:fixed;right:16px;bottom:16px;padding:12px 16px;border-radius:10px;background:#071a20;border-left:6px solid var(--accent2);box-shadow:0 10px 30px rgba(2,6,23,0.6);color:#e6f6ff;min-width:220px;transform:translateY(12px);opacity:0;transition:all .28s cubic-bezier(.2,.9,.3,1)}
+  .toast.show{opacity:1;transform:translateY(0)}
+  /* Floating action button for mobile */
+  .fab{
+    position:fixed;right:16px;bottom:86px;background:linear-gradient(180deg,var(--accent1),var(--accent2));color:#04263a;border-radius:999px;padding:14px 16px;font-weight:800;box-shadow:0 12px 36px rgba(2,10,20,0.6);cursor:pointer;border:0;
+    display:flex;align-items:center;gap:8px;
+  }
+
+  /* Responsive: small screens */
+  @media (max-width:760px){
+    header{flex-direction:column;align-items:flex-start;gap:10px}
+    .controls{width:100%;overflow:auto;padding-bottom:6px}
+    .stat{min-width:84px;padding:10px;flex:0 0 auto}
+    main{flex-direction:column}
+    .months{flex-direction:column;gap:14px}
+    .month{min-width:auto;width:100%}
+    .right-panel{width:100%}
+    .day{min-height:78px;padding:12px 10px}
+    .grid{gap:10px}
+    .weekdays div{font-size:12px}
+    .fab{bottom:82px;right:16px}
+  }
+
+  @media (max-width:420px){
+    .date{font-size:15px}
+    .note{font-size:12px}
+    .day{min-height:84px;padding:14px}
+    .fab{padding:12px 14px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="title">
+      <div class="logo">NS</div>
+      <div>
+        <h1>No-Sugar Day Tracker</h1>
+        <p class="lead">Tap days to mark sugar-free days. Streaks saved locally.</p>
+      </div>
+    </div>
+
+    <div class="controls" id="controlsRow">
+      <div class="stat"><div class="num" id="currentStreak">0</div><div class="label">Current</div></div>
+      <div class="stat"><div class="num" id="longestStreak">0</div><div class="label">Longest</div></div>
+      <div class="stat"><div class="num" id="totalDays">0</div><div class="label">Marked</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="calendar-wrap" id="calendarWrap">
+      <div class="months" id="monthsContainer"></div>
+      <div class="footer">Calendar starts on: <span id="baseDateLabel"></span></div>
+    </div>
+
+    <aside class="right-panel">
+      <div class="panel">
+        <h4>Recent marks</h4>
+        <div class="list" id="recentList"></div>
+
+        <h4 style="margin-top:12px">How it works</h4>
+        <div style="color:var(--muted);font-size:13px">
+          • First marked day = Day 1.<br>
+          • Mark consecutive day to continue streak.<br>
+          • Mark after a gap → streak restarts.<br>
+          • Tap a marked day to unmark it.
+        </div>
+
+        <div style="margin-top:12px;color:var(--muted);font-size:12px">Data stored locally in your browser.</div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<button class="fab" id="markTodayBtn" title="Mark today">＋ Mark Today</button>
+<div id="toast" class="toast"></div>
+
+<script>
+/* Responsive No-Sugar Day Tracker */
+const STORAGE_BASE = 'noSugar_baseDate';
+const STORAGE_MARKED = 'noSugar_markedDates';
+const DAYS_TO_SHOW = 180;
+
+function iso(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function parseISO(s){ return new Date(s + 'T00:00:00'); }
+function daysBetween(aIso, bIso){
+  const a = parseISO(aIso);
+  const b = parseISO(bIso);
+  const ms = b.getTime() - a.getTime();
+  return Math.round(ms / (24*3600*1000));
+}
+
+function getBaseDate(){
+  let base = localStorage.getItem(STORAGE_BASE);
+  if(!base){
+    base = iso(new Date());
+    localStorage.setItem(STORAGE_BASE, base);
+  }
+  return base;
+}
+function getMarkedDates(){
+  const raw = localStorage.getItem(STORAGE_MARKED);
+  if(!raw) return [];
+  try{ const arr = JSON.parse(raw); return Array.isArray(arr) ? arr : []; }catch(e){ return []; }
+}
+function saveMarkedDates(arr){
+  const unique = Array.from(new Set(arr)).sort();
+  localStorage.setItem(STORAGE_MARKED, JSON.stringify(unique));
+}
+
+function showToast(text, type='info'){
+  const t = document.getElementById('toast');
+  t.style.borderLeftColor = (type === 'ok') ? 'var(--success)' : (type === 'warn' ? 'var(--danger)' : 'var(--accent2)');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=> t.classList.remove('show'), 3000);
+}
+
+function computeStreaks(marked){
+  if(!marked.length) return {current:0,longest:0};
+  const sorted = marked.slice().sort();
+  let longest = 1; let curr = 1;
+  for(let i=1;i<sorted.length;i++){
+    if(daysBetween(sorted[i-1], sorted[i]) === 1) curr++;
+    else { if(curr>longest) longest = curr; curr = 1; }
+  }
+  if(curr>longest) longest = curr;
+
+  let currentStreak = 1;
+  for(let i=sorted.length-1;i>0;i--){
+    if(daysBetween(sorted[i-1], sorted[i]) === 1) currentStreak++;
+    else break;
+  }
+  return {current: currentStreak, longest};
+}
+
+function renderStats(){
+  const marked = getMarkedDates();
+  const s = computeStreaks(marked);
+  document.getElementById('currentStreak').textContent = s.current;
+  document.getElementById('longestStreak').textContent = s.longest;
+  document.getElementById('totalDays').textContent = marked.length;
+
+  const recent = document.getElementById('recentList');
+  recent.innerHTML = '';
+  if(marked.length === 0){
+    recent.innerHTML = '<div class="item" style="color:var(--muted)">No marked days yet.</div>'; return;
+  }
+  const sortedDesc = marked.slice().sort((a,b)=> new Date(b) - new Date(a));
+  for(let i=0;i<Math.min(6, sortedDesc.length); i++){
+    const d = sortedDesc[i];
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.textContent = parseISO(d).toDateString();
+    recent.appendChild(el);
+  }
+}
+
+function renderCalendar(){
+  const base = getBaseDate();
+  document.getElementById('baseDateLabel').textContent = parseISO(base).toDateString();
+  const monthsContainer = document.getElementById('monthsContainer');
+  monthsContainer.innerHTML = '';
+  const marked = getMarkedDates();
+  const markedSet = new Set(marked);
+  const start = parseISO(base);
+
+  const months = {};
+  for(let i=0;i<DAYS_TO_SHOW;i++){
+    const cur = new Date(start.getTime() + i*24*3600*1000);
+    const monthKey = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}`;
+    if(!months[monthKey]) months[monthKey] = [];
+    months[monthKey].push(cur);
+  }
+
+  for(const mKey of Object.keys(months)){
+    const arr = months[mKey];
+    const monthEl = document.createElement('div'); monthEl.className = 'month';
+    const monthName = arr[0].toLocaleString(undefined,{month:'long', year:'numeric'});
+    monthEl.innerHTML = `<h3>${monthName}</h3>
+      <div class="weekdays">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="grid"></div>`;
+    const grid = monthEl.querySelector('.grid');
+
+    const first = arr[0];
+    const blanks = first.getDay();
+    for(let b=0;b<blanks;b++){
+      const blank = document.createElement('div');
+      blank.className = 'day disabled';
+      blank.innerHTML = `<div class="date">&nbsp;</div>`; grid.appendChild(blank);
+    }
+
+    arr.forEach(d => {
+      const key = iso(d);
+      const el = document.createElement('div');
+      el.className = 'day';
+      if(markedSet.has(key)) el.classList.add('marked');
+      el.dataset.date = key;
+      el.innerHTML = `<div class="date">${d.getDate()}</div>
+                      <div class="note">${d.toLocaleString(undefined,{weekday:'short'})}</div>
+                      ${markedSet.has(key)?'<div class="badge">Marked</div>':''}`;
+      el.addEventListener('click', ()=> toggleDateByKey(key));
+      grid.appendChild(el);
+    });
+
+    monthsContainer.appendChild(monthEl);
+  }
+
+  renderStats();
+}
+
+/* Toggle by date key (YYYY-MM-DD) — same logic as clicking a tile */
+function toggleDateByKey(key){
+  let marked = getMarkedDates();
+  const idx = marked.indexOf(key);
+  if(idx !== -1){
+    marked.splice(idx,1);
+    saveMarkedDates(marked);
+    showToast(`Unmarked ${parseISO(key).toDateString()}`, 'warn');
+    renderCalendar();
+    return;
+  }
+
+  const sorted = marked.slice().sort();
+  let message = '';
+  if(sorted.length === 0){
+    message = `Day 1 of no sugar — ${parseISO(key).toDateString()}`;
+  } else {
+    const last = sorted[sorted.length-1];
+    const diff = daysBetween(last, key);
+    if(diff === 1){
+      const after = sorted.concat([key]).sort();
+      const s = computeStreaks(after);
+      message = `Continued streak — Day ${s.current} (${parseISO(key).toDateString()})`;
+    } else if(diff <= 0){
+      const after = sorted.concat([key]).sort();
+      const s = computeStreaks(after);
+      message = `Marked ${parseISO(key).toDateString()}. Current streak: ${s.current}`;
+    } else {
+      message = `Streak broken. New Day 1 on ${parseISO(key).toDateString()}`;
+    }
+  }
+  marked.push(key);
+  saveMarkedDates(marked);
+  renderCalendar();
+  showToast(message, 'ok');
+}
+
+/* Mark today's date quickly (fab) */
+function markToday(){
+  const todayKey = iso(new Date());
+  toggleDateByKey(todayKey);
+}
+
+function resetAll(){
+  if(!confirm('Reset all saved data? This will clear your base start date and all marked days.')) return;
+  localStorage.removeItem(STORAGE_BASE);
+  localStorage.removeItem(STORAGE_MARKED);
+  getBaseDate();
+  renderCalendar();
+  showToast('Reset done', 'warn');
+}
+
+document.getElementById('resetBtn').addEventListener('click', resetAll);
+document.getElementById('markTodayBtn').addEventListener('click', markToday);
+
+/* init */
+getBaseDate();
+renderCalendar();
+</script>
+</body>
+</html>
