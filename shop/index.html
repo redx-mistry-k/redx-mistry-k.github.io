@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Restaurant Takeaway Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #ffffff;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    header small {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #eee;
+      background: #f9fafb;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 14px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .tab-button.active {
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    main {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 8px 0 6px;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .menu-item {
+      background: #f3f4f6;
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .menu-item:hover {
+      border-color: #111827;
+    }
+
+    .menu-item-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .menu-item-price {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+
+    .badge-veg {
+      display: inline-block;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      margin-top: 4px;
+      align-self: flex-start;
+    }
+
+    .badge-nonveg {
+      display: inline-block;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: #991b1b;
+      margin-top: 4px;
+      align-self: flex-start;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .chip {
+      display: inline-flex;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      align-items: center;
+    }
+
+    .chip-preparing {
+      background: #e0f2fe;
+      color: #075985;
+    }
+
+    .chip-ready {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .chip-done {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .items-list {
+      font-size: 13px;
+      margin: 4px 0;
+      padding-left: 16px;
+    }
+
+    .items-list li {
+      margin-bottom: 2px;
+    }
+
+    .note {
+      font-size: 12px;
+      font-style: italic;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .total-row {
+      font-size: 13px;
+      font-weight: 600;
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #111827;
+      color: #f9fafb;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      font-size: 13px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      margin-bottom: 6px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .cart-empty {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .cart-items {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .cart-items div {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .highlight {
+      font-weight: 600;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .summary-card {
+      background: #f3f4f6;
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 13px;
+    }
+
+    .summary-card span {
+      display: block;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    .summary-value {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .small {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .top-info {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .filter-chip.active {
+      background: #111827;
+      color: #f9fafb;
+      border-color: #111827;
+    }
+
+    @media (max-width: 500px) {
+      main {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Takeaway Manager</h1>
+      <small>For small restaurants · Runs in browser only</small>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-button active" data-tab="new-order">New Order</button>
+      <button class="tab-button" data-tab="queue">Queue</button>
+      <button class="tab-button" data-tab="summary">Summary</button>
+    </div>
+
+    <main>
+      <!-- New Order Section -->
+      <section id="new-order" class="section active">
+        <div class="top-info">
+          Tap items to add them to the order. Then save the order to the queue.
+        </div>
+
+        <h2>Menu</h2>
+        <div class="menu-grid" id="menu-grid">
+          <!-- Menu items injected by JS -->
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Current Order</div>
+              <div class="card-subtitle" id="order-items-count">No items added yet</div>
+            </div>
+            <div>
+              <span class="card-subtitle" id="order-total">Total: ₹0</span>
+            </div>
+          </div>
+
+          <div id="cart-content">
+            <p class="cart-empty">Tap any item from the menu above to add it here.</p>
+          </div>
+
+          <input id="customer-name" type="text" placeholder="Customer name (optional)" />
+          <textarea id="order-note" placeholder="Notes (e.g., no onion, extra spicy)"></textarea>
+
+          <div class="btn-row">
+            <button class="btn btn-secondary" id="clear-cart-btn">Clear Order</button>
+            <button class="btn btn-primary" id="save-order-btn">Save Order to Queue</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Queue Section -->
+      <section id="queue" class="section">
+        <div class="top-info">
+          View all active orders. Update status as you prepare and hand over.
+        </div>
+
+        <div class="filter-row">
+          <button class="filter-chip active" data-status="all">All</button>
+          <button class="filter-chip" data-status="preparing">Preparing</button>
+          <button class="filter-chip" data-status="ready">Ready</button>
+        </div>
+
+        <div id="queue-list">
+          <!-- Orders rendered here -->
+        </div>
+      </section>
+
+      <!-- Summary Section -->
+      <section id="summary" class="section">
+        <div class="top-info">
+          This summary is based on all orders stored in this browser. Use "Reset Day" at closing time.
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <span class="summary-label">Total orders</span>
+            <span class="summary-value" id="summary-orders">0</span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label">Total sales</span>
+            <span class="summary-value" id="summary-sales">₹0</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Most ordered items</div>
+          </div>
+          <ul class="items-list" id="summary-items">
+            <!-- Popular items list -->
+          </ul>
+        </div>
+
+        <button class="btn btn-danger" id="reset-day-btn">Reset Day (Clear All Orders)</button>
+        <p class="small">Note: This will delete all stored orders from this device. Use at the end of the day.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ------ CONFIG: MENU ------
+    // You can change this to match the real restaurant menu.
+    const MENU = [
+      { id: 1, name: "Idli (2 pcs)", price: 30, veg: true },
+      { id: 2, name: "Dosa", price: 50, veg: true },
+      { id: 3, name: "Poori Masala", price: 60, veg: true },
+      { id: 4, name: "Veg Fried Rice", price: 90, veg: true },
+      { id: 5, name: "Chicken Fried Rice", price: 120, veg: false },
+      { id: 6, name: "Egg Fried Rice", price: 100, veg: false },
+      { id: 7, name: "Parotta", price: 20, veg: true },
+      { id: 8, name: "Chicken Curry", price: 130, veg: false }
+    ];
+
+    const STORAGE_KEY = "takeaway_orders_v1";
+
+    let orders = [];
+    let cart = [];
+    let currentStatusFilter = "all";
+
+    // ------ INIT ------
+    function init() {
+      renderMenu();
+      loadOrders();
+      renderCart();
+      renderQueue();
+      renderSummary();
+      setupTabs();
+      setupActions();
+    }
+
+    // ------ MENU RENDER ------
+    function renderMenu() {
+      const menuGrid = document.getElementById("menu-grid");
+      menuGrid.innerHTML = "";
+      MENU.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "menu-item";
+        div.onclick = () => addToCart(item.id);
+        div.innerHTML = `
+          <span class="menu-item-name">${item.name}</span>
+          <span class="menu-item-price">₹${item.price}</span>
+          <span class="${item.veg ? "badge-veg" : "badge-nonveg"}">
+            ${item.veg ? "Veg" : "Non-Veg"}
+          </span>
+        `;
+        menuGrid.appendChild(div);
+      });
+    }
+
+    // ------ CART LOGIC ------
+    function addToCart(menuId) {
+      const item = MENU.find(m => m.id === menuId);
+      if (!item) return;
+
+      const existing = cart.find(ci => ci.id === menuId);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...item, qty: 1 });
+      }
+      renderCart();
+    }
+
+    function clearCart() {
+      cart = [];
+      renderCart();
+    }
+
+    function renderCart() {
+      const cartContent = document.getElementById("cart-content");
+      const countLabel = document.getElementById("order-items-count");
+      const totalLabel = document.getElementById("order-total");
+
+      if (cart.length === 0) {
+        cartContent.innerHTML = `<p class="cart-empty">Tap any item from the menu above to add it here.</p>`;
+        countLabel.textContent = "No items added yet";
+        totalLabel.textContent = "Total: ₹0";
+        return;
+      }
+
+      let totalItems = 0;
+      let totalPrice = 0;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "cart-items";
+
+      cart.forEach(ci => {
+        totalItems += ci.qty;
+        totalPrice += ci.qty * ci.price;
+
+        const row = document.createElement("div");
+        row.innerHTML = `
+          <span>${ci.qty} x ${ci.name}</span>
+          <span>₹${ci.qty * ci.price}</span>
+        `;
+        wrapper.appendChild(row);
+      });
+
+      cartContent.innerHTML = "";
+      cartContent.appendChild(wrapper);
+
+      countLabel.textContent = `${totalItems} item${totalItems > 1 ? "s" : ""} in this order`;
+      totalLabel.textContent = `Total: ₹${totalPrice}`;
+    }
+
+    // ------ ORDERS: STORAGE ------
+    function loadOrders() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        orders = saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        orders = [];
+      }
+    }
+
+    function saveOrders() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    }
+
+    // ------ SAVE ORDER ------
+    function saveOrder() {
+      if (cart.length === 0) {
+        alert("Add at least one item to the order.");
+        return;
+      }
+
+      const nameInput = document.getElementById("customer-name");
+      const noteInput = document.getElementById("order-note");
+
+      const createdAt = new Date();
+      const orderId = createdAt.getTime(); // simple unique id
+
+      const order = {
+        id: orderId,
+        displayId: "#" + (orders.length + 1),
+        customerName: nameInput.value.trim() || "No name",
+        note: noteInput.value.trim(),
+        items: cart.map(ci => ({ id: ci.id, name: ci.name, price: ci.price, qty: ci.qty })),
+        status: "preparing",
+        total: cart.reduce((sum, ci) => sum + ci.qty * ci.price, 0),
+        createdAt: createdAt.toISOString()
+      };
+
+      orders.push(order);
+      saveOrders();
+      clearCart();
+      nameInput.value = "";
+      noteInput.value = "";
+      renderQueue();
+      renderSummary();
+
+      alert("Order added to queue!");
+    }
+
+    // ------ QUEUE RENDER + STATUS ------
+    function setStatusFilter(status) {
+      currentStatusFilter = status;
+      document.querySelectorAll(".filter-chip").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.status === status);
+      });
+      renderQueue();
+    }
+
+    function renderQueue() {
+      const container = document.getElementById("queue-list");
+      container.innerHTML = "";
+
+      let filtered = orders;
+      if (currentStatusFilter !== "all") {
+        filtered = orders.filter(o => o.status === currentStatusFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p class="small">No orders found for this filter.</p>`;
+        return;
+      }
+
+      filtered
+        .slice()
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+        .forEach(order => {
+          const card = document.createElement("div");
+          card.className = "card";
+
+          const statusChipClass =
+            order.status === "preparing"
+              ? "chip chip-preparing"
+              : order.status === "ready"
+              ? "chip chip-ready"
+              : "chip chip-done";
+
+          const statusLabel =
+            order.status === "preparing"
+              ? "Preparing"
+              : order.status === "ready"
+              ? "Ready"
+              : "Completed";
+
+          const time = new Date(order.createdAt);
+          const timeStr = time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+          card.innerHTML = `
+            <div class="card-header">
+              <div>
+                <div class="card-title">${order.displayId} · ${order.customerName}</div>
+                <div class="card-subtitle">${timeStr}</div>
+              </div>
+              <div class="${statusChipClass}">${statusLabel}</div>
+            </div>
+            <ul class="items-list">
+              ${order.items
+                .map(it => `<li>${it.qty} x ${it.name} (₹${it.price})</li>`)
+                .join("")}
+            </ul>
+            ${
+              order.note
+                ? `<div class="note">Note: ${order.note}</div>`
+                : ""
+            }
+            <div class="total-row">Total: ₹${order.total}</div>
+          `;
+
+          const btnRow = document.createElement("div");
+          btnRow.className = "btn-row";
+
+          if (order.status === "preparing") {
+            const readyBtn = document.createElement("button");
+            readyBtn.className = "btn btn-primary";
+            readyBtn.textContent = "Mark Ready";
+            readyBtn.onclick = () => updateOrderStatus(order.id, "ready");
+            btnRow.appendChild(readyBtn);
+          }
+
+          if (order.status === "ready") {
+            const doneBtn = document.createElement("button");
+            doneBtn.className = "btn btn-primary";
+            doneBtn.textContent = "Mark Picked Up";
+            doneBtn.onclick = () => updateOrderStatus(order.id, "done");
+            btnRow.appendChild(doneBtn);
+          }
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "btn btn-secondary";
+          deleteBtn.textContent = "Remove from Queue";
+          deleteBtn.onclick = () => deleteOrder(order.id);
+          btnRow.appendChild(deleteBtn);
+
+          card.appendChild(btnRow);
+          container.appendChild(card);
+        });
+    }
+
+    function updateOrderStatus(id, status) {
+      const order = orders.find(o => o.id === id);
+      if (!order) return;
+      order.status = status;
+      saveOrders();
+      renderQueue();
+      renderSummary();
+    }
+
+    function deleteOrder(id) {
+      if (!confirm("Remove this order from queue?")) return;
+      orders = orders.filter(o => o.id !== id);
+      saveOrders();
+      renderQueue();
+      renderSummary();
+    }
+
+    // ------ SUMMARY ------
+    function renderSummary() {
+      const totalOrdersEl = document.getElementById("summary-orders");
+      const totalSalesEl = document.getElementById("summary-sales");
+      const itemsListEl = document.getElementById("summary-items");
+
+      if (orders.length === 0) {
+        totalOrdersEl.textContent = "0";
+        totalSalesEl.textContent = "₹0";
+        itemsListEl.innerHTML = `<li>No orders yet.</li>`;
+        return;
+      }
+
+      const totalOrders = orders.length;
+      const totalSales = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+      totalOrdersEl.textContent = totalOrders;
+      totalSalesEl.textContent = "₹" + totalSales;
+
+      const itemCountMap = {};
+      orders.forEach(order => {
+        order.items.forEach(it => {
+          if (!itemCountMap[it.name]) {
+            itemCountMap[it.name] = 0;
+          }
+          itemCountMap[it.name] += it.qty;
+        });
+      });
+
+      const sortedItems = Object.entries(itemCountMap)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6);
+
+      itemsListEl.innerHTML = sortedItems
+        .map(([name, qty]) => `<li>${name}: <span class="highlight">${qty}</span> orders</li>`)
+        .join("");
+    }
+
+    function resetDay() {
+      if (!confirm("Reset everything for today? This will clear ALL stored orders.")) return;
+      orders = [];
+      saveOrders();
+      renderQueue();
+      renderSummary();
+      alert("All orders cleared for a new day.");
+    }
+
+    // ------ TABS ------
+    function setupTabs() {
+      const tabButtons = document.querySelectorAll(".tab-button");
+      const sections = document.querySelectorAll(".section");
+
+      tabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.tab;
+
+          tabButtons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          sections.forEach(sec => {
+            sec.classList.toggle("active", sec.id === target);
+          });
+        });
+      });
+    }
+
+    // ------ ACTIONS + FILTERS ------
+    function setupActions() {
+      document.getElementById("clear-cart-btn").addEventListener("click", clearCart);
+      document.getElementById("save-order-btn").addEventListener("click", saveOrder);
+      document.getElementById("reset-day-btn").addEventListener("click", resetDay);
+
+      document.querySelectorAll(".filter-chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          setStatusFilter(btn.dataset.status);
+        });
+      });
+    }
+
+    // Start app
+    init();
+  </script>
+</body>
+</html>
