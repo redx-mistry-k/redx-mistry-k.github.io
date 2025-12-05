@@ -254,6 +254,12 @@
       border: 1px solid #10b981;
     }
 
+    .btn-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #3b82f6;
+    }
+
     .btn-whatsapp {
       background: #25d366;
       color: white;
@@ -465,6 +471,92 @@
       font-size: 16px;
     }
 
+    .export-modal-content {
+      max-width: 500px;
+    }
+
+    .export-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .export-option {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .export-option:hover {
+      background: #f9fafb;
+      border-color: #111827;
+    }
+
+    .export-icon {
+      font-size: 20px;
+      margin-right: 12px;
+      width: 40px;
+      text-align: center;
+    }
+
+    .export-text {
+      flex: 1;
+    }
+
+    .export-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .export-description {
+      font-size: 12px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .date-range-selector {
+      margin: 15px 0;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+
+    .date-range-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .date-input-group {
+      flex: 1;
+    }
+
+    .date-input-group label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 4px;
+      color: #666;
+    }
+
+    .date-input {
+      width: 100%;
+      padding: 8px;
+      font-size: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+    }
+
+    .export-status {
+      text-align: center;
+      padding: 10px;
+      font-size: 13px;
+      color: #666;
+    }
+
     @media (max-width: 500px) {
       main {
         padding: 10px;
@@ -566,8 +658,15 @@
           </ul>
         </div>
 
-        <button class="btn btn-danger" id="reset-day-btn">Reset Day (Clear All Orders)</button>
-        <p class="small">Note: This will delete all stored orders from this device. Use at the end of the day.</p>
+        <div class="btn-row">
+          <button class="btn btn-info" id="export-sales-btn">
+            <span class="btn-icon">📊</span>
+            Export Sales Data
+          </button>
+          <button class="btn btn-danger" id="reset-day-btn">Reset Day (Clear All Orders)</button>
+        </div>
+        
+        <p class="small">Note: Export will download all order data as CSV/Excel file. Reset Day will delete all stored orders from this device. Use at the end of the day.</p>
       </section>
     </main>
   </div>
@@ -610,6 +709,60 @@
     </div>
   </div>
 
+  <!-- Export Sales Modal -->
+  <div class="modal" id="export-modal">
+    <div class="modal-content export-modal-content">
+      <div class="modal-header">
+        <div class="modal-title">Export Sales Data</div>
+        <button class="modal-close" id="close-export-modal-btn">&times;</button>
+      </div>
+
+      <div class="date-range-selector">
+        <div class="date-range-row">
+          <div class="date-input-group">
+            <label for="start-date">From Date</label>
+            <input type="date" id="start-date" class="date-input">
+          </div>
+          <div class="date-input-group">
+            <label for="end-date">To Date</label>
+            <input type="date" id="end-date" class="date-input">
+          </div>
+        </div>
+        <div class="small" style="text-align: center; margin-top: 8px;">
+          Leave dates empty to export all orders
+        </div>
+      </div>
+
+      <div class="export-options">
+        <div class="export-option" id="export-csv-option">
+          <div class="export-icon">📄</div>
+          <div class="export-text">
+            <div class="export-title">Export as CSV</div>
+            <div class="export-description">Comma-separated values file, can be opened in Excel, Google Sheets, etc.</div>
+          </div>
+        </div>
+        
+        <div class="export-option" id="export-excel-option">
+          <div class="export-icon">📊</div>
+          <div class="export-text">
+            <div class="export-title">Export as Excel (XLSX)</div>
+            <div class="export-description">Microsoft Excel format with formatting</div>
+          </div>
+        </div>
+
+        <div class="export-option" id="export-details-option">
+          <div class="export-icon">📋</div>
+          <div class="export-text">
+            <div class="export-title">Export Detailed Report</div>
+            <div class="export-description">Includes item-level details for each order</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="export-status" id="export-status"></div>
+    </div>
+  </div>
+
   <script>
     // ------ CONFIG: MENU ------
     const MENU = [
@@ -640,6 +793,7 @@
       setupTabs();
       setupActions();
       setupWhatsAppModal();
+      setupExportModal();
     }
 
     // ------ MENU RENDER ------
@@ -877,6 +1031,288 @@
       });
     }
 
+    // ------ EXPORT FUNCTIONALITY ------
+    function showExportModal() {
+      // Set today's date as default end date
+      const today = new Date().toISOString().split('T')[0];
+      const startDateInput = document.getElementById('start-date');
+      const endDateInput = document.getElementById('end-date');
+      
+      // Set defaults (last 7 days)
+      const lastWeek = new Date();
+      lastWeek.setDate(lastWeek.getDate() - 7);
+      const lastWeekStr = lastWeek.toISOString().split('T')[0];
+      
+      startDateInput.value = lastWeekStr;
+      endDateInput.value = today;
+      
+      // Clear status
+      document.getElementById('export-status').textContent = '';
+      
+      // Show modal
+      document.getElementById('export-modal').classList.add('active');
+    }
+
+    function setupExportModal() {
+      const modal = document.getElementById('export-modal');
+      const closeBtn = document.getElementById('close-export-modal-btn');
+      const exportCsvOption = document.getElementById('export-csv-option');
+      const exportExcelOption = document.getElementById('export-excel-option');
+      const exportDetailsOption = document.getElementById('export-details-option');
+      const exportBtn = document.getElementById('export-sales-btn');
+
+      // Open export modal
+      exportBtn.addEventListener('click', showExportModal);
+
+      // Close modal
+      closeBtn.addEventListener('click', () => {
+        modal.classList.remove('active');
+      });
+
+      // Close when clicking outside
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+
+      // Export as CSV
+      exportCsvOption.addEventListener('click', () => {
+        exportSalesData('csv');
+      });
+
+      // Export as Excel
+      exportExcelOption.addEventListener('click', () => {
+        exportSalesData('excel');
+      });
+
+      // Export detailed report
+      exportDetailsOption.addEventListener('click', () => {
+        exportSalesData('detailed');
+      });
+    }
+
+    function filterOrdersByDate(startDate, endDate) {
+      if (!startDate || !endDate) {
+        return orders; // Return all orders if no date filter
+      }
+
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // Include entire end day
+
+      return orders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return orderDate >= start && orderDate <= end;
+      });
+    }
+
+    function formatCurrency(amount) {
+      return '₹' + amount.toFixed(2);
+    }
+
+    function exportSalesData(format) {
+      const startDate = document.getElementById('start-date').value;
+      const endDate = document.getElementById('end-date').value;
+      const statusEl = document.getElementById('export-status');
+
+      // Validate dates if provided
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (start > end) {
+          statusEl.textContent = 'Error: Start date cannot be after end date';
+          statusEl.style.color = '#dc2626';
+          return;
+        }
+      }
+
+      const filteredOrders = filterOrdersByDate(startDate, endDate);
+      
+      if (filteredOrders.length === 0) {
+        statusEl.textContent = 'No orders found for the selected date range';
+        statusEl.style.color = '#dc2626';
+        return;
+      }
+
+      statusEl.textContent = 'Preparing export...';
+      statusEl.style.color = '#666';
+
+      setTimeout(() => {
+        try {
+          if (format === 'csv') {
+            exportToCSV(filteredOrders);
+          } else if (format === 'excel') {
+            exportToExcel(filteredOrders);
+          } else if (format === 'detailed') {
+            exportDetailedReport(filteredOrders);
+          }
+          
+          statusEl.textContent = 'Export completed successfully!';
+          statusEl.style.color = '#16a34a';
+          
+          // Auto-close modal after success
+          setTimeout(() => {
+            document.getElementById('export-modal').classList.remove('active');
+            statusEl.textContent = '';
+          }, 1500);
+          
+        } catch (error) {
+          statusEl.textContent = 'Error during export: ' + error.message;
+          statusEl.style.color = '#dc2626';
+        }
+      }, 500);
+    }
+
+    function exportToCSV(orders) {
+      // Create CSV content
+      const headers = ['Order ID', 'Customer Name', 'Phone', 'Date', 'Time', 'Status', 'Items Count', 'Total', 'Note'];
+      const rows = orders.map(order => {
+        const date = new Date(order.createdAt);
+        const dateStr = date.toLocaleDateString();
+        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const itemsCount = order.items.reduce((sum, item) => sum + item.qty, 0);
+        
+        return [
+          order.displayId,
+          order.customerName,
+          order.customerPhone || '',
+          dateStr,
+          timeStr,
+          order.status.charAt(0).toUpperCase() + order.status.slice(1),
+          itemsCount,
+          formatCurrency(order.total),
+          order.note || ''
+        ];
+      });
+
+      // Create CSV string
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ].join('\n');
+
+      // Create and download file
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const filename = `sales_export_${new Date().toISOString().split('T')[0]}.csv`;
+      
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function exportToExcel(orders) {
+      // For Excel export, we'll create a more complex CSV with better formatting
+      const headers = ['Order ID', 'Customer', 'Phone', 'Date', 'Time', 'Status', 'Items', 'Quantity', 'Item Total', 'Order Total', 'Notes'];
+      
+      // Create rows with item-level details
+      const rows = [];
+      orders.forEach(order => {
+        const date = new Date(order.createdAt);
+        const dateStr = date.toLocaleDateString();
+        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        order.items.forEach((item, index) => {
+          rows.push([
+            order.displayId,
+            index === 0 ? order.customerName : '', // Only show customer name on first row
+            index === 0 ? (order.customerPhone || '') : '',
+            index === 0 ? dateStr : '',
+            index === 0 ? timeStr : '',
+            index === 0 ? (order.status.charAt(0).toUpperCase() + order.status.slice(1)) : '',
+            item.name,
+            item.qty,
+            formatCurrency(item.price * item.qty),
+            index === 0 ? formatCurrency(order.total) : '', // Only show total on first row
+            index === 0 ? (order.note || '') : ''
+          ]);
+        });
+        
+        // Add a separator row between orders
+        rows.push(['', '', '', '', '', '', '', '', '', '', '']);
+      });
+
+      // Create CSV string
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ].join('\n');
+
+      // Create and download file with .xls extension (can be opened in Excel)
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const link = document.createElement('a');
+      const filename = `sales_export_${new Date().toISOString().split('T')[0]}.xls`;
+      
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function exportDetailedReport(orders) {
+      // Create a comprehensive report with summary
+      const date = new Date();
+      const exportDate = date.toLocaleDateString();
+      const exportTime = date.toLocaleTimeString();
+      
+      let csvContent = `Restaurant Sales Report\n`;
+      csvContent += `Export Date: ${exportDate} ${exportTime}\n`;
+      csvContent += `Total Orders: ${orders.length}\n`;
+      csvContent += `Total Sales: ${formatCurrency(orders.reduce((sum, o) => sum + o.total, 0))}\n\n`;
+      
+      // Summary section
+      csvContent += `ORDER SUMMARY\n`;
+      csvContent += 'Order ID,Customer,Date,Time,Status,Items Count,Total,Phone,Notes\n';
+      
+      orders.forEach(order => {
+        const orderDate = new Date(order.createdAt);
+        const itemsCount = order.items.reduce((sum, item) => sum + item.qty, 0);
+        
+        csvContent += `${order.displayId},"${order.customerName}",${orderDate.toLocaleDateString()},${orderDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })},${order.status.toUpperCase()},${itemsCount},${formatCurrency(order.total)},"${order.customerPhone || ''}","${order.note || ''}"\n`;
+      });
+      
+      csvContent += `\n\nITEM DETAILS\n`;
+      csvContent += 'Order ID,Item Name,Quantity,Price,Item Total\n';
+      
+      // Item details
+      orders.forEach(order => {
+        order.items.forEach(item => {
+          csvContent += `${order.displayId},"${item.name}",${item.qty},${formatCurrency(item.price)},${formatCurrency(item.price * item.qty)}\n`;
+        });
+      });
+      
+      csvContent += `\n\nSALES BY ITEM\n`;
+      csvContent += 'Item Name,Total Quantity Sold,Total Revenue\n';
+      
+      // Sales by item summary
+      const itemSales = {};
+      orders.forEach(order => {
+        order.items.forEach(item => {
+          if (!itemSales[item.name]) {
+            itemSales[item.name] = { quantity: 0, revenue: 0 };
+          }
+          itemSales[item.name].quantity += item.qty;
+          itemSales[item.name].revenue += item.qty * item.price;
+        });
+      });
+      
+      Object.entries(itemSales).forEach(([itemName, data]) => {
+        csvContent += `"${itemName}",${data.quantity},${formatCurrency(data.revenue)}\n`;
+      });
+
+      // Create and download file
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const filename = `detailed_sales_report_${new Date().toISOString().split('T')[0]}.csv`;
+      
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
     // ------ QUEUE RENDER + STATUS ------
     function setStatusFilter(status) {
       currentStatusFilter = status;
@@ -1066,6 +1502,7 @@
       document.getElementById("clear-cart-btn").addEventListener("click", clearCart);
       document.getElementById("save-order-btn").addEventListener("click", saveOrder);
       document.getElementById("reset-day-btn").addEventListener("click", resetDay);
+      document.getElementById("export-sales-btn").addEventListener("click", showExportModal);
 
       document.querySelectorAll(".filter-chip").forEach(btn => {
         btn.addEventListener("click", () => {
