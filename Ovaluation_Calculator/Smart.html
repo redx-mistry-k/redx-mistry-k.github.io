@@ -223,12 +223,25 @@
                   style="width: 0%"
                 ></div>
               </div>
-              <br>
+              
+            </div>
+            <br>
               <button id="exportCsvBtn"
   class="bg-blue-600 text-white px-4 py-2 rounded-lg">
   Export CSV
 </button>
-            </div>
+            <button id="importCsvBtn"
+  class="bg-gray-600 text-white px-4 py-2 rounded-lg ml-2">
+  Import CSV
+</button>
+
+<input
+  type="file"
+  id="importCsvInput"
+  accept=".csv"
+  class="hidden"
+/>
+
           </div>
         </div>
       </div>
@@ -276,7 +289,8 @@
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "cycle_history.csv";
+  a.download = `cycle_history_${new Date().toISOString().slice(0,10)}.csv`;
+
   a.click();
   URL.revokeObjectURL(url);
 });
@@ -853,8 +867,73 @@
           }
         }
       }
+      const importBtn = document.getElementById("importCsvBtn");
+const fileInput = document.getElementById("importCsvInput");
+
+importBtn.addEventListener("click", () => {
+  fileInput.click();
+});
+fileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      const lines = reader.result.trim().split("\n");
+
+      // remove header
+      const rows = lines.slice(1);
+
+      if (rows.length === 0) {
+        alert("CSV file is empty");
+        return;
+      }
+
+      const periods = [];
+
+      rows.forEach(line => {
+        const [date, isActual, cycleLength, predictedDate] =
+          line.split(",");
+
+        if (!date) return;
+
+        periods.push({
+          date: date,
+          actual: isActual === "1",
+          cycleLength: cycleLength ? Number(cycleLength) : undefined,
+          predictedDate: predictedDate || undefined
+        });
+      });
+
+      const confirmReplace = confirm(
+        "This will replace your existing cycle data. Continue?"
+      );
+      if (!confirmReplace) return;
+
+      const newCycleData = {
+        periods,
+        predictions: [],
+        calculatedLength: 28
+      };
+
+      localStorage.setItem("cycleData", JSON.stringify(newCycleData));
+
+      alert("CSV imported successfully. Reloading…");
+      location.reload();
+
+    } catch (err) {
+      alert("Invalid CSV file");
+    }
+  };
+
+  reader.readAsText(file);
+});
+
     </script>
   </body>
 </html>
+
 
 
