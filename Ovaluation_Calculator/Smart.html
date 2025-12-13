@@ -223,6 +223,11 @@
                   style="width: 0%"
                 ></div>
               </div>
+              <br>
+              <button id="exportCsvBtn"
+  class="bg-blue-600 text-white px-4 py-2 rounded-lg">
+  Export CSV
+</button>
             </div>
           </div>
         </div>
@@ -244,6 +249,38 @@
     </div>
 
     <script>
+      //export CSV
+      document.getElementById("exportCsvBtn").addEventListener("click", () => {
+  const data = JSON.parse(localStorage.getItem("cycleData"));
+  if (!data || data.periods.length === 0) {
+    alert("No data to export");
+    return;
+  }
+
+  const rows = [
+    ["date", "is_actual", "cycle_length", "predicted_next_period"]
+  ];
+
+  data.periods.forEach(p => {
+    rows.push([
+      p.date,
+      p.actual ? 1 : 0,
+      p.cycleLength || "",
+      p.predictedDate || ""
+    ]);
+  });
+
+  const csv = rows.map(r => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cycle_history.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
       // Initialize feather icons
       feather.replace();
 
@@ -819,4 +856,5 @@
     </script>
   </body>
 </html>
+
 
