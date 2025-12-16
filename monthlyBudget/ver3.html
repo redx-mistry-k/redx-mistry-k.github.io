@@ -62,6 +62,11 @@
         flex: 1;
         min-width: 250px;
         text-align: center;
+        transition: transform 0.3s;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
       }
 
       .card h3 {
@@ -76,9 +81,20 @@
       }
 
       .card .percentage {
-        color: #27ae60;
         font-size: 1.2rem;
         margin-top: 10px;
+      }
+
+      .positive {
+        color: #27ae60;
+      }
+
+      .negative {
+        color: #e74c3c;
+      }
+
+      .neutral {
+        color: #7f8c8d;
       }
 
       .form-container {
@@ -89,15 +105,16 @@
         margin-bottom: 30px;
       }
 
-      form {
+      .form-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        align-items: end;
       }
-      #category {
-        min-width: 180px;
-        padding: 8px;
-        display: block;
+
+      .form-grid > div {
+        display: flex;
+        flex-direction: column;
       }
 
       label {
@@ -114,6 +131,14 @@
         border: 1px solid #ddd;
         border-radius: 5px;
         font-size: 1rem;
+        transition: border 0.3s;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #4b6cb7;
+        box-shadow: 0 0 0 2px rgba(75, 108, 183, 0.2);
       }
 
       button {
@@ -125,27 +150,19 @@
         cursor: pointer;
         font-size: 1rem;
         font-weight: 600;
-        transition: background 0.3s;
+        transition: all 0.3s;
       }
 
       button:hover {
         background: #3a5795;
-      }
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 20px;
-        align-items: end;
-      }
-      .form-grid > div {
-        display: flex;
-        flex-direction: column;
+        transform: translateY(-2px);
       }
 
       .form-button-container {
         display: flex;
         justify-content: flex-end;
         align-items: center;
+        gap: 10px;
       }
 
       .diagram-container {
@@ -203,10 +220,14 @@
         font-weight: bold;
       }
 
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+
       .actions button {
-        padding: 8px 12px;
+        padding: 6px 12px;
         font-size: 0.9rem;
-        margin-right: 5px;
       }
 
       .delete-btn {
@@ -217,33 +238,162 @@
         background: #c0392b;
       }
 
+      .edit-btn {
+        background: #f39c12;
+      }
+
+      .edit-btn:hover {
+        background: #d68910;
+      }
+
+      .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+        font-style: italic;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .reset-btn {
+        background: #95a5a6;
+      }
+
+      .reset-btn:hover {
+        background: #7f8c8d;
+      }
+
+      .export-btn {
+        background: #2ecc71;
+      }
+
+      .export-btn:hover {
+        background: #27ae60;
+      }
+
+      .import-btn {
+        background: #3498db;
+      }
+
+      .import-btn:hover {
+        background: #2980b9;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 30px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .modal-header h3 {
+        color: #2c3e50;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #7f8c8d;
+      }
+
+      .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
       @media (max-width: 768px) {
         .summary-cards {
           flex-direction: column;
         }
 
-        form {
+        .form-grid {
           grid-template-columns: 1fr;
         }
 
         th,
         td {
           padding: 10px;
+          font-size: 0.9rem;
+        }
+
+        .form-button-container {
+          flex-direction: column;
+        }
+
+        .controls {
+          flex-direction: column;
         }
       }
 
-      form {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        align-items: end;
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: white;
+        font-weight: 600;
+        z-index: 1001;
+        animation: slideIn 0.3s, fadeOut 0.3s 2.7s;
+        animation-fill-mode: forwards;
       }
 
-      .form-button-container {
-        grid-column: 1 / -1;
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
+      .notification.success {
+        background-color: #27ae60;
+      }
+
+      .notification.error {
+        background-color: #e74c3c;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
       }
 
       .node-label {
@@ -255,7 +405,7 @@
   </head>
   <body>
     <header>
-      <h1>Monthly Budget</h1>
+      <h1>Monthly Budget Tracker</h1>
       <p>Visualize how your income flows to expenses and savings</p>
     </header>
 
@@ -279,7 +429,6 @@
       <h2>Add New Budget Item</h2>
       <p>Enter your income or expense details below</p>
       <form id="budgetForm">
-        <!-- Added the missing id attribute here -->
         <div class="form-grid">
           <div>
             <label for="type">Type</label>
@@ -291,7 +440,9 @@
 
           <div>
             <label for="category">Category</label>
-            <select id="category" required></select>
+            <select id="category" required>
+              <!-- Categories will be populated dynamically -->
+            </select>
           </div>
 
           <div>
@@ -300,6 +451,8 @@
               type="number"
               id="amount"
               placeholder="Enter amount"
+              min="0"
+              step="0.01"
               required
             />
           </div>
@@ -309,11 +462,27 @@
             <input type="date" id="date" required />
           </div>
 
+          <div>
+            <label for="description">Description (Optional)</label>
+            <input
+              type="text"
+              id="description"
+              placeholder="Enter description"
+            />
+          </div>
+
           <div class="form-button-container">
-            <button type="submit">Add Item</button>
+            <button type="button" id="clearForm">Clear</button>
+            <button type="submit" id="submitBtn">Add Item</button>
           </div>
         </div>
       </form>
+    </div>
+
+    <div class="controls">
+      <button class="reset-btn" id="resetAllBtn">Reset All Data</button>
+      <button class="export-btn" id="exportBtn">Export Data</button>
+      <button class="import-btn" id="importBtn">Import Data</button>
     </div>
 
     <div class="diagram-container">
@@ -321,7 +490,6 @@
       <p>Visualizing how your income is allocated to expenses and savings:</p>
       <div id="sankeyDiagram"></div>
     </div>
-    <div id="sankeyLabels" class="diagram-labels"></div>
 
     <h2>Your Budget Items</h2>
     <table>
@@ -330,6 +498,7 @@
           <th>TYPE</th>
           <th>CATEGORY</th>
           <th>AMOUNT</th>
+          <th>DESCRIPTION</th>
           <th>DATE</th>
           <th>ACTIONS</th>
         </tr>
@@ -338,6 +507,37 @@
         <!-- Budget items will be dynamically added here -->
       </tbody>
     </table>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="resetModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Reset All Data</h3>
+          <button class="close-btn">&times;</button>
+        </div>
+        <p>Are you sure you want to delete all budget data? This action cannot be undone.</p>
+        <div class="modal-buttons">
+          <button class="reset-btn" id="confirmReset">Yes, Reset All</button>
+          <button class="cancel-btn" id="cancelReset">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import Modal -->
+    <div id="importModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Import Budget Data</h3>
+          <button class="close-btn">&times;</button>
+        </div>
+        <p>Paste your exported budget data (JSON format):</p>
+        <textarea id="importData" rows="10" style="width: 100%; margin: 15px 0; padding: 10px;"></textarea>
+        <div class="modal-buttons">
+          <button class="import-btn" id="confirmImport">Import Data</button>
+          <button class="cancel-btn" id="cancelImport">Cancel</button>
+        </div>
+      </div>
+    </div>
 
     <script>
       // Define income and expense categories
@@ -360,59 +560,162 @@
         "Shopping",
         "Other Expenses",
       ];
-      const typeSelect = document.getElementById("type");
-      const categorySelect = document.getElementById("category");
 
-      function updateCategoryOptions() {
-        categorySelect.innerHTML = ""; // clear old options
-        let categories =
-          typeSelect.value === "Income" ? incomeCategories : expenseCategories;
+      // Budget data storage - start with empty array for new users
+      let budgetData = [];
+      let editIndex = null;
 
-        categories.forEach((cat) => {
-          let option = document.createElement("option");
-          option.value = cat;
-          option.textContent = cat;
-          categorySelect.appendChild(option);
-        });
+      // Initialize the application
+      document.addEventListener("DOMContentLoaded", function () {
+        loadFromLocalStorage();
+        setupEventListeners();
+        initializeForm();
+        updateUI();
+      });
+
+      // Load data from localStorage
+      function loadFromLocalStorage() {
+        const savedData = localStorage.getItem("budgetData");
+        if (savedData) {
+          try {
+            budgetData = JSON.parse(savedData);
+          } catch (e) {
+            console.error("Error loading saved data:", e);
+            budgetData = [];
+          }
+        } else {
+          budgetData = []; // Start fresh for new users
+        }
       }
-
-      // Listen for changes
-      typeSelect.addEventListener("change", updateCategoryOptions);
-
-      // Run once at page load to initialize
-      updateCategoryOptions();
-
-      // Budget data storage - load from localStorage or use default
-      let budgetData = JSON.parse(localStorage.getItem("budgetData")) || [
-        {
-          type: "Income",
-          category: "Salary",
-          amount: 88000,
-          date: new Date().toISOString().split("T")[0],
-        },
-        {
-          type: "Expense",
-          category: "Housing",
-          amount: 8860,
-          date: new Date().toISOString().split("T")[0],
-        },
-        {
-          type: "Expense",
-          category: "Utilities",
-          amount: 2500,
-          date: new Date().toISOString().split("T")[0],
-        },
-        {
-          type: "Expense",
-          category: "Other Expenses",
-          amount: 18000,
-          date: new Date().toISOString().split("T")[0],
-        },
-      ];
 
       // Save data to localStorage
       function saveToLocalStorage() {
         localStorage.setItem("budgetData", JSON.stringify(budgetData));
+      }
+
+      // Setup all event listeners
+      function setupEventListeners() {
+        const typeSelect = document.getElementById("type");
+        const categorySelect = document.getElementById("category");
+        const form = document.getElementById("budgetForm");
+        const clearFormBtn = document.getElementById("clearForm");
+        const resetAllBtn = document.getElementById("resetAllBtn");
+        const exportBtn = document.getElementById("exportBtn");
+        const importBtn = document.getElementById("importBtn");
+        const closeModalBtns = document.querySelectorAll(".close-btn, .cancel-btn");
+        const confirmResetBtn = document.getElementById("confirmReset");
+        const confirmImportBtn = document.getElementById("confirmImport");
+        const cancelImportBtn = document.getElementById("cancelImport");
+
+        // Update category options when type changes
+        typeSelect.addEventListener("change", updateCategoryOptions);
+
+        // Form submission
+        form.addEventListener("submit", handleFormSubmit);
+
+        // Clear form button
+        clearFormBtn.addEventListener("click", initializeForm);
+
+        // Reset all data button
+        resetAllBtn.addEventListener("click", () => showModal("resetModal"));
+
+        // Export button
+        exportBtn.addEventListener("click", exportData);
+
+        // Import button
+        importBtn.addEventListener("click", () => showModal("importModal"));
+
+        // Modal close buttons
+        closeModalBtns.forEach(btn => {
+          btn.addEventListener("click", closeAllModals);
+        });
+
+        // Confirm reset
+        confirmResetBtn.addEventListener("click", resetAllData);
+
+        // Confirm import
+        confirmImportBtn.addEventListener("click", importData);
+
+        // Close modal when clicking outside
+        window.addEventListener("click", (e) => {
+          if (e.target.classList.contains("modal")) {
+            closeAllModals();
+          }
+        });
+      }
+
+      // Initialize form with default values
+      function initializeForm() {
+        document.getElementById("type").value = "Income";
+        document.getElementById("amount").value = "";
+        document.getElementById("date").valueAsDate = new Date();
+        document.getElementById("description").value = "";
+        updateCategoryOptions();
+        editIndex = null;
+        document.getElementById("submitBtn").textContent = "Add Item";
+      }
+
+      // Update category dropdown based on type selection
+      function updateCategoryOptions() {
+        const type = document.getElementById("type").value;
+        const categorySelect = document.getElementById("category");
+        
+        categorySelect.innerHTML = "";
+        
+        const categories = type === "Income" ? incomeCategories : expenseCategories;
+        
+        categories.forEach(category => {
+          const option = document.createElement("option");
+          option.value = category;
+          option.textContent = category;
+          categorySelect.appendChild(option);
+        });
+      }
+
+      // Handle form submission
+      function handleFormSubmit(e) {
+        e.preventDefault();
+
+        const type = document.getElementById("type").value;
+        const category = document.getElementById("category").value;
+        const amount = parseFloat(document.getElementById("amount").value);
+        const date = document.getElementById("date").value;
+        const description = document.getElementById("description").value.trim();
+
+        if (isNaN(amount) || amount <= 0) {
+          showNotification("Please enter a valid amount", "error");
+          return;
+        }
+
+        const item = {
+          type,
+          category,
+          amount,
+          date,
+          description,
+          id: Date.now() // Unique ID for each item
+        };
+
+        if (editIndex !== null) {
+          // Edit existing item
+          budgetData[editIndex] = item;
+          showNotification("Item updated successfully", "success");
+        } else {
+          // Add new item
+          budgetData.push(item);
+          showNotification("Item added successfully", "success");
+        }
+
+        saveToLocalStorage();
+        updateUI();
+        initializeForm();
+      }
+
+      // Update all UI components
+      function updateUI() {
+        renderBudgetTable();
+        updateSankeyDiagram();
+        updateSummaryCards();
       }
 
       // Format currency in Indian Rupees
@@ -425,206 +728,149 @@
         }).format(amount);
       }
 
-      // Initialize the application
-      document.addEventListener("DOMContentLoaded", function () {
-        // Set today's date as default for the date input
-        document.getElementById("date").valueAsDate = new Date();
-
-        // Initialize category dropdown
-        updateCategories();
-
-        // Render initial budget table
-        renderBudgetTable();
-
-        // Calculate and render initial Sankey diagram
-        updateSankeyDiagram();
-
-        // Update summary cards
-        updateSummaryCards();
-
-        // Form submission handler
-        document
-          .getElementById("budgetForm")
-          .addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const type = document.getElementById("type").value;
-            const category = document.getElementById("category").value;
-            const amount = parseFloat(document.getElementById("amount").value);
-            const date = document.getElementById("date").value;
-
-            // Add new item to budget data
-            budgetData.push({ type, category, amount, date });
-
-            // Save to localStorage
-            saveToLocalStorage();
-
-            // Re-render the table and diagram
-            renderBudgetTable();
-            updateSankeyDiagram();
-            updateSummaryCards();
-
-            // Reset form
-            this.reset();
-            document.getElementById("date").valueAsDate = new Date();
-            updateCategories();
-          });
-
-        // Update categories when type changes
-        document
-          .getElementById("type")
-          .addEventListener("change", updateCategories);
-      });
-
-      // Update category dropdown based on type selection
-      function updateCategories() {
-        const type = document.getElementById("type").value;
-        const categorySelect = document.getElementById("category");
-
-        // Clear existing options
-        categorySelect.innerHTML = "";
-
-        // Add appropriate options based on type
-        const categories =
-          type === "Income" ? incomeCategories : expenseCategories;
-
-        categories.forEach((category) => {
-          const option = document.createElement("option");
-          option.value = category;
-          option.textContent = category;
-          categorySelect.appendChild(option);
-        });
-      }
-
-      // Function to render the budget table
+      // Render the budget table
       function renderBudgetTable() {
-        const table = document.getElementById("budgetTable");
-        table.innerHTML = "";
+        const tableBody = document.getElementById("budgetTable");
+        
+        if (budgetData.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="6" class="no-data">
+                No budget items yet. Add your first income or expense above!
+              </td>
+            </tr>
+          `;
+          return;
+        }
 
         // Sort by date (newest first)
-        const sortedData = [...budgetData].sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
-        );
+        const sortedData = [...budgetData].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        sortedData.forEach((item, index) => {
-          const row = document.createElement("tr");
-
-          const formattedDate = new Date(item.date).toLocaleDateString(
-            "en-GB",
-            {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            }
-          );
-
-          row.innerHTML = `
-                    <td><strong>${item.type}</strong></td>
-                    <td>${item.category}</td>
-                    <td class="${item.type.toLowerCase()}-amount">${formatCurrency(
-            item.amount
-          )}</td>
-                    <td>${formattedDate}</td>
-                    <td class="actions">
-                        <button class="delete-btn" data-index="${index}">Delete</button>
-                    </td>
-                `;
-
-          table.appendChild(row);
-        });
-
-        // Add event listeners to delete buttons
-        document.querySelectorAll(".delete-btn").forEach((button) => {
-          button.addEventListener("click", function () {
-            const index = parseInt(this.getAttribute("data-index"));
-            budgetData.splice(index, 1);
-
-            // Save to localStorage
-            saveToLocalStorage();
-
-            renderBudgetTable();
-            updateSankeyDiagram();
-            updateSummaryCards();
+        tableBody.innerHTML = sortedData.map((item, index) => {
+          const formattedDate = new Date(item.date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
           });
-        });
+
+          return `
+            <tr>
+              <td><strong>${item.type}</strong></td>
+              <td>${item.category}</td>
+              <td class="${item.type.toLowerCase()}-amount">${formatCurrency(item.amount)}</td>
+              <td>${item.description || "-"}</td>
+              <td>${formattedDate}</td>
+              <td class="actions">
+                <button class="edit-btn" onclick="editItem(${index})">Edit</button>
+                <button class="delete-btn" onclick="deleteItem(${index})">Delete</button>
+              </td>
+            </tr>
+          `;
+        }).join("");
       }
 
-      // Function to update summary cards
+      // Edit an item
+      window.editItem = function(index) {
+        const item = budgetData[index];
+        document.getElementById("type").value = item.type;
+        document.getElementById("amount").value = item.amount;
+        document.getElementById("date").value = item.date;
+        document.getElementById("description").value = item.description || "";
+        updateCategoryOptions();
+        document.getElementById("category").value = item.category;
+        editIndex = index;
+        document.getElementById("submitBtn").textContent = "Update Item";
+        
+        // Scroll to form
+        document.querySelector(".form-container").scrollIntoView({ behavior: 'smooth' });
+      };
+
+      // Delete an item
+      window.deleteItem = function(index) {
+        if (confirm("Are you sure you want to delete this item?")) {
+          budgetData.splice(index, 1);
+          saveToLocalStorage();
+          updateUI();
+          showNotification("Item deleted successfully", "success");
+        }
+      };
+
+      // Update summary cards
       function updateSummaryCards() {
         const totalIncome = budgetData
-          .filter((item) => item.type === "Income")
+          .filter(item => item.type === "Income")
           .reduce((sum, item) => sum + item.amount, 0);
 
         const totalExpenses = budgetData
-          .filter((item) => item.type === "Expense")
+          .filter(item => item.type === "Expense")
           .reduce((sum, item) => sum + item.amount, 0);
 
         const balance = totalIncome - totalExpenses;
-        const savingsRate =
-          totalIncome > 0 ? ((balance / totalIncome) * 100).toFixed(1) : 0;
+        const savingsRate = totalIncome > 0 ? ((balance / totalIncome) * 100).toFixed(1) : 0;
 
-        document.getElementById("totalIncome").textContent =
-          formatCurrency(totalIncome);
-        document.getElementById("totalExpenses").textContent =
-          formatCurrency(totalExpenses);
-        document.getElementById("balance").textContent =
-          formatCurrency(balance);
-        document.getElementById(
-          "savingsRate"
-        ).textContent = `Savings Rate: ${savingsRate}%`;
+        document.getElementById("totalIncome").textContent = formatCurrency(totalIncome);
+        document.getElementById("totalExpenses").textContent = formatCurrency(totalExpenses);
+        document.getElementById("balance").textContent = formatCurrency(balance);
+        
+        const savingsRateElement = document.getElementById("savingsRate");
+        savingsRateElement.textContent = `Savings Rate: ${savingsRate}%`;
+        
+        // Color code based on savings rate
+        savingsRateElement.className = "percentage";
+        if (savingsRate > 20) {
+          savingsRateElement.classList.add("positive");
+        } else if (savingsRate > 0) {
+          savingsRateElement.classList.add("neutral");
+        } else {
+          savingsRateElement.classList.add("negative");
+        }
       }
 
-      // Function to update the Sankey diagram
+      // Update the Sankey diagram
       function updateSankeyDiagram() {
         // Clear previous diagram
         d3.select("#sankeyDiagram").selectAll("*").remove();
 
         // Calculate totals
         const totalIncome = budgetData
-          .filter((item) => item.type === "Income")
+          .filter(item => item.type === "Income")
           .reduce((sum, item) => sum + item.amount, 0);
 
-        // If no income, don't render the diagram
+        // If no income, show message
         if (totalIncome <= 0) {
           d3.select("#sankeyDiagram")
             .append("div")
             .style("text-align", "center")
             .style("padding", "50px")
             .style("color", "#666")
-            .text("Add income data to see the budget flow diagram");
+            .html("Add income data to see the budget flow diagram.<br>Start by adding your first income source above!");
           return;
         }
 
         const expensesByCategory = {};
         budgetData
-          .filter((item) => item.type === "Expense")
-          .forEach((item) => {
-            expensesByCategory[item.category] =
-              (expensesByCategory[item.category] || 0) + item.amount;
+          .filter(item => item.type === "Expense")
+          .forEach(item => {
+            expensesByCategory[item.category] = (expensesByCategory[item.category] || 0) + item.amount;
           });
 
-        const totalExpenses = Object.values(expensesByCategory).reduce(
-          (sum, amount) => sum + amount,
-          0
-        );
+        const totalExpenses = Object.values(expensesByCategory).reduce((sum, amount) => sum + amount, 0);
         const savings = Math.max(0, totalIncome - totalExpenses);
 
         // Prepare data for Sankey diagram
         const nodes = [
-          { name: "Income" },
-          ...Object.keys(expensesByCategory).map((category) => ({
-            name: category,
-          })),
+          { name: "Total Income" },
+          ...Object.keys(expensesByCategory).map(category => ({ name: category })),
           { name: "Savings" },
         ];
 
         const links = [
           ...Object.entries(expensesByCategory).map(([category, amount]) => ({
-            source: "Income",
+            source: "Total Income",
             target: category,
             value: amount,
           })),
-          { source: "Income", target: "Savings", value: savings },
+          { source: "Total Income", target: "Savings", value: savings },
         ];
 
         // Map node names to indices
@@ -636,7 +882,7 @@
         // Format data for D3 Sankey
         const sankeyData = {
           nodes: nodes,
-          links: links.map((link) => ({
+          links: links.map(link => ({
             source: nodeMap[link.source],
             target: nodeMap[link.target],
             value: link.value,
@@ -644,150 +890,179 @@
         };
 
         // Set up dimensions
-        const width = document.getElementById("sankeyDiagram").clientWidth;
+        const container = document.getElementById("sankeyDiagram");
+        const width = container.clientWidth;
         const height = 400;
 
         // Create SVG container
-        const svg = d3
-          .select("#sankeyDiagram")
+        const svg = d3.select("#sankeyDiagram")
           .append("svg")
           .attr("width", width)
-          .attr("height", height);
+          .attr("height", height)
+          .attr("viewBox", `0 0 ${width} ${height}`)
+          .attr("preserveAspectRatio", "xMidYMid meet");
 
         // Set up Sankey generator
-        const sankey = d3
-          .sankey()
+        const sankey = d3.sankey()
           .nodeWidth(15)
           .nodePadding(10)
-          .extent([
-            [1, 1],
-            [width - 1, height - 5],
-          ]);
+          .extent([[1, 1], [width - 1, height - 5]]);
 
         // Compute node and link positions
         const { nodes: sankeyNodes, links: sankeyLinks } = sankey({
-          nodes: sankeyData.nodes.map((d) => Object.assign({}, d)),
-          links: sankeyData.links.map((d) => Object.assign({}, d)),
+          nodes: sankeyData.nodes.map(d => Object.assign({}, d)),
+          links: sankeyData.links.map(d => Object.assign({}, d)),
         });
 
         // Color scale
-        const color = d3
-          .scaleOrdinal()
-          .domain([
-            "Income",
-            "Housing",
-            "Utilities",
-            "Other Expenses",
-            "Savings",
-            "Food",
-            "Transportation",
-            "Entertainment",
-            "Healthcare",
-            "Education",
-            "Shopping",
-            "Freelance",
-            "Investments",
-            "Gifts",
-            "Other Income",
-          ])
+        const color = d3.scaleOrdinal()
+          .domain(["Total Income", "Savings", ...expenseCategories, ...incomeCategories])
           .range([
-            "#4b6cb7",
-            "#e74c3c",
-            "#f39c12",
-            "#9b59b6",
-            "#27ae60",
-            "#e67e22",
-            "#3498db",
-            "#1abc9c",
-            "#d35400",
-            "#8e44ad",
-            "#2c3e50",
-            "#16a085",
-            "#2980b9",
-            "#c0392b",
-            "#7f8c8d",
+            "#4b6cb7", // Income
+            "#27ae60", // Savings
+            "#e74c3c", // Housing
+            "#f39c12", // Utilities
+            "#e67e22", // Food
+            "#3498db", // Transportation
+            "#1abc9c", // Healthcare
+            "#9b59b6", // Entertainment
+            "#8e44ad", // Education
+            "#2c3e50", // Shopping
+            "#7f8c8d", // Other Expenses
+            "#16a085", // Salary
+            "#2980b9", // Freelance
+            "#c0392b", // Investments
+            "#d35400", // Gifts
+            "#95a5a6", // Other Income
           ]);
 
         // Draw the links
-        const link = svg
-          .append("g")
+        const link = svg.append("g")
           .selectAll("path")
           .data(sankeyLinks)
           .join("path")
           .attr("d", d3.sankeyLinkHorizontal())
-          .attr("stroke", (d) => d3.color(color(d.source.name)).darker(0.5))
-          .attr("stroke-width", (d) => Math.max(1, d.width))
+          .attr("stroke", d => color(d.source.name))
+          .attr("stroke-width", d => Math.max(1, d.width))
           .attr("fill", "none")
-          .attr("stroke-opacity", 0.6)
-          .style("mix-blend-mode", "multiply");
+          .attr("stroke-opacity", 0.7);
 
-        // Add a gradient to links
-        link
-          .style("stroke", (d) => {
-            return `url(#gradient-${d.index})`;
-          })
-          .each(function (d) {
-            // Create gradient for each link
-            const sourceColor = d3.color(color(d.source.name)).darker(0.5);
-            const targetColor = d3.color(color(d.target.name)).darker(0.5);
-
-            const gradient = svg
-              .append("linearGradient")
-              .attr("id", `gradient-${d.index}`)
-              .attr("gradientUnits", "userSpaceOnUse")
-              .attr("x1", d.source.x1)
-              .attr("x2", d.target.x0);
-
-            gradient
-              .append("stop")
-              .attr("offset", "0%")
-              .attr("stop-color", sourceColor);
-
-            gradient
-              .append("stop")
-              .attr("offset", "100%")
-              .attr("stop-color", targetColor);
+        // Add tooltips to links
+        link.append("title")
+          .text(d => {
+            const percentage = ((d.value / totalIncome) * 100).toFixed(1);
+            return `${d.source.name} → ${d.target.name}\n${formatCurrency(d.value)} (${percentage}%)`;
           });
 
         // Draw the nodes
-        const node = svg
-          .append("g")
+        const node = svg.append("g")
           .selectAll("g")
           .data(sankeyNodes)
           .join("g")
-          .attr("transform", (d) => `translate(${d.x0},${d.y0})`);
+          .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
-        node
-          .append("rect")
-          .attr("height", (d) => d.y1 - d.y0)
-          .attr("width", (d) => d.x1 - d.x0)
-          .attr("fill", (d) => color(d.name))
-          .attr("stroke", (d) => d3.rgb(color(d.name)).darker(0.5));
+        node.append("rect")
+          .attr("height", d => d.y1 - d.y0)
+          .attr("width", d => d.x1 - d.x0)
+          .attr("fill", d => color(d.name))
+          .attr("stroke", d => d3.rgb(color(d.name)).darker(0.5));
 
-        // Add labels with amounts for all nodes
-        node
-          .append("text")
-          .attr("x", (d) => (d.x0 < width / 2 ? d.x1 + 10 : d.x0 - 10))
-          .attr("y", (d) => (d.y1 + d.y0) / 2)
+        // Add labels with amounts
+        node.append("text")
+          .attr("x", d => d.x0 < width / 2 ? d.x1 + 10 : d.x0 - 10)
+          .attr("y", d => (d.y1 + d.y0) / 2)
           .attr("dy", "0.35em")
-          .attr("text-anchor", (d) => (d.x0 < width / 2 ? "start" : "end"))
-          .text((d) => `${d.name}: ₹${d.value.toLocaleString("en-IN")}`)
-          .style("font-size", "13px")
+          .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+          .text(d => `${d.name}\n${formatCurrency(d.value)}`)
+          .style("font-size", "12px")
           .style("font-weight", "600")
-          .style("fill", "#2c3e50");
+          .style("fill", "#2c3e50")
+          .style("line-height", "1.2");
+      }
 
-        // Add category + value tooltips to links
-        link.append("title").text((d) => {
-          let targetLabel = d.target.name;
-          if (d.target.name !== "Savings" && d.target.name !== "Income") {
-            targetLabel = `Expense (${d.target.name})`;
-          }
-          return `${d.source.name} → ${targetLabel}: ${formatCurrency(
-            d.value
-          )}`;
+      // Show notification
+      function showNotification(message, type = "success") {
+        const notification = document.createElement("div");
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      // Show modal
+      function showModal(modalId) {
+        document.getElementById(modalId).style.display = "block";
+      }
+
+      // Close all modals
+      function closeAllModals() {
+        document.querySelectorAll(".modal").forEach(modal => {
+          modal.style.display = "none";
         });
+      }
+
+      // Reset all data
+      function resetAllData() {
+        budgetData = [];
+        saveToLocalStorage();
+        updateUI();
+        closeAllModals();
+        showNotification("All data has been reset", "success");
+      }
+
+      // Export data
+      function exportData() {
+        const dataStr = JSON.stringify(budgetData, null, 2);
+        const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `budget-data-${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement("a");
+        linkElement.setAttribute("href", dataUri);
+        linkElement.setAttribute("download", exportFileDefaultName);
+        linkElement.click();
+        
+        showNotification("Data exported successfully", "success");
+      }
+
+      // Import data
+      function importData() {
+        const importDataText = document.getElementById("importData").value;
+        
+        if (!importDataText.trim()) {
+          showNotification("Please paste valid JSON data", "error");
+          return;
+        }
+
+        try {
+          const importedData = JSON.parse(importDataText);
+          
+          // Validate imported data structure
+          if (!Array.isArray(importedData)) {
+            throw new Error("Data must be an array");
+          }
+          
+          // Basic validation of items
+          importedData.forEach(item => {
+            if (!item.type || !item.category || !item.amount || !item.date) {
+              throw new Error("Invalid data structure");
+            }
+          });
+
+          budgetData = importedData;
+          saveToLocalStorage();
+          updateUI();
+          closeAllModals();
+          document.getElementById("importData").value = "";
+          showNotification("Data imported successfully", "success");
+        } catch (e) {
+          showNotification("Invalid JSON data. Please check the format.", "error");
+          console.error("Import error:", e);
+        }
       }
     </script>
   </body>
 </html>
-
