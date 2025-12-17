@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meetings & Action Items</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+
+    body {
+      background: #f4f6fb;
+      color: #1f2937;
+      padding: 32px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.4rem; margin-bottom: 12px; }
+
+    .hidden { display: none; }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .subtitle { color: #6b7280; margin-top: 6px; }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .primary { background: #6366f1; color: white; }
+    .primary:hover { background: #4f46e5; }
+
+    .danger { background: #ef4444; color: white; }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      margin-bottom: 20px;
+    }
+
+    .meeting-row {
+      padding: 14px;
+      border-radius: 10px;
+      background: #f9fafb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .meeting-row:hover { background: #eef2ff; }
+
+    .muted { color: #6b7280; font-size: 0.85rem; }
+
+    label { font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 6px; }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 0.95rem;
+    }
+
+    textarea { min-height: 220px; resize: vertical; }
+
+    .row { display: flex; gap: 16px; }
+    .row > div { flex: 1; }
+
+    .action-item {
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 4px solid #6366f1;
+    }
+
+    .action-item.done { border-left-color: #22c55e; opacity: 0.8; }
+
+    .pill { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; background: #e0e7ff; color: #4338ca; font-weight: 600; }
+    .pill.done { background: #dcfce7; color: #166534; }
+
+    footer { text-align: center; color: #9ca3af; margin-top: 40px; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>Meetings</h1>
+    <p class="subtitle">One meeting. Clear notes. Clear actions.</p>
+  </div>
+  <button class="btn primary" onclick="createMeeting()"><i class="fa-solid fa-plus"></i> New Meeting</button>
+</div>
+
+<!-- HOME VIEW -->
+<div id="homeView">
+  <div id="meetingList"></div>
+</div>
+
+<!-- MEETING VIEW -->
+<div id="meetingView" class="hidden">
+  <button class="btn" onclick="goHome()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+
+  <div class="card">
+    <h2>Meeting Details</h2>
+
+    <label>Meeting name</label>
+    <input id="mName" />
+
+    <div class="row" style="margin-top:12px;">
+      <div>
+        <label>Date</label>
+        <input type="date" id="mDate" />
+      </div>
+    </div>
+
+    <label style="margin-top:12px;">Notes</label>
+    <textarea id="mNotes"></textarea>
+  </div>
+
+  <div class="card">
+    <h2>Action Items</h2>
+
+    <label>Task</label>
+    <input id="tTitle" placeholder="What needs to be done" />
+
+    <div class="row" style="margin-top:12px;">
+      <div>
+        <label>Owner</label>
+        <input id="tOwner" />
+      </div>
+      <div>
+        <label>Deadline</label>
+        <input type="date" id="tDate" />
+      </div>
+    </div>
+
+    <button class="btn primary" style="margin-top:12px;" onclick="addTask()">Add Action</button>
+
+    <div id="taskList" style="margin-top:16px;"></div>
+  </div>
+</div>
+
+<footer>Saved locally in your browser</footer>
+
+<script>
+let meetings = JSON.parse(localStorage.getItem('meetings') || '[]');
+let currentId = null;
+
+function save() {
+  localStorage.setItem('meetings', JSON.stringify(meetings));
+}
+
+function renderHome() {
+  const list = document.getElementById('meetingList');
+  list.innerHTML = '';
+
+  if (!meetings.length) {
+    list.innerHTML = '<p class="muted">No meetings yet</p>';
+    return;
+  }
+
+  meetings.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'meeting-row';
+    div.innerHTML = `<div><strong>${m.name}</strong><div class="muted">${m.date}</div></div><div class="pill">${m.actions.length} actions</div>`;
+    div.onclick = () => openMeeting(m.id);
+    list.appendChild(div);
+  });
+}
+
+function createMeeting() {
+  const id = Date.now();
+  meetings.unshift({ id, name: 'New meeting', date: new Date().toISOString().split('T')[0], notes: '', actions: [] });
+  save();
+  openMeeting(id);
+}
+
+function openMeeting(id) {
+  currentId = id;
+  const m = meetings.find(x => x.id === id);
+
+  document.getElementById('homeView').classList.add('hidden');
+  document.getElementById('meetingView').classList.remove('hidden');
+
+  mName.value = m.name;
+  mDate.value = m.date;
+  mNotes.value = m.notes;
+
+  renderTasks();
+}
+
+function goHome() {
+  saveMeeting();
+  document.getElementById('meetingView').classList.add('hidden');
+  document.getElementById('homeView').classList.remove('hidden');
+  renderHome();
+}
+
+function saveMeeting() {
+  const m = meetings.find(x => x.id === currentId);
+  m.name = mName.value;
+  m.date = mDate.value;
+  m.notes = mNotes.value;
+  save();
+}
+
+[mName, mDate, mNotes].forEach(el => el.addEventListener('input', saveMeeting));
+
+function renderTasks() {
+  const m = meetings.find(x => x.id === currentId);
+  const list = document.getElementById('taskList');
+  list.innerHTML = '';
+
+  m.actions.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = `action-item ${t.done ? 'done' : ''}`;
+    div.innerHTML = `<div><strong>${t.title}</strong><div class="muted">${t.owner} • ${t.date}</div></div><div class="pill ${t.done ? 'done' : ''}">${t.done ? 'Done' : 'Pending'}</div>`;
+    div.onclick = () => { t.done = !t.done; save(); renderTasks(); };
+    list.appendChild(div);
+  });
+}
+
+function addTask() {
+  if (!tTitle.value.trim()) return;
+  const m = meetings.find(x => x.id === currentId);
+  m.actions.push({ title: tTitle.value, owner: tOwner.value || 'Unassigned', date: tDate.value, done: false });
+  tTitle.value = ''; tOwner.value = '';
+  save(); renderTasks(); renderHome();
+}
+
+renderHome();
+</script>
+</body>
+</html>
