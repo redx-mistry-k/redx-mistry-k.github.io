@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Work Log</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e5e7eb;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 28px;
+      border-radius: 14px;
+      margin-bottom: 32px;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      opacity: 0.95;
+      max-width: 700px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+    }
+
+    .card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--text);
+    }
+
+    .btn-success { background: var(--success); color: white; }
+
+    .btn-danger { background: var(--danger); color: white; }
+
+    .log-entry {
+      border-left: 4px solid var(--primary);
+      padding: 16px;
+      margin-bottom: 16px;
+      background: #f9fafb;
+      border-radius: 10px;
+    }
+
+    .log-entry h4 {
+      margin-bottom: 10px;
+      color: var(--primary-dark);
+    }
+
+    .log-block {
+      margin-bottom: 12px;
+    }
+
+    .log-block strong {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .weekly-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .weekly-summary {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px dashed var(--border);
+    }
+
+    .weekly-summary h3 {
+      margin-bottom: 12px;
+      color: var(--primary-dark);
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 10px;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fa-solid fa-clipboard"></i> Daily Work Log</h1>
+      <p>Log what you worked on each day and get a clean weekly summary you can actually use.</p>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h2><i class="fa-solid fa-pen"></i> Daily Entry</h2>
+        <label>Date</label>
+        <input type="date" id="date" />
+
+        <label>What did you work on?</label>
+        <textarea id="workedOn"></textarea>
+
+        <label>What went well?</label>
+        <textarea id="wentWell"></textarea>
+
+        <label>What was blocked?</label>
+        <textarea id="blocked"></textarea>
+
+        <div class="btn-group">
+          <button class="btn-primary" onclick="saveLog()"><i class="fa-solid fa-save"></i> Save</button>
+          <button class="btn-secondary" onclick="clearForm()"><i class="fa-solid fa-eraser"></i> Clear</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><i class="fa-solid fa-calendar-week"></i> Weekly Summary</h2>
+        <div class="weekly-controls">
+          <input type="week" id="weekPicker" />
+          <button class="btn-primary" onclick="generateWeeklySummary()"><i class="fa-solid fa-chart-simple"></i> Generate</button>
+        </div>
+        <div id="weeklySummary" class="weekly-summary">
+          <p class="muted">Select a week to see summary.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <h2><i class="fa-solid fa-clock-rotate-left"></i> Previous Logs</h2>
+      <div id="logs"></div>
+    </div>
+
+    <footer>
+      <p>Stored locally in your browser • Simple • Private</p>
+    </footer>
+  </div>
+
+  <div id="notification" class="notification"></div>
+
+  <script>
+    const dateInput = document.getElementById('date');
+    const workedOnInput = document.getElementById('workedOn');
+    const wentWellInput = document.getElementById('wentWell');
+    const blockedInput = document.getElementById('blocked');
+    const logsDiv = document.getElementById('logs');
+    const weeklySummaryDiv = document.getElementById('weeklySummary');
+    const notification = document.getElementById('notification');
+
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.value = today;
+
+    function getLogs() {
+      return JSON.parse(localStorage.getItem('workLogs') || '[]');
+    }
+
+    function saveLog() {
+      const log = {
+        date: dateInput.value,
+        workedOn: workedOnInput.value.trim(),
+        wentWell: wentWellInput.value.trim(),
+        blocked: blockedInput.value.trim()
+      };
+
+      if (!log.date || (!log.workedOn && !log.wentWell && !log.blocked)) {
+        showNotification('Please add some content');
+        return;
+      }
+
+      const logs = getLogs().filter(l => l.date !== log.date);
+      logs.push(log);
+      localStorage.setItem('workLogs', JSON.stringify(logs));
+
+      showNotification('Log saved');
+      clearForm(false);
+      renderLogs();
+    }
+
+    function clearForm(resetDate = true) {
+      workedOnInput.value = '';
+      wentWellInput.value = '';
+      blockedInput.value = '';
+      if (resetDate) dateInput.value = today;
+    }
+
+    function renderLogs() {
+      const logs = getLogs().sort((a,b) => new Date(b.date) - new Date(a.date));
+      logsDiv.innerHTML = '';
+
+      if (!logs.length) {
+        logsDiv.innerHTML = '<p>No logs yet.</p>';
+        return;
+      }
+
+      logs.forEach(log => {
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = `
+          <h4>${new Date(log.date).toDateString()}</h4>
+          ${log.workedOn ? `<div class="log-block"><strong>Worked on</strong>${log.workedOn}</div>` : ''}
+          ${log.wentWell ? `<div class="log-block"><strong>Went well</strong>${log.wentWell}</div>` : ''}
+          ${log.blocked ? `<div class="log-block"><strong>Blocked</strong>${log.blocked}</div>` : ''}
+        `;
+        logsDiv.appendChild(div);
+      });
+    }
+
+    function generateWeeklySummary() {
+      const weekValue = document.getElementById('weekPicker').value;
+      if (!weekValue) return;
+
+      const [year, week] = weekValue.split('-W');
+      const logs = getLogs();
+
+      const summary = { workedOn: [], wentWell: [], blocked: [] };
+
+      logs.forEach(log => {
+        const d = new Date(log.date);
+        const firstDay = new Date(d.getFullYear(), 0, 1);
+        const weekNum = Math.ceil((((d - firstDay) / 86400000) + firstDay.getDay() + 1) / 7);
+
+        if (d.getFullYear() == year && weekNum == week) {
+          if (log.workedOn) summary.workedOn.push(log.workedOn);
+          if (log.wentWell) summary.wentWell.push(log.wentWell);
+          if (log.blocked) summary.blocked.push(log.blocked);
+        }
+      });
+
+      weeklySummaryDiv.innerHTML = `
+        <h3>Weekly Overview</h3>
+        <p><strong>Worked on:</strong><br>${summary.workedOn.join('<br>') || '—'}</p><br>
+        <p><strong>Went well:</strong><br>${summary.wentWell.join('<br>') || '—'}</p><br>
+        <p><strong>Blocked:</strong><br>${summary.blocked.join('<br>') || '—'}</p>
+      `;
+    }
+
+    function showNotification(msg) {
+      notification.textContent = msg;
+      notification.style.display = 'block';
+      setTimeout(() => notification.style.display = 'none', 2500);
+    }
+
+    renderLogs();
+  </script>
+</body>
+</html>
