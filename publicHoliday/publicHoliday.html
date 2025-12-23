@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Public Holidays</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ccc;
+    }
+
+    th {
+        background: #007bff;
+        color: white;
+    }
+
+    .public {
+        background-color: #d4edda;
+        font-weight: bold;
+    }
+
+    .optional {
+        background-color: #fff3cd;
+    }
+
+    .note {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #555;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Holiday List - <span id="year"></span></h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Holiday</th>
+            <th>Type</th>
+        </tr>
+    </thead>
+    <tbody id="holidayTable"></tbody>
+</table>
+
+<div class="note">
+    <strong>NOTE:</strong><br>
+    • All <b>Public Holidays</b> are leaves for everyone.<br>
+    • <b>4 Optional Holidays</b> are available per year.<br>
+    • Optional holidays require <b>2 weeks prior intimation</b>.
+</div>
+
+<script>
+const holidays = [
+    { d: 1,  m: 0,  name: "New Year's Day", type: "Public Holiday" },
+    { d: 15, m: 0,  name: "Pongal", type: "Public Holiday" },
+    { d: 16, m: 0,  name: "Thiruvalluvar Day", type: "Optional" },
+    { d: 17, m: 0,  name: "Uzhavar Thirunal", type: "Optional" },
+    { d: 25, m: 0,  name: "Thai Poosam", type: "Optional" },
+    { d: 26, m: 0,  name: "Republic Day", type: "Public Holiday" },
+    { d: 29, m: 2,  name: "Good Friday", type: "Optional" },
+    { d: 1,  m: 3,  name: "Annual Closing of Accounts (Banks)", type: "Optional" },
+    { d: 9,  m: 3,  name: "Telugu New Year Day", type: "Optional" },
+    { d: 11, m: 3,  name: "Ramzan (Idul Fitr)", type: "Optional" },
+    { d: 14, m: 3,  name: "Tamil New Year & Dr. B. R. Ambedkar Jayanti", type: "Public Holiday" },
+    { d: 21, m: 3,  name: "Mahaveer Jayanthi", type: "Optional" },
+    { d: 1,  m: 4,  name: "May Day", type: "Public Holiday" },
+    { d: 17, m: 5,  name: "Bakrid (Idul Azha)", type: "Optional" },
+    { d: 17, m: 6,  name: "Muharram", type: "Optional" },
+    { d: 15, m: 7,  name: "Independence Day", type: "Public Holiday" },
+    { d: 26, m: 7,  name: "Krishna Jayanthi", type: "Optional" },
+    { d: 7,  m: 8,  name: "Vinayakar Chathurthi", type: "Public Holiday" },
+    { d: 16, m: 8,  name: "Milad-un-Nabi", type: "Optional" },
+    { d: 2,  m: 9,  name: "Gandhi Jayanthi", type: "Public Holiday" },
+    { d: 11, m: 9,  name: "Ayutha Pooja", type: "Public Holiday" },
+    { d: 12, m: 9,  name: "Vijaya Dasami", type: "Optional" },
+    { d: 31, m: 9,  name: "Deepavali", type: "Public Holiday" },
+    { d: 25, m: 11, name: "Christmas", type: "Public Holiday" }
+];
+
+const year = new Date().getFullYear();
+document.getElementById("year").textContent = year;
+
+const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+const table = document.getElementById("holidayTable");
+
+holidays.forEach(h => {
+    const date = new Date(year, h.m, h.d);
+    const row = document.createElement("tr");
+    row.className = h.type.includes("Public") ? "public" : "optional";
+
+    row.innerHTML = `
+        <td>${h.d}-${months[h.m]}-${year}</td>
+        <td>${days[date.getDay()]}</td>
+        <td>${h.name}</td>
+        <td>${h.type}</td>
+    `;
+    table.appendChild(row);
+});
+</script>
+
+</body>
+</html>
