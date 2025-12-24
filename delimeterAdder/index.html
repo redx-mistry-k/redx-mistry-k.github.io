@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delimiter Adder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 10px;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      padding: 10px 15px;
+      margin-right: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background: #0078d4;
+      color: white;
+    }
+
+    button:hover {
+      background: #005fa3;
+    }
+
+    .output {
+      background: #f0f0f0;
+      padding: 10px;
+      min-height: 60px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin-top: 15px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>SharePoint Delimiter Adder</h2>
+
+  <p>Paste IDs (one per line):</p>
+  <textarea id="inputData" placeholder="1231&#10;3244&#10;5675&#10;9803"></textarea>
+
+  <button onclick="addDelimiter()">Add Delimiter</button>
+  <button onclick="copyResult()">Copy Output</button>
+
+  <div class="output" id="outputData"></div>
+</div>
+
+<script>
+  const DELIMITER = "%3B%23";
+
+  function addDelimiter() {
+    const input = document.getElementById("inputData").value;
+
+    const lines = input
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(line => line !== "");
+
+    const result = lines.join(DELIMITER);
+
+    document.getElementById("outputData").textContent = result;
+  }
+
+  function copyResult() {
+    const output = document.getElementById("outputData").textContent;
+
+    if (!output) return;
+
+    navigator.clipboard.writeText(output).then(() => {
+      alert("Copied to clipboard!");
+    });
+  }
+</script>
+
+</body>
+</html>
