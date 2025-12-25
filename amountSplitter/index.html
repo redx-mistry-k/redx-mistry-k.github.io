@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Amount Splitter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      width: 320px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #0078d4;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #005fa3;
+    }
+
+    .result {
+      margin-top: 16px;
+      background: #f1f1f1;
+      padding: 12px;
+      border-radius: 6px;
+    }
+
+    .result p {
+      margin: 6px 0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Amount Split</h2>
+
+    <input type="number" id="amount" placeholder="Enter amount" />
+
+    <button onclick="splitAmount()">Split</button>
+
+    <div class="result" id="result" style="display:none;">
+      <p>25%: <span id="percent25"></span></p>
+      <p>50%: <span id="percent50"></span></p>
+    </div>
+  </div>
+
+  <script>
+    function splitAmount() {
+      const amount = Number(document.getElementById("amount").value);
+
+      if (!amount || amount <= 0) {
+        alert("Please enter a valid amount");
+        return;
+      }
+
+      const p25 = amount * 0.25;
+      const p50 = amount * 0.50;
+
+      document.getElementById("percent25").innerText = p25.toFixed(2);
+      document.getElementById("percent50").innerText = p50.toFixed(2);
+      document.getElementById("result").style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
