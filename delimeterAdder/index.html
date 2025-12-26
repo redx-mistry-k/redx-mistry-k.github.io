@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Delimiter Adder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,93 +13,129 @@
     }
 
     .container {
-      max-width: 700px;
+      max-width: 760px;
       margin: auto;
-      background: #fff;
-      padding: 20px;
+      background: #ffffff;
+      padding: 24px;
       border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    h2 {
-      margin-bottom: 10px;
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: #555;
+      font-size: 14px;
     }
 
     textarea {
       width: 100%;
-      min-height: 150px;
-      padding: 10px;
+      min-height: 180px;
+      padding: 12px;
       font-size: 14px;
-      margin-bottom: 15px;
+      margin-top: 12px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      resize: vertical;
     }
 
     button {
-      padding: 10px 15px;
-      margin-right: 10px;
+      padding: 10px 16px;
       font-size: 14px;
-      cursor: pointer;
       border: none;
       border-radius: 4px;
-      background: #0078d4;
-      color: white;
+      cursor: pointer;
+      background-color: #0078d4;
+      color: #ffffff;
+      margin-right: 8px;
     }
 
     button:hover {
-      background: #005fa3;
+      background-color: #005fa3;
     }
 
     .output {
       background: #f0f0f0;
-      padding: 10px;
+      padding: 12px;
       min-height: 60px;
-      white-space: pre-wrap;
-      word-break: break-all;
-      margin-top: 15px;
       border-radius: 4px;
+      font-size: 14px;
+      word-break: break-all;
+      white-space: pre-wrap;
+      margin-top: 12px;
+    }
+
+    .footer {
+      margin-top: 16px;
+      font-size: 12px;
+      color: #777;
+      text-align: center;
     }
   </style>
 </head>
+
 <body>
 
-<div class="container">
-  <h2>Delimiter Adder</h2>
+  <div class="container">
+    <h1>Delimiter Adder</h1>
+    <p>
+      Paste values (one per line). Values are URL-encoded and joined using the default delimiter.
+    </p>
 
-  <p>Paste IDs (one per line):</p>
-  <textarea id="inputData" placeholder="1231&#10;3244&#10;5675&#10;9803"></textarea>
+    <textarea
+      id="inputData"
+      placeholder="sampleData1&#10;sampleData2&#10;sampleData3"></textarea>
 
-  <button onclick="addDelimiter()">Add Delimiter</button>
-  <button onclick="copyResult()">Copy Output</button>
+    <button onclick="formatValues()">Format</button>
+    <button onclick="copyOutput()">Copy</button>
 
-  <div class="output" id="outputData"></div>
-</div>
+    <div id="outputData" class="output"></div>
 
-<script>
-  const DELIMITER = "%3B%23";
+    <div class="footer">
+      Runs entirely in your browser. No data is stored or transmitted.
+    </div>
+  </div>
 
-  function addDelimiter() {
-    const input = document.getElementById("inputData").value;
+  <script>
+    const DELIMITER = "%3B%23";
 
-    const lines = input
-      .split(/\r?\n/)
-      .map(line => line.trim())
-      .filter(line => line !== "");
+    function customEncode(value) {
+      let encoded = encodeURIComponent(value);
 
-    const result = lines.join(DELIMITER);
+      encoded = encoded
+        .replace(/\./g, "%2E")
+        .replace(/,/g, "%2C")
+        .replace(/;/g, "%3B");
 
-    document.getElementById("outputData").textContent = result;
-  }
+      return encoded;
+    }
 
-  function copyResult() {
-    const output = document.getElementById("outputData").textContent;
+    function formatValues() {
+      const input = document.getElementById("inputData").value;
 
-    if (!output) return;
+      const values = input
+        .split(/\r?\n/)
+        .map(v => v.trim())
+        .filter(v => v !== "")
+        .map(v => customEncode(v));
 
-    navigator.clipboard.writeText(output).then(() => {
-      alert("Copied to clipboard!");
-    });
-  }
-</script>
+      const result = values.join(DELIMITER);
+
+      document.getElementById("outputData").textContent = result;
+    }
+
+    function copyOutput() {
+      const output = document.getElementById("outputData").textContent;
+      if (!output) return;
+
+      navigator.clipboard.writeText(output).then(() => {
+        alert("Copied to clipboard!");
+      });
+    }
+  </script>
 
 </body>
 </html>
-
