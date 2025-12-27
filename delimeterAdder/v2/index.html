@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delimiter Adder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .card {
+      border-radius: 12px;
+    }
+
+    .output-box {
+      background-color: #f1f3f5;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 0.875rem;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+
+    mark {
+      background-color: #ffe58f;
+      padding: 0 3px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+          <h4 class="mb-1">Delimiter Adder</h4>
+          <p class="text-muted mb-4">
+            Replace filter values directly in the URL.
+          </p>
+
+          <!-- URL Input -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              Full URL (apply at least one data in filter before copying)
+            </label>
+            <textarea
+              id="urlInput"
+              class="form-control"
+              rows="4"
+              placeholder="https://example.com/...&FilterField1=Column&FilterValue1=OLDVALUE&FilterType1=Text"></textarea>
+          </div>
+
+          <!-- Values Input -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">
+              Values (one per line)
+            </label>
+            <textarea
+              id="valuesInput"
+              class="form-control"
+              rows="4"
+              placeholder="sampleData1&#10;sampleData2&#10;sampleData3"></textarea>
+          </div>
+
+          <!-- Button -->
+          <div class="text-end mb-4">
+            <button class="btn btn-primary px-4" onclick="processUrl()">
+              Format & Copy URL
+            </button>
+          </div>
+
+          <!-- Encoded Values -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Encoded Values</label>
+            <div id="encodedValues" class="output-box"></div>
+          </div>
+
+          <!-- Final URL -->
+          <div>
+            <label class="form-label fw-semibold">Updated URL (highlighted)</label>
+            <div id="finalUrl" class="output-box"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <p class="text-center text-muted small mt-4">
+        Runs entirely in your browser. No data is stored or transmitted.
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const DELIMITER = "%3B%23";
+  const NUMBER_DECIMALS = 11;
+
+  function encodeText(value) {
+    return encodeURIComponent(value)
+      .replace(/\./g, "%2E")
+      .replace(/,/g, "%2C")
+      .replace(/;/g, "%3B");
+  }
+
+  function encodeNumber(value) {
+    const cleaned = value.replace(/,/g, "").trim();
+    if (cleaned === "" || isNaN(cleaned)) return null;
+
+    const normalized = Number(cleaned).toFixed(NUMBER_DECIMALS);
+    return encodeURIComponent(normalized).replace(/\./g, "%2E");
+  }
+
+  function highlightPluralParams(url) {
+    return url
+      .replace(/\bFilterFields1\b/, "FilterField<mark>s</mark>1")
+      .replace(/\bFilterValues1\b/, "FilterValue<mark>s</mark>1")
+      .replace(/\bFilterTypes1\b/, "FilterType<mark>s</mark>1");
+  }
+
+  function processUrl() {
+    let url = document.getElementById("urlInput").value.trim();
+    const rawValues = document.getElementById("valuesInput").value;
+
+    if (!url || !rawValues) {
+      alert("Please provide both the URL and values.");
+      return;
+    }
+
+    const isNumber =
+      url.includes("FilterType1=Number") ||
+      url.includes("FilterTypes1=Number");
+
+    const values = rawValues
+      .split(/\r?\n/)
+      .map(v => v.trim())
+      .filter(v => v !== "");
+
+    if (values.length === 0) {
+      alert("No valid values found.");
+      return;
+    }
+
+    const isMulti = values.length > 1;
+
+    const wasSingle =
+      url.includes("FilterField1=") ||
+      url.includes("FilterValue1=") ||
+      url.includes("FilterType1=");
+
+    let pluralized = false;
+
+    if (isMulti && wasSingle) {
+      pluralized = true;
+      url = url
+        .replace(/\bFilterField1=/, "FilterFields1=")
+        .replace(/\bFilterValue1=/, "FilterValues1=")
+        .replace(/\bFilterType1=/, "FilterTypes1=");
+    } else if (!isMulti) {
+      url = url
+        .replace(/\bFilterFields1=/, "FilterField1=")
+        .replace(/\bFilterValues1=/, "FilterValue1=")
+        .replace(/\bFilterTypes1=/, "FilterType1=");
+    }
+
+    const valueParam = isMulti ? "FilterValues1=" : "FilterValue1=";
+    const startIndex = url.indexOf(valueParam);
+
+    if (startIndex === -1) {
+      alert("FilterValue parameter not found in URL.");
+      return;
+    }
+
+    const encodedValues = [];
+    for (const v of values) {
+      const encoded = isNumber ? encodeNumber(v) : encodeText(v);
+      if (encoded === null) {
+        alert("Invalid number value: " + v);
+        return;
+      }
+      encodedValues.push(encoded);
+    }
+
+    const joinedValues = encodedValues.join(DELIMITER);
+
+    const valueStart = startIndex + valueParam.length;
+    const nextAmp = url.indexOf("&", valueStart);
+
+    const before = url.substring(0, valueStart);
+    const after = nextAmp !== -1 ? url.substring(nextAmp) : "";
+
+    const finalUrl = before + joinedValues + after;
+
+    let highlightedUrl =
+      before + "<mark>" + joinedValues + "</mark>" + after;
+
+    if (pluralized) {
+      highlightedUrl = highlightPluralParams(highlightedUrl);
+    }
+
+    document.getElementById("encodedValues").textContent = joinedValues;
+    document.getElementById("finalUrl").innerHTML = highlightedUrl;
+
+    navigator.clipboard.writeText(finalUrl);
+  }
+</script>
+
+</body>
+</html>
