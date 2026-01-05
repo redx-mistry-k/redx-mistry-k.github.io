@@ -8,7 +8,7 @@
       font-family: Arial, sans-serif;
       background: #f6f7fb;
       padding: 20px;
-      max-width: 1100px;
+      max-width: 1200px;
       margin: auto;
     }
 
@@ -32,9 +32,7 @@
       margin-right: 8px;
     }
 
-    .copy-btn {
-      background: #16a34a;
-    }
+    .copy-btn { background: #16a34a; }
 
     table {
       width: 100%;
@@ -52,21 +50,28 @@
 
     th {
       background: #f1f5f9;
+      cursor: pointer;
+      user-select: none;
     }
+
+    th.sort-asc::after { content: " ▲"; }
+    th.sort-desc::after { content: " ▼"; }
 
     tr.highlight {
       background-color: #fff7cc;
     }
 
-    .controls {
-      display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
+    .panel {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: 12px;
+      font-size: 13px;
     }
 
-    .error { color: red; }
-    .success { color: green; }
+    .ok { color: green; }
+    .warn { color: #b45309; }
+    .err { color: red; }
   </style>
 </head>
 <body>
@@ -82,134 +87,164 @@
 <label><strong>New Steps (comma or new line separated)</strong></label>
 <textarea id="stepsInput"></textarea>
 
-<div class="controls">
-  <label><input type="checkbox" id="prettyToggle"> Pretty JSON</label>
-  <button onclick="addSteps()">Add Steps</button>
-  <button class="copy-btn" onclick="copyOutput()">Copy Output</button>
-</div>
+<button onclick="addSteps()">Add Steps</button>
+<button class="copy-btn" onclick="copyOutput()">Copy Output</button>
 
 <label><strong>JSON Output</strong></label>
 <textarea id="output" readonly></textarea>
 <button onclick="loadOutput()">Load Output Preview</button>
 
-<div id="message"></div>
+<div id="summary" class="panel"></div>
 
 <script>
-  let data = [];
-  let highlightedIndexes = new Set();
+let data = [];
+let highlighted = new Set();
+let sortState = {};
 
-  function today() {
-    return new Date().toISOString().split("T")[0];
+function today() {
+  return new Date().toISOString().split("T")[0];
+}
+
+/* ---------- TABLE RENDER ---------- */
+function renderTable(rows) {
+  const container = document.getElementById("tableContainer");
+  container.innerHTML = "";
+  if (!rows.length) return;
+
+  const cols = Object.keys(rows[0]);
+  let html = "<table><thead><tr>";
+
+  cols.forEach(c => {
+    html += `<th onclick="sortBy('${c}')">${c}</th>`;
+  });
+
+  html += "</tr></thead><tbody>";
+
+  rows.forEach((r, i) => {
+    html += `<tr class="${highlighted.has(i) ? "highlight" : ""}">`;
+    cols.forEach(c => html += `<td>${r[c] ?? ""}</td>`);
+    html += "</tr>";
+  });
+
+  html += "</tbody></table>";
+  container.innerHTML = html;
+}
+
+/* ---------- SORTING ---------- */
+function sortBy(column) {
+  const dir = sortState[column] === "asc" ? "desc" : "asc";
+  sortState = { [column]: dir };
+
+  data.sort((a, b) => {
+    const x = a[column] ?? "";
+    const y = b[column] ?? "";
+    if (!isNaN(x) && !isNaN(y)) return dir === "asc" ? x - y : y - x;
+    return dir === "asc"
+      ? String(x).localeCompare(String(y))
+      : String(y).localeCompare(String(x));
+  });
+
+  renderTable(data);
+}
+
+/* ---------- LOAD INPUT ---------- */
+function loadInput() {
+  try {
+    data = JSON.parse(jsonInput.value);
+    if (!Array.isArray(data)) throw "";
+    highlighted.clear();
+    renderTable(data);
+    summary.innerHTML = "";
+  } catch {
+    summary.innerHTML = "<span class='err'>Invalid input JSON</span>";
   }
+}
 
-  function renderTable(rows) {
-    const container = document.getElementById("tableContainer");
-    container.innerHTML = "";
-    if (!rows.length) return;
+/* ---------- ADD / UPDATE STEPS ---------- */
+function addSteps() {
+  if (!data.length) return;
 
-    const cols = Object.keys(rows[0]);
-    let html = "<table><thead><tr>";
-    cols.forEach(c => html += `<th>${c}</th>`);
-    html += "</tr></thead><tbody>";
+  const steps = stepsInput.value
+    .split(/[\n,]+/)
+    .map(s => s.trim())
+    .filter(Boolean);
 
-    rows.forEach((r, i) => {
-      html += `<tr class="${highlightedIndexes.has(i) ? "highlight" : ""}">`;
-      cols.forEach(c => html += `<td>${r[c] ?? ""}</td>`);
-      html += "</tr>";
-    });
+  const added = [];
+  const updated = [];
+  const skipped = [];
 
-    html += "</tbody></table>";
-    container.innerHTML = html;
-  }
+  const t = today();
 
-  function loadInput() {
-    try {
-      data = JSON.parse(document.getElementById("jsonInput").value);
-      if (!Array.isArray(data)) throw "";
-      highlightedIndexes.clear();
-      renderTable(data);
-      document.getElementById("message").textContent = "";
-    } catch {
-      showError("Invalid input JSON");
-    }
-  }
+  steps.forEach(s => {
+    const step = Number(s);
+    let handled = false;
 
-  function addSteps() {
-    if (!data.length) return showError("Load input preview first");
+    data.forEach((row, i) => {
+      if (row.Steps === step) {
+        const blockers = [];
+        if (row.Date !== null) blockers.push("Date");
+        if (row.IsCompleted !== null) blockers.push("IsCompleted");
+        if (row.UpdatedBy !== null) blockers.push("UpdatedBy");
 
-    const steps = document.getElementById("stepsInput").value
-      .split(/[\n,]+/)
-      .map(s => s.trim())
-      .filter(Boolean);
-
-    const t = today();
-
-    steps.forEach(stepVal => {
-      const step = Number(stepVal);
-      let found = false;
-
-      data.forEach((row, index) => {
-        if (
-          row.Steps === step &&
-          row.Date === null &&
-          row.IsCompleted === null &&
-          row.UpdatedBy === null
-        ) {
+        if (blockers.length === 0) {
           row.Date = t;
           row.IsCompleted = 1;
           row.UpdatedBy = "System";
-          highlightedIndexes.add(index);
-          found = true;
+          highlighted.add(i);
+          updated.push(step);
+        } else {
+          skipped.push({ step, blockers });
         }
-      });
-
-      if (!found) {
-        data.push({
-          Date: t,
-          IsCompleted: 1,
-          Steps: step,
-          UpdatedBy: "System"
-        });
-        highlightedIndexes.add(data.length - 1);
+        handled = true;
       }
     });
 
-    document.getElementById("output").value =
-      document.getElementById("prettyToggle").checked
-        ? JSON.stringify(data, null, 2)
-        : JSON.stringify(data);
-
-    showSuccess("Steps processed successfully");
-  }
-
-  function loadOutput() {
-    try {
-      const parsed = JSON.parse(document.getElementById("output").value);
-      if (!Array.isArray(parsed)) throw "";
-      renderTable(parsed);
-    } catch {
-      showError("Invalid output JSON");
+    if (!handled) {
+      data.push({
+        Date: t,
+        IsCompleted: 1,
+        Steps: step,
+        UpdatedBy: "System"
+      });
+      highlighted.add(data.length - 1);
+      added.push(step);
     }
+  });
+
+  output.value = JSON.stringify(data, null, 2);
+
+  /* ---------- SUMMARY ---------- */
+  let html = "";
+  if (added.length)
+    html += `<div class="ok">✅ Added: ${added.join(", ")}</div>`;
+  if (updated.length)
+    html += `<div class="ok">🔄 Updated: ${updated.join(", ")}</div>`;
+  if (skipped.length) {
+    html += `<div class="warn">⚠️ Skipped:</div><ul>`;
+    skipped.forEach(s =>
+      html += `<li>Step ${s.step} (has data in: ${s.blockers.join(", ")})</li>`
+    );
+    html += "</ul>";
   }
 
-  function copyOutput() {
-    const out = document.getElementById("output").value;
-    if (!out) return showError("Nothing to copy");
-    navigator.clipboard.writeText(out);
-    showSuccess("Copied to clipboard");
-  }
+  summary.innerHTML = html;
+}
 
-  function showError(msg) {
-    const m = document.getElementById("message");
-    m.textContent = msg;
-    m.className = "error";
+/* ---------- OUTPUT PREVIEW ---------- */
+function loadOutput() {
+  try {
+    const parsed = JSON.parse(output.value);
+    if (!Array.isArray(parsed)) throw "";
+    renderTable(parsed);
+  } catch {
+    summary.innerHTML = "<span class='err'>Invalid output JSON</span>";
   }
+}
 
-  function showSuccess(msg) {
-    const m = document.getElementById("message");
-    m.textContent = msg;
-    m.className = "success";
-  }
+/* ---------- COPY ---------- */
+function copyOutput() {
+  navigator.clipboard.writeText(output.value);
+}
 </script>
 
 </body>
