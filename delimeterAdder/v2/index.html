@@ -116,7 +116,8 @@
     return encodeURIComponent(value)
       .replace(/\./g, "%2E")
       .replace(/,/g, "%2C")
-      .replace(/;/g, "%3B");
+      .replace(/;/g, "%3B")
+      .replace(/-/g, "%2D");
   }
 
   function encodeNumber(value) {
@@ -223,4 +224,5 @@
 
 </body>
 </html>
+
 
