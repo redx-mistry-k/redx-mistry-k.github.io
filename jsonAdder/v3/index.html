@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Step Adder</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #f6f7fb 0%, #f0f4f8 100%);
+      padding: 20px;
+      margin: 0;
+      color: #334155;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* Laptop/Desktop optimized base styles */
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+      margin-bottom: 24px;
+      width: 100%;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h2 {
+      color: #1e293b;
+      margin-top: 0;
+      margin-bottom: 24px;
+      font-size: 26px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2:before {
+      content: "📊";
+      font-size: 28px;
+    }
+
+    h3 {
+      color: #475569;
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-size: 18px;
+      font-weight: 600;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    h4 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 14px;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 13px;
+      margin-bottom: 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    textarea#output {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-width: 120px;
+      height: 40px;
+    }
+
+    button:first-of-type {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+    }
+
+    button.copy-btn {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+      color: white;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      font-size: 13px;
+    }
+
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px 14px;
+      text-align: left;
+      word-break: break-word;
+    }
+
+    th {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 2px solid #e2e8f0;
+      position: relative;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    th:hover {
+      background: #e2e8f0;
+    }
+
+    th:after {
+      content: "↕";
+      position: absolute;
+      right: 6px;
+      opacity: 0.5;
+      font-size: 11px;
+    }
+
+    td.editable {
+      background: #fefce8;
+      transition: background 0.2s;
+    }
+
+    td.editable:focus {
+      background: #fff;
+      outline: 2px solid #fbbf24;
+      outline-offset: -2px;
+    }
+
+    td.readonly {
+      background: #f8fafc;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    tr:hover td {
+      background: #f1f5f9;
+    }
+
+    .box {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s ease;
+    }
+
+    .box:hover {
+      transform: translateY(-1px);
+    }
+
+    .box.added {
+      border-top: 4px solid #10b981;
+    }
+
+    .box.added h4 {
+      color: #10b981;
+    }
+
+    .box.updated {
+      border-top: 4px solid #f59e0b;
+    }
+
+    .box.updated h4 {
+      color: #f59e0b;
+    }
+
+    .box.edited {
+      border-top: 4px solid #6366f1;
+    }
+
+    .box.edited h4 {
+      color: #6366f1;
+    }
+
+    .panel {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 18px;
+      margin-top: 20px;
+      font-size: 13px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .ok {
+      color: #10b981;
+      font-weight: 600;
+      padding: 8px 14px;
+      background: #d1fae5;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .warn {
+      color: #f59e0b;
+      font-weight: 600;
+      padding: 8px 14px;
+      background: #fef3c7;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+
+    .err {
+      color: #ef4444;
+      font-weight: 600;
+      padding: 8px 14px;
+      background: #fee2e2;
+      border-radius: 6px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    .badge-added {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-updated {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-edited {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .input-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .section-title i {
+      font-size: 18px;
+    }
+
+    .instructions {
+      background: #f0f9ff;
+      border-left: 4px solid #0ea5e9;
+      padding: 16px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .instructions ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin-bottom: 6px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-top: 4px solid #e2e8f0;
+    }
+
+    .stat-card.added {
+      border-color: #10b981;
+    }
+
+    .stat-card.updated {
+      border-color: #f59e0b;
+    }
+
+    .stat-card.edited {
+      border-color: #6366f1;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 8px 0;
+      line-height: 1.2;
+    }
+
+    .stat-added { color: #10b981; }
+    .stat-updated { color: #f59e0b; }
+    .stat-edited { color: #6366f1; }
+
+    .stat-label {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      color: #94a3b8;
+    }
+
+    .empty-state i {
+      font-size: 36px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      margin: 0;
+    }
+
+    /* Tablet styles (768px - 1024px) */
+    @media (max-width: 1024px) {
+      .container {
+        padding: 20px;
+        border-radius: 10px;
+      }
+      
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Mobile styles (< 768px) */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+      
+      .container {
+        padding: 16px;
+        border-radius: 10px;
+      }
+      
+      h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
+      }
+      
+      h2:before {
+        font-size: 24px;
+      }
+      
+      h3 {
+        font-size: 17px;
+        margin-bottom: 16px;
+      }
+      
+      h4 {
+        font-size: 15px;
+        margin-bottom: 12px;
+      }
+      
+      textarea {
+        padding: 12px;
+        font-size: 14px;
+        min-height: 100px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      button {
+        width: 100%;
+        height: 44px;
+        font-size: 15px;
+        min-width: 0;
+      }
+      
+      table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        font-size: 14px;
+      }
+      
+      th, td {
+        padding: 12px;
+        min-width: 80px;
+      }
+      
+      .box {
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      
+      .panel {
+        padding: 16px;
+      }
+      
+      .instructions {
+        padding: 14px;
+        font-size: 14px;
+      }
+      
+      .stat-card {
+        padding: 14px;
+      }
+      
+      .stat-number {
+        font-size: 22px;
+      }
+      
+      .mobile-action-bar {
+        display: flex;
+      }
+    }
+
+    /* Small mobile styles (< 480px) */
+    @media (max-width: 480px) {
+      .container {
+        padding: 14px;
+      }
+      
+      h2 {
+        font-size: 20px;
+      }
+      
+      textarea {
+        font-size: 16px; /* Prevent zoom on iOS */
+      }
+      
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      
+      .empty-state {
+        padding: 20px 16px;
+      }
+      
+      .empty-state i {
+        font-size: 32px;
+      }
+    }
+
+    /* Mobile Action Bar */
+    .mobile-action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 12px 16px;
+      border-top: 1px solid #e2e8f0;
+      display: none;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 100;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .mobile-action-bar {
+        display: flex;
+      }
+      
+      body {
+        padding-bottom: 80px; /* Space for fixed action bar */
+      }
+    }
+
+    /* Hide/show for different screens */
+    @media (max-width: 768px) {
+      .desktop-only {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-only {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>JSON Step Adder</h2>
+
+  <div class="instructions">
+    <p><strong>How to use:</strong></p>
+    <ul>
+      <li>Paste your existing JSON array in the first textarea</li>
+      <li>Enter new step numbers (comma or newline separated) in the second textarea</li>
+      <li>Click "Add Steps" to process and update your data</li>
+      <li>Edit any cell directly (except "Steps" column)</li>
+      <li>Copy the final JSON output when done</li>
+    </ul>
+  </div>
+
+  <div class="input-section">
+    <div class="section-title">
+      <span>📥</span>
+      <label><strong>Existing JSON</strong></label>
+    </div>
+    <textarea id="jsonInput" placeholder='[{"Date": "2023-10-01", "IsCompleted": 1, "Steps": 100, "UpdatedBy": "System"}, ...]'></textarea>
+    <div class="button-group desktop-only">
+      <button onclick="loadInput()">
+        <span>📋</span>
+        Load Input
+      </button>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="section-title">
+      <span>✨</span>
+      <label><strong>New Steps</strong></label>
+    </div>
+    <textarea id="stepsInput" placeholder="Enter step numbers separated by commas or new lines&#10;Example: 101, 102, 103"></textarea>
+    
+    <div class="button-group desktop-only">
+      <button onclick="addSteps()">
+        <span>➕</span>
+        Add Steps
+      </button>
+      <button class="copy-btn" onclick="copyOutput()">
+        <span>📋</span>
+        Copy Output
+      </button>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="section-title">
+      <span>📤</span>
+      <label><strong>JSON Output</strong></label>
+    </div>
+    <textarea id="output" readonly placeholder="Output JSON will appear here..."></textarea>
+  </div>
+</div>
+
+<div class="container">
+  <div class="stats" id="statsContainer">
+    <!-- Stats will be populated by JavaScript -->
+  </div>
+
+  <div class="grid">
+    <!-- MAIN TABLE -->
+    <div>
+      <h3>Main Data (Editable) <span class="status-badge badge-edited" id="mainCount">0 rows</span></h3>
+      <div id="tableContainer" class="card">
+        <div class="empty-state">
+          <div>📊</div>
+          <p>No data loaded. Paste JSON and click "Load Input" to begin.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDE TABLES -->
+    <div>
+      <div class="box added">
+        <h4>➕ Added Steps <span class="status-badge badge-added" id="addedCount">0</span></h4>
+        <div id="addedTable" class="empty-state">
+          <div>🆕</div>
+          <p>New steps will appear here</p>
+        </div>
+      </div>
+
+      <div class="box updated">
+        <h4>🔄 Updated Steps <span class="status-badge badge-updated" id="updatedCount">0</span></h4>
+        <div id="updatedTable" class="empty-state">
+          <div>📝</div>
+          <p>Updated steps will appear here</p>
+        </div>
+      </div>
+
+      <div class="box edited">
+        <h4>✏️ Edited Steps <span class="status-badge badge-edited" id="editedCount">0</span></h4>
+        <div id="editedTable" class="empty-state">
+          <div>✏️</div>
+          <p>Manually edited steps will appear here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="summary" class="panel">
+    <div class="empty-state">
+      <div>📈</div>
+      <p>Summary will appear here after adding steps</p>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Action Bar -->
+<div class="mobile-action-bar mobile-only">
+  <button onclick="loadInput()">
+    <span>📋</span>
+    Load
+  </button>
+  <button onclick="addSteps()">
+    <span>➕</span>
+    Add Steps
+  </button>
+  <button class="copy-btn" onclick="copyOutput()">
+    <span>📋</span>
+    Copy
+  </button>
+</div>
+
+<script>
+let data = [];
+let rowStatus = {}; // keyed by Steps
+
+function today() {
+  return new Date().toISOString().split("T")[0];
+}
+
+/* ---------- RENDER STATS ---------- */
+function renderStats() {
+  const added = data.filter(r => rowStatus[r.Steps] === "added").length;
+  const updated = data.filter(r => rowStatus[r.Steps] === "updated").length;
+  const edited = data.filter(r => rowStatus[r.Steps] === "edited").length;
+  const total = data.length;
+
+  document.getElementById("mainCount").textContent = `${total} rows`;
+  document.getElementById("addedCount").textContent = added;
+  document.getElementById("updatedCount").textContent = updated;
+  document.getElementById("editedCount").textContent = edited;
+
+  const statsContainer = document.getElementById("statsContainer");
+  statsContainer.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Total Rows</div>
+      <div class="stat-number">${total}</div>
+      <small>All steps</small>
+    </div>
+    <div class="stat-card added">
+      <div class="stat-label">Added</div>
+      <div class="stat-number stat-added">${added}</div>
+      <small>New steps</small>
+    </div>
+    <div class="stat-card updated">
+      <div class="stat-label">Updated</div>
+      <div class="stat-number stat-updated">${updated}</div>
+      <small>Existing steps</small>
+    </div>
+    <div class="stat-card edited">
+      <div class="stat-label">Edited</div>
+      <div class="stat-number stat-edited">${edited}</div>
+      <small>Manual edits</small>
+    </div>
+  `;
+}
+
+/* ---------- TABLE RENDER ---------- */
+function renderTable() {
+  renderMainTable();
+  renderSideTables();
+  syncOutput();
+  renderStats();
+}
+
+function renderMainTable() {
+  const container = document.getElementById("tableContainer");
+  
+  if (!data.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div>📊</div>
+        <p>No data loaded. Paste JSON and click "Load Input" to begin.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const cols = Object.keys(data[0]);
+  let html = "<table><thead><tr>";
+
+  cols.forEach(c => html += `<th>${c}</th>`);
+  html += "</tr></thead><tbody>";
+
+  data.forEach((row, i) => {
+    const status = rowStatus[row.Steps];
+    html += "<tr>";
+    cols.forEach(col => {
+      const editable = col !== "Steps";
+      const statusClass = status ? `status-${status}` : "";
+      html += `
+        <td class="${editable ? "editable" : "readonly"} ${statusClass}"
+            contenteditable="${editable}"
+            onblur="updateCell(${i}, '${col}', this.innerText)"
+            title="${editable ? "Click to edit" : "Read-only"}">
+          ${row[col] ?? ""}
+        </td>`;
+    });
+    html += "</tr>";
+  });
+
+  html += "</tbody></table>";
+  container.innerHTML = html;
+}
+
+/* ---------- SIDE TABLES ---------- */
+function renderSideTables() {
+  renderStatusTable("added", "addedTable", "🆕", "New steps will appear here");
+  renderStatusTable("updated", "updatedTable", "📝", "Updated steps will appear here");
+  renderStatusTable("edited", "editedTable", "✏️", "Manually edited steps will appear here");
+}
+
+function renderStatusTable(status, containerId, icon, emptyMessage) {
+  const rows = data.filter(r => rowStatus[r.Steps] === status);
+  const container = document.getElementById(containerId);
+
+  if (!rows.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div>${icon}</div>
+        <p>${emptyMessage}</p>
+      </div>
+    `;
+    return;
+  }
+
+  const cols = Object.keys(rows[0]);
+  let html = "<table><thead><tr>";
+  cols.forEach(c => html += `<th>${c}</th>`);
+  html += "</tr></thead><tbody>";
+
+  rows.forEach(row => {
+    html += "<tr>";
+    cols.forEach(c => {
+      const cellValue = row[c] ?? "";
+      html += `<td>${cellValue}</td>`;
+    });
+    html += "</tr>";
+  });
+
+  html += "</tbody></table>";
+  container.innerHTML = html;
+}
+
+/* ---------- CELL UPDATE ---------- */
+function updateCell(index, column, value) {
+  if (column === "Steps") return;
+
+  value = value.trim();
+  if (value === "") data[index][column] = null;
+  else if (column === "IsCompleted") data[index][column] = Number(value);
+  else data[index][column] = value;
+
+  if (!rowStatus[data[index].Steps]) {
+    rowStatus[data[index].Steps] = "edited";
+  }
+
+  renderTable();
+}
+
+/* ---------- LOAD INPUT ---------- */
+function loadInput() {
+  try {
+    data = JSON.parse(jsonInput.value);
+    if (!Array.isArray(data)) throw "";
+    rowStatus = {};
+    renderTable();
+    summary.innerHTML = `
+      <div class="ok">
+        <span>✅</span>
+        Successfully loaded ${data.length} rows
+      </div>
+    `;
+  } catch {
+    summary.innerHTML = `<div class="err">
+      <span>❌</span>
+      Invalid JSON. Please check your input.
+    </div>`;
+  }
+}
+
+/* ---------- ADD / UPDATE ---------- */
+function addSteps() {
+  const steps = stepsInput.value
+    .split(/[\n,]+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  if (steps.length === 0) {
+    summary.innerHTML = `<div class="warn">
+      <span>⚠️</span>
+      No steps provided. Please enter step numbers.
+    </div>`;
+    return;
+  }
+
+  const added = [];
+  const updated = [];
+  const skipped = [];
+  const t = today();
+
+  steps.forEach(s => {
+    const step = Number(s);
+    let found = false;
+
+    data.forEach(row => {
+      if (row.Steps === step) {
+        found = true;
+        const blockers = [];
+        if (row.Date !== null) blockers.push("Date");
+        if (row.IsCompleted !== null) blockers.push("IsCompleted");
+        if (row.UpdatedBy !== null) blockers.push("UpdatedBy");
+
+        if (!blockers.length) {
+          row.Date = t;
+          row.IsCompleted = 1;
+          row.UpdatedBy = "System";
+          rowStatus[step] = "updated";
+          updated.push(step);
+        } else {
+          skipped.push({ step, blockers });
+        }
+      }
+    });
+
+    if (!found) {
+      data.push({
+        Date: t,
+        IsCompleted: 1,
+        Steps: step,
+        UpdatedBy: "System"
+      });
+      rowStatus[step] = "added";
+      added.push(step);
+    }
+  });
+
+  renderTable();
+
+  let html = "";
+  if (added.length) html += `<div class="ok"><span>✅</span> Added: ${added.join(", ")}</div>`;
+  if (updated.length) html += `<div class="ok"><span>🔄</span> Updated: ${updated.join(", ")}</div>`;
+  if (skipped.length) {
+    html += `<div class="warn"><span>⚠️</span> Skipped:</div><ul>`;
+    skipped.forEach(s =>
+      html += `<li>Step ${s.step} (has ${s.blockers.join(", ")})</li>`
+    );
+    html += "</ul>";
+  }
+
+  if (!html) {
+    html = `<div class="warn"><span>ℹ️</span> No changes were made.</div>`;
+  }
+
+  summary.innerHTML = html;
+}
+
+/* ---------- OUTPUT ---------- */
+function syncOutput() {
+  output.value = JSON.stringify(data, null, 2);
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(output.value);
+  const originalText = '📋 Copy Output';
+  const buttons = document.querySelectorAll('.copy-btn');
+  buttons.forEach(btn => {
+    const currentText = btn.innerHTML;
+    btn.innerHTML = '<span>✓</span> Copied!';
+    setTimeout(() => {
+      btn.innerHTML = currentText.includes('Copy Output') ? '<span>📋</span> Copy Output' : '<span>📋</span> Copy';
+    }, 2000);
+  });
+}
+
+/* ---------- MOBILE ENHANCEMENTS ---------- */
+document.addEventListener('DOMContentLoaded', function() {
+  // Adjust layout on orientation change
+  window.addEventListener('orientationchange', function() {
+    setTimeout(renderTable, 100);
+  });
+});
+</script>
+
+</body>
+</html>
