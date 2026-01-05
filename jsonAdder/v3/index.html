@@ -97,12 +97,16 @@
     textarea#output {
       background: #f1f5f9;
       border-color: #cbd5e1;
+      font-size: 12px;
+      line-height: 1.4;
     }
 
     .button-group {
       display: flex;
       gap: 10px;
       margin-bottom: 20px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     button {
@@ -131,6 +135,12 @@
       color: white;
     }
 
+    button.format-toggle {
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      color: white;
+      min-width: 140px;
+    }
+
     button:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -144,6 +154,24 @@
       opacity: 0.6;
       cursor: not-allowed;
       transform: none !important;
+    }
+
+    .format-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #e0e7ff;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #4f46e5;
+      margin-left: auto;
+    }
+
+    .format-indicator.compact {
+      background: #fef3c7;
+      color: #d97706;
     }
 
     .grid {
@@ -436,6 +464,15 @@
       .stats {
         grid-template-columns: repeat(2, 1fr);
       }
+      
+      .button-group {
+        flex-wrap: wrap;
+      }
+      
+      .format-indicator {
+        margin-left: 0;
+        margin-top: 8px;
+      }
     }
 
     /* Mobile styles (< 768px) */
@@ -477,6 +514,7 @@
       .button-group {
         flex-direction: column;
         gap: 8px;
+        align-items: stretch;
       }
       
       button {
@@ -484,6 +522,16 @@
         height: 44px;
         font-size: 15px;
         min-width: 0;
+      }
+      
+      .format-toggle {
+        order: 3;
+      }
+      
+      .format-indicator {
+        order: 4;
+        justify-content: center;
+        margin: 8px 0 0 0;
       }
       
       table {
@@ -605,6 +653,7 @@
       <li>Enter new step numbers (comma or newline separated) in the second textarea</li>
       <li>Click "Add Steps" to process and update your data</li>
       <li>Edit any cell directly (except "Steps" column)</li>
+      <li>Toggle between formatted and minified JSON output</li>
       <li>Copy the final JSON output when done</li>
     </ul>
   </div>
@@ -639,6 +688,14 @@
         <span>📋</span>
         Copy Output
       </button>
+      <button class="format-toggle" onclick="toggleFormat()">
+        <span id="formatIcon">📄</span>
+        <span id="formatText">Minify</span>
+      </button>
+      <div class="format-indicator" id="formatIndicator">
+        <span>📄</span>
+        <span>Formatted</span>
+      </div>
     </div>
   </div>
 
@@ -646,6 +703,24 @@
     <div class="section-title">
       <span>📤</span>
       <label><strong>JSON Output</strong></label>
+    </div>
+    <div class="button-group mobile-only">
+      <button onclick="addSteps()">
+        <span>➕</span>
+        Add Steps
+      </button>
+      <button class="copy-btn" onclick="copyOutput()">
+        <span>📋</span>
+        Copy
+      </button>
+      <button class="format-toggle" onclick="toggleFormat()">
+        <span id="formatIconMobile">📄</span>
+        <span id="formatTextMobile">Minify</span>
+      </button>
+    </div>
+    <div class="format-indicator mobile-only" id="formatIndicatorMobile">
+      <span>📄</span>
+      <span>Formatted</span>
     </div>
     <textarea id="output" readonly placeholder="Output JSON will appear here..."></textarea>
   </div>
@@ -723,9 +798,61 @@
 <script>
 let data = [];
 let rowStatus = {}; // keyed by Steps
+let isMinified = false; // Track current format
 
 function today() {
   return new Date().toISOString().split("T")[0];
+}
+
+/* ---------- FORMAT TOGGLE ---------- */
+function toggleFormat() {
+  isMinified = !isMinified;
+  updateFormatUI();
+  syncOutput();
+}
+
+function updateFormatUI() {
+  const formatIcon = document.getElementById('formatIcon');
+  const formatText = document.getElementById('formatText');
+  const formatIndicator = document.getElementById('formatIndicator');
+  
+  const formatIconMobile = document.getElementById('formatIconMobile');
+  const formatTextMobile = document.getElementById('formatTextMobile');
+  const formatIndicatorMobile = document.getElementById('formatIndicatorMobile');
+  
+  if (isMinified) {
+    // Update desktop UI
+    if (formatIcon) formatIcon.textContent = '📦';
+    if (formatText) formatText.textContent = 'Format';
+    if (formatIndicator) {
+      formatIndicator.innerHTML = '<span>📦</span><span>Minified</span>';
+      formatIndicator.classList.add('compact');
+    }
+    
+    // Update mobile UI
+    if (formatIconMobile) formatIconMobile.textContent = '📦';
+    if (formatTextMobile) formatTextMobile.textContent = 'Format';
+    if (formatIndicatorMobile) {
+      formatIndicatorMobile.innerHTML = '<span>📦</span><span>Minified</span>';
+      formatIndicatorMobile.classList.add('compact');
+    }
+  } else {
+    // Update desktop UI
+    if (formatIcon) formatIcon.textContent = '📄';
+    if (formatText) formatText.textContent = 'Minify';
+    if (formatIndicator) {
+      formatIndicator.innerHTML = '<span>📄</span><span>Formatted</span>';
+      formatIndicator.classList.remove('compact');
+    }
+    
+    // Update mobile UI
+    if (formatIconMobile) formatIconMobile.textContent = '📄';
+    if (formatTextMobile) formatTextMobile.textContent = 'Minify';
+    if (formatIndicatorMobile) {
+      formatIndicatorMobile.innerHTML = '<span>📄</span><span>Formatted</span>';
+      formatIndicatorMobile.classList.remove('compact');
+    }
+  }
 }
 
 /* ---------- RENDER STATS ---------- */
@@ -967,24 +1094,50 @@ function addSteps() {
 
 /* ---------- OUTPUT ---------- */
 function syncOutput() {
-  output.value = JSON.stringify(data, null, 2);
+  if (isMinified) {
+    // Minified JSON (no spaces, single line)
+    output.value = JSON.stringify(data);
+  } else {
+    // Formatted JSON with indentation
+    output.value = JSON.stringify(data, null, 2);
+  }
 }
 
 function copyOutput() {
   navigator.clipboard.writeText(output.value);
-  const originalText = '📋 Copy Output';
-  const buttons = document.querySelectorAll('.copy-btn');
-  buttons.forEach(btn => {
-    const currentText = btn.innerHTML;
-    btn.innerHTML = '<span>✓</span> Copied!';
+  
+  // Update all copy buttons with success state
+  const copyButtons = document.querySelectorAll('.copy-btn');
+  copyButtons.forEach(btn => {
+    const originalHTML = btn.innerHTML;
+    const isMobile = btn.innerHTML.includes('Copy</span>');
+    
+    btn.innerHTML = isMinified 
+      ? '<span>✓</span> Copied Minified!' 
+      : '<span>✓</span> Copied Formatted!';
+    
     setTimeout(() => {
-      btn.innerHTML = currentText.includes('Copy Output') ? '<span>📋</span> Copy Output' : '<span>📋</span> Copy';
+      btn.innerHTML = originalHTML;
     }, 2000);
   });
+  
+  // Show a brief notification in the summary panel
+  const currentSummary = summary.innerHTML;
+  const formatType = isMinified ? "minified" : "formatted";
+  summary.innerHTML = `
+    <div class="ok">
+      <span>✓</span>
+      Copied ${formatType} JSON to clipboard
+    </div>
+    ${currentSummary}
+  `;
 }
 
 /* ---------- MOBILE ENHANCEMENTS ---------- */
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize format UI
+  updateFormatUI();
+  
   // Adjust layout on orientation change
   window.addEventListener('orientationchange', function() {
     setTimeout(renderTable, 100);
