@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSON Step Adder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f7fb;
+      padding: 20px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin-right: 8px;
+    }
+
+    .copy-btn {
+      background: #16a34a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+    }
+
+    tr.highlight {
+      background-color: #fff7cc;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .error { color: red; }
+    .success { color: green; }
+  </style>
+</head>
+<body>
+
+<h2>JSON Step Adder</h2>
+
+<label><strong>Existing JSON</strong></label>
+<textarea id="jsonInput"></textarea>
+<button onclick="loadInput()">Load Input Preview</button>
+
+<div id="tableContainer"></div>
+
+<label><strong>New Steps (comma or new line separated)</strong></label>
+<textarea id="stepsInput"></textarea>
+
+<div class="controls">
+  <label><input type="checkbox" id="prettyToggle"> Pretty JSON</label>
+  <button onclick="addSteps()">Add Steps</button>
+  <button class="copy-btn" onclick="copyOutput()">Copy Output</button>
+</div>
+
+<label><strong>JSON Output</strong></label>
+<textarea id="output" readonly></textarea>
+<button onclick="loadOutput()">Load Output Preview</button>
+
+<div id="message"></div>
+
+<script>
+  let data = [];
+  let highlightedIndexes = new Set();
+
+  function today() {
+    return new Date().toISOString().split("T")[0];
+  }
+
+  function renderTable(rows) {
+    const container = document.getElementById("tableContainer");
+    container.innerHTML = "";
+    if (!rows.length) return;
+
+    const cols = Object.keys(rows[0]);
+    let html = "<table><thead><tr>";
+    cols.forEach(c => html += `<th>${c}</th>`);
+    html += "</tr></thead><tbody>";
+
+    rows.forEach((r, i) => {
+      html += `<tr class="${highlightedIndexes.has(i) ? "highlight" : ""}">`;
+      cols.forEach(c => html += `<td>${r[c] ?? ""}</td>`);
+      html += "</tr>";
+    });
+
+    html += "</tbody></table>";
+    container.innerHTML = html;
+  }
+
+  function loadInput() {
+    try {
+      data = JSON.parse(document.getElementById("jsonInput").value);
+      if (!Array.isArray(data)) throw "";
+      highlightedIndexes.clear();
+      renderTable(data);
+      document.getElementById("message").textContent = "";
+    } catch {
+      showError("Invalid input JSON");
+    }
+  }
+
+  function addSteps() {
+    if (!data.length) return showError("Load input preview first");
+
+    const steps = document.getElementById("stepsInput").value
+      .split(/[\n,]+/)
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    const t = today();
+
+    steps.forEach(stepVal => {
+      const step = Number(stepVal);
+      let found = false;
+
+      data.forEach((row, index) => {
+        if (
+          row.Steps === step &&
+          row.Date === null &&
+          row.IsCompleted === null &&
+          row.UpdatedBy === null
+        ) {
+          row.Date = t;
+          row.IsCompleted = 1;
+          row.UpdatedBy = "System";
+          highlightedIndexes.add(index);
+          found = true;
+        }
+      });
+
+      if (!found) {
+        data.push({
+          Date: t,
+          IsCompleted: 1,
+          Steps: step,
+          UpdatedBy: "System"
+        });
+        highlightedIndexes.add(data.length - 1);
+      }
+    });
+
+    document.getElementById("output").value =
+      document.getElementById("prettyToggle").checked
+        ? JSON.stringify(data, null, 2)
+        : JSON.stringify(data);
+
+    showSuccess("Steps processed successfully");
+  }
+
+  function loadOutput() {
+    try {
+      const parsed = JSON.parse(document.getElementById("output").value);
+      if (!Array.isArray(parsed)) throw "";
+      renderTable(parsed);
+    } catch {
+      showError("Invalid output JSON");
+    }
+  }
+
+  function copyOutput() {
+    const out = document.getElementById("output").value;
+    if (!out) return showError("Nothing to copy");
+    navigator.clipboard.writeText(out);
+    showSuccess("Copied to clipboard");
+  }
+
+  function showError(msg) {
+    const m = document.getElementById("message");
+    m.textContent = msg;
+    m.className = "error";
+  }
+
+  function showSuccess(msg) {
+    const m = document.getElementById("message");
+    m.textContent = msg;
+    m.className = "success";
+  }
+</script>
+
+</body>
+</html>

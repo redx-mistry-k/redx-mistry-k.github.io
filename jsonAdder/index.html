@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSON Step Adder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f7fb;
+      padding: 20px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin-right: 8px;
+    }
+
+    button:hover {
+      background: #1e4fd8;
+    }
+
+    .copy-btn {
+      background: #16a34a;
+    }
+
+    .copy-btn:hover {
+      background: #12803c;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 12px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 8px;
+    }
+
+    .success {
+      color: green;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>JSON Step Adder</h2>
+
+  <label><strong>Existing JSON</strong></label>
+  <textarea id="jsonInput" placeholder="Paste your JSON array here"></textarea>
+
+  <button onclick="loadPreview()">Load Preview</button>
+
+  <div id="tableContainer"></div>
+
+  <label><strong>New Steps (comma or new line separated)</strong></label>
+  <textarea id="stepsInput" placeholder="501
+502
+504
+505"></textarea>
+
+  <div class="controls">
+    <label>
+      <input type="checkbox" id="prettyToggle" />
+      Pretty JSON
+    </label>
+
+    <button onclick="addSteps()">Add Steps</button>
+    <button class="copy-btn" onclick="copyOutput()">Copy Output</button>
+  </div>
+
+  <label><strong>JSON Output</strong></label>
+  <textarea id="output" readonly></textarea>
+
+  <div id="message"></div>
+
+  <script>
+    let currentData = [];
+
+    function getToday() {
+      return new Date().toISOString().split("T")[0];
+    }
+
+    function loadPreview() {
+      const input = document.getElementById("jsonInput").value.trim();
+      const container = document.getElementById("tableContainer");
+      const message = document.getElementById("message");
+
+      container.innerHTML = "";
+      message.textContent = "";
+
+      try {
+        currentData = JSON.parse(input);
+        if (!Array.isArray(currentData)) throw new Error();
+      } catch {
+        message.textContent = "Invalid JSON. Must be an array.";
+        message.className = "error";
+        return;
+      }
+
+      if (currentData.length === 0) return;
+
+      const columns = Object.keys(currentData[0]);
+      let html = "<table><thead><tr>";
+
+      columns.forEach(col => {
+        html += `<th>${col}</th>`;
+      });
+
+      html += "</tr></thead><tbody>";
+
+      currentData.forEach(row => {
+        html += "<tr>";
+        columns.forEach(col => {
+          html += `<td>${row[col] ?? ""}</td>`;
+        });
+        html += "</tr>";
+      });
+
+      html += "</tbody></table>";
+      container.innerHTML = html;
+    }
+
+    function addSteps() {
+      const stepsText = document.getElementById("stepsInput").value.trim();
+      const pretty = document.getElementById("prettyToggle").checked;
+      const output = document.getElementById("output");
+      const message = document.getElementById("message");
+
+      if (!currentData.length) {
+        message.textContent = "Load JSON preview first.";
+        message.className = "error";
+        return;
+      }
+
+      if (!stepsText) {
+        message.textContent = "Please enter step numbers.";
+        message.className = "error";
+        return;
+      }
+
+      const today = getToday();
+
+      const steps = stepsText
+        .split(/[\n,]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      steps.forEach(step => {
+        currentData.push({
+          Date: today,
+          IsCompleted: 1,
+          Steps: Number(step),
+          UpdatedBy: "System"
+        });
+      });
+
+      output.value = pretty
+        ? JSON.stringify(currentData, null, 2)
+        : JSON.stringify(currentData);
+
+      message.textContent = "Steps added successfully.";
+      message.className = "success";
+    }
+
+    function copyOutput() {
+      const output = document.getElementById("output");
+      const message = document.getElementById("message");
+
+      if (!output.value) {
+        message.textContent = "Nothing to copy.";
+        message.className = "error";
+        return;
+      }
+
+      navigator.clipboard.writeText(output.value).then(() => {
+        message.textContent = "Copied to clipboard.";
+        message.className = "success";
+      });
+    }
+  </script>
+
+</body>
+</html>
