@@ -19,7 +19,6 @@
       min-height: 100vh;
     }
 
-    /* Laptop/Desktop optimized base styles */
     .container {
       background: white;
       border-radius: 12px;
@@ -141,6 +140,12 @@
       min-width: 140px;
     }
 
+    button.undo-btn {
+      background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+      color: white;
+      min-width: 120px;
+    }
+
     button:hover {
       transform: translateY(-1px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -172,6 +177,21 @@
     .format-indicator.compact {
       background: #fef3c7;
       color: #d97706;
+    }
+
+    .sort-indicator {
+      display: inline-block;
+      font-size: 10px;
+      opacity: 0.5;
+      margin-left: 4px;
+    }
+
+    .sort-indicator.asc:after {
+      content: "↑";
+    }
+
+    .sort-indicator.desc:after {
+      content: "↓";
     }
 
     .grid {
@@ -208,18 +228,11 @@
       position: relative;
       user-select: none;
       white-space: nowrap;
+      cursor: pointer;
     }
 
     th:hover {
       background: #e2e8f0;
-    }
-
-    th:after {
-      content: "↕";
-      position: absolute;
-      right: 6px;
-      opacity: 0.5;
-      font-size: 11px;
     }
 
     td.editable {
@@ -237,6 +250,15 @@
       background: #f8fafc;
       color: #64748b;
       font-weight: 600;
+    }
+
+    td.error {
+      background: #fee2e2;
+      border-color: #fca5a5;
+    }
+
+    td.error:focus {
+      outline: 2px solid #ef4444;
     }
 
     tr:hover td {
@@ -318,6 +340,15 @@
       padding: 8px 14px;
       background: #fee2e2;
       border-radius: 6px;
+    }
+
+    .info {
+      color: #3b82f6;
+      font-weight: 600;
+      padding: 8px 14px;
+      background: #dbeafe;
+      border-radius: 6px;
+      margin-bottom: 8px;
     }
 
     .status-badge {
@@ -524,7 +555,7 @@
         min-width: 0;
       }
       
-      .format-toggle {
+      .format-toggle, .undo-btn {
         order: 3;
       }
       
@@ -653,8 +684,9 @@
       <li>Enter new step numbers (comma or newline separated) in the second textarea</li>
       <li>Click "Add Steps" to process and update your data</li>
       <li>Edit any cell directly (except "Steps" column)</li>
+      <li>Click table headers to sort columns</li>
+      <li>Use Undo button to revert to loaded state</li>
       <li>Toggle between formatted and minified JSON output</li>
-      <li>Copy the final JSON output when done</li>
     </ul>
   </div>
 
@@ -668,6 +700,10 @@
       <button onclick="loadInput()">
         <span>📋</span>
         Load Input
+      </button>
+      <button class="undo-btn" onclick="undoChanges()" id="undoBtn" disabled>
+        <span>↶</span>
+        Undo Changes
       </button>
     </div>
   </div>
@@ -705,6 +741,10 @@
       <label><strong>JSON Output</strong></label>
     </div>
     <div class="button-group mobile-only">
+      <button onclick="loadInput()">
+        <span>📋</span>
+        Load
+      </button>
       <button onclick="addSteps()">
         <span>➕</span>
         Add Steps
@@ -712,6 +752,10 @@
       <button class="copy-btn" onclick="copyOutput()">
         <span>📋</span>
         Copy
+      </button>
+      <button class="undo-btn" onclick="undoChanges()" id="undoBtnMobile" disabled>
+        <span>↶</span>
+        Undo
       </button>
       <button class="format-toggle" onclick="toggleFormat()">
         <span id="formatIconMobile">📄</span>
@@ -797,8 +841,11 @@
 
 <script>
 let data = [];
+let originalData = []; // Store for undo functionality
 let rowStatus = {}; // keyed by Steps
 let isMinified = false; // Track current format
+let currentSort = { column: null, direction: 'asc' }; // Track sorting state
+let cellErrors = {}; // Track cell validation errors: {rowIndex_columnName: errorMessage}
 
 function today() {
   return new Date().toISOString().split("T")[0];
@@ -855,6 +902,169 @@ function updateFormatUI() {
   }
 }
 
+/* ---------- SORTING LOGIC ---------- */
+function sortTable(column) {
+  if (!data.length) return;
+  
+  // Toggle direction if same column, otherwise start with ascending
+  if (currentSort.column === column) {
+    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    currentSort.column = column;
+    currentSort.direction = 'asc';
+  }
+  
+  // Create a copy to sort
+  const sortedData = [...data];
+  
+  sortedData.sort((a, b) => {
+    const aVal = a[column];
+    const bVal = b[column];
+    
+    // Handle null/undefined values
+    if (aVal === null || aVal === undefined) return 1;
+    if (bVal === null || bVal === undefined) return -1;
+    
+    // Handle numeric sorting for Steps and IsCompleted
+    if (column === 'Steps' || column === 'IsCompleted') {
+      const numA = Number(aVal);
+      const numB = Number(bVal);
+      return currentSort.direction === 'asc' ? numA - numB : numB - numA;
+    }
+    
+    // Handle date sorting
+    if (column === 'Date') {
+      const dateA = new Date(aVal);
+      const dateB = new Date(bVal);
+      return currentSort.direction === 'asc' ? dateA - dateB : dateB - dateA;
+    }
+    
+    // Default string sorting
+    const strA = String(aVal).toLowerCase();
+    const strB = String(bVal).toLowerCase();
+    return currentSort.direction === 'asc' 
+      ? strA.localeCompare(strB) 
+      : strB.localeCompare(strA);
+  });
+  
+  data = sortedData;
+  renderTable();
+}
+
+/* ---------- VALIDATION FUNCTIONS ---------- */
+function validateDate(dateString) {
+  if (!dateString || dateString.trim() === '') return null; // Empty is allowed
+  
+  // Simple yyyy-mm-dd validation
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateString)) {
+    return 'Date must be in YYYY-MM-DD format';
+  }
+  
+  // Check if it's a valid date
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    return 'Invalid date';
+  }
+  
+  // Check if date string matches parsed date (prevents 2023-13-01)
+  const [year, month, day] = dateString.split('-').map(Number);
+  if (date.getFullYear() !== year || 
+      date.getMonth() + 1 !== month || 
+      date.getDate() !== day) {
+    return 'Invalid date (month/day out of range)';
+  }
+  
+  return null; // Valid
+}
+
+function validateIsCompleted(value) {
+  if (value === null || value === '') return null; // Empty is allowed
+  
+  const num = Number(value);
+  if (isNaN(num)) {
+    return 'Must be a number (0 or 1)';
+  }
+  
+  if (num !== 0 && num !== 1) {
+    return 'Must be 0 or 1';
+  }
+  
+  return null; // Valid
+}
+
+function validateSteps(value) {
+  if (value === null || value === '') {
+    return 'Step number is required';
+  }
+  
+  const num = Number(value);
+  if (isNaN(num)) {
+    return 'Must be a number';
+  }
+  
+  if (!Number.isInteger(num)) {
+    return 'Must be an integer';
+  }
+  
+  if (num < 0) {
+    return 'Must be positive';
+  }
+  
+  return null; // Valid
+}
+
+/* ---------- DUPLICATE DETECTION ---------- */
+function detectDuplicates() {
+  const stepCounts = {};
+  const duplicates = [];
+  
+  data.forEach(row => {
+    const step = row.Steps;
+    if (step !== null && step !== undefined) {
+      stepCounts[step] = (stepCounts[step] || 0) + 1;
+    }
+  });
+  
+  for (const [step, count] of Object.entries(stepCounts)) {
+    if (count > 1) {
+      duplicates.push(Number(step));
+    }
+  }
+  
+  return duplicates;
+}
+
+/* ---------- UNDO FUNCTIONALITY ---------- */
+function undoChanges() {
+  if (originalData.length === 0) return;
+  
+  // Restore original data
+  data = JSON.parse(JSON.stringify(originalData));
+  rowStatus = {};
+  cellErrors = {};
+  
+  // Update UI
+  renderTable();
+  updateUndoButton();
+  
+  summary.innerHTML = `
+    <div class="info">
+      <span>↶</span>
+      Changes undone. Restored to loaded state.
+    </div>
+  `;
+}
+
+function updateUndoButton() {
+  const hasChanges = JSON.stringify(data) !== JSON.stringify(originalData);
+  const undoBtn = document.getElementById('undoBtn');
+  const undoBtnMobile = document.getElementById('undoBtnMobile');
+  
+  if (undoBtn) undoBtn.disabled = !hasChanges;
+  if (undoBtnMobile) undoBtnMobile.disabled = !hasChanges;
+}
+
 /* ---------- RENDER STATS ---------- */
 function renderStats() {
   const added = data.filter(r => rowStatus[r.Steps] === "added").length;
@@ -898,6 +1108,7 @@ function renderTable() {
   renderSideTables();
   syncOutput();
   renderStats();
+  updateUndoButton();
 }
 
 function renderMainTable() {
@@ -916,7 +1127,13 @@ function renderMainTable() {
   const cols = Object.keys(data[0]);
   let html = "<table><thead><tr>";
 
-  cols.forEach(c => html += `<th>${c}</th>`);
+  cols.forEach(c => {
+    const sortIndicator = currentSort.column === c 
+      ? `<span class="sort-indicator ${currentSort.direction}"></span>`
+      : '';
+    html += `<th onclick="sortTable('${c}')">${c}${sortIndicator}</th>`;
+  });
+  
   html += "</tr></thead><tbody>";
 
   data.forEach((row, i) => {
@@ -925,11 +1142,15 @@ function renderMainTable() {
     cols.forEach(col => {
       const editable = col !== "Steps";
       const statusClass = status ? `status-${status}` : "";
+      const errorKey = `${i}_${col}`;
+      const hasError = cellErrors[errorKey];
+      const cellClass = `${editable ? "editable" : "readonly"} ${statusClass} ${hasError ? "error" : ""}`;
+      
       html += `
-        <td class="${editable ? "editable" : "readonly"} ${statusClass}"
+        <td class="${cellClass}"
             contenteditable="${editable}"
             onblur="updateCell(${i}, '${col}', this.innerText)"
-            title="${editable ? "Click to edit" : "Read-only"}">
+            title="${hasError || (editable ? "Click to edit" : "Read-only")}">
           ${row[col] ?? ""}
         </td>`;
     });
@@ -984,9 +1205,46 @@ function updateCell(index, column, value) {
   if (column === "Steps") return;
 
   value = value.trim();
-  if (value === "") data[index][column] = null;
-  else if (column === "IsCompleted") data[index][column] = Number(value);
-  else data[index][column] = value;
+  const errorKey = `${index}_${column}`;
+  
+  // Clear previous error
+  delete cellErrors[errorKey];
+  
+  // Validate based on column type
+  let validationError = null;
+  
+  if (column === "Date") {
+    validationError = validateDate(value);
+  } else if (column === "IsCompleted") {
+    validationError = validateIsCompleted(value);
+  }
+  
+  if (validationError) {
+    // Show error but don't update the data
+    cellErrors[errorKey] = validationError;
+    renderTable();
+    
+    // Show error in summary
+    summary.innerHTML = `
+      <div class="err">
+        <span>❌</span>
+        Validation error in row ${index + 1}, ${column}: ${validationError}
+      </div>
+      ${summary.innerHTML}
+    `;
+    return;
+  }
+  
+  // Update the data
+  if (value === "") {
+    data[index][column] = null;
+  } else if (column === "IsCompleted") {
+    // Clamp to 0 or 1
+    const num = Number(value);
+    data[index][column] = num === 0 ? 0 : 1;
+  } else {
+    data[index][column] = value;
+  }
 
   if (!rowStatus[data[index].Steps]) {
     rowStatus[data[index].Steps] = "edited";
@@ -1000,14 +1258,36 @@ function loadInput() {
   try {
     data = JSON.parse(jsonInput.value);
     if (!Array.isArray(data)) throw "";
+    
+    // Store original for undo
+    originalData = JSON.parse(JSON.stringify(data));
+    
+    // Clear states
     rowStatus = {};
+    cellErrors = {};
+    currentSort = { column: null, direction: 'asc' };
+    
+    // Check for duplicate steps
+    const duplicates = detectDuplicates();
+    if (duplicates.length > 0) {
+      summary.innerHTML = `
+        <div class="warn">
+          <span>⚠️</span>
+          Duplicate step numbers detected: ${duplicates.join(", ")}
+        </div>
+      `;
+    } else {
+      summary.innerHTML = `
+        <div class="ok">
+          <span>✅</span>
+          Successfully loaded ${data.length} rows
+        </div>
+      `;
+    }
+    
     renderTable();
-    summary.innerHTML = `
-      <div class="ok">
-        <span>✅</span>
-        Successfully loaded ${data.length} rows
-      </div>
-    `;
+    updateUndoButton();
+    
   } catch {
     summary.innerHTML = `<div class="err">
       <span>❌</span>
@@ -1133,7 +1413,7 @@ function copyOutput() {
   `;
 }
 
-/* ---------- MOBILE ENHANCEMENTS ---------- */
+/* ---------- INITIALIZATION ---------- */
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize format UI
   updateFormatUI();
