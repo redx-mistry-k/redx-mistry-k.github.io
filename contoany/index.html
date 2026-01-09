@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Order Data Converter</title>
+
+    <!-- YOUR SAME CSS (unchanged) -->
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+          sans-serif;
+        background: #f3f6fb;
+        padding: 24px;
+        color: #1f2937;
+      }
+
+      .wrapper {
+        max-width: 1400px;
+        margin: auto;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 24px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+      h2 {
+        font-size: 18px;
+        margin-bottom: 6px;
+      }
+
+      p {
+        margin: 0 0 14px;
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      label {
+        font-size: 14px;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        margin-bottom: 16px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 220px;
+        resize: vertical;
+        font-family: Consolas, monospace;
+        font-size: 13px;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: #f9fafb;
+      }
+
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: #2563eb;
+        background: #fff;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin: 20px 0;
+        flex-wrap: wrap;
+      }
+
+      button {
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        padding: 12px 26px;
+        font-size: 14px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      button.secondary {
+        background: #10b981;
+      }
+
+      button:hover {
+        opacity: 0.9;
+      }
+
+      .meta {
+        font-size: 13px;
+        color: #4b5563;
+        margin-bottom: 10px;
+      }
+
+      .preview-wrapper {
+        max-height: 280px;
+        overflow: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+
+      thead {
+        background: #f3f4f6;
+        position: sticky;
+        top: 0;
+      }
+
+      th,
+      td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+      }
+
+      th {
+        font-weight: 600;
+        text-align: left;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 12px;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="card">
+        <h1>Order Data Converter</h1>
+        <p>
+          Convert between Orders, Cancelled Orders and Completed Orders using
+          column-based mapping.
+        </p>
+      </div>
+
+      <div class="card">
+        <label for="conversionMode">Conversion type</label>
+        <select id="conversionMode">
+          <option value="cancelled_to_orders">Cancelled → Orders</option>
+          <option value="orders_to_cancelled">Orders → Cancelled</option>
+          <option value="orders_to_completed">Orders → Completed</option>
+          <option value="completed_to_orders">Completed → Orders</option>
+        </select>
+
+        <label>Paste source data (with headers)</label>
+        <textarea id="inputData"></textarea>
+      </div>
+
+      <div class="actions">
+        <button onclick="convertData()">Convert</button>
+        <button class="secondary" onclick="copyOutput()">Copy Output</button>
+      </div>
+
+      <div class="card">
+        <h2>Converted Output</h2>
+        <div class="meta" id="rowCount">Rows: 0</div>
+        <textarea id="outputData"></textarea>
+      </div>
+
+      <div class="card">
+        <h2>Preview (first 10 rows)</h2>
+        <div class="preview-wrapper">
+          <table id="previewTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <footer>Internal helper tool • No data is stored</footer>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
