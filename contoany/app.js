@@ -1,18 +1,27 @@
 const WORKER_URL = "https://or-con-api.vkrishnaanand.workers.dev/convert";
 
 async function convertData() {
-  try {
-    const mode = document.getElementById("conversionMode").value;
-    const input = document.getElementById("inputData").value.trim();
-    if (!input) return;
+  const mode = document.getElementById("conversionMode").value;
+  const input = document.getElementById("inputData").value.trim();
+  if (!input) return;
 
+  try {
     const res = await fetch(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mode, input }),
     });
 
-    if (!res.ok) throw new Error("Backend error");
+    // Handle Cloudflare limit / backend down
+    if (!res.ok) {
+      if (res.status === 429 || res.status === 503) {
+        alert(
+          "Service temporarily unavailable. Please try later after 5am."
+        );
+        return;
+      }
+      throw new Error(`Backend error: ${res.status}`);
+    }
 
     const { rows, columns } = await res.json();
 
@@ -20,12 +29,16 @@ async function convertData() {
       .map((r) => r.join("\t"))
       .join("\n");
 
-    document.getElementById("rowCount").textContent = `Rows: ${rows.length}`;
+    document.getElementById("rowCount").textContent =
+      `Rows: ${rows.length}`;
 
     renderPreview(rows, columns);
-  } catch (e) {
-    console.error(e);
-    alert("Conversion failed");
+
+  } catch (err) {
+    console.error(err);
+    alert(
+      "Service temporarily unavailable. Please try later after 5am."
+    );
   }
 }
 
@@ -61,4 +74,5 @@ function renderPreview(rows, columns) {
     tbody.appendChild(tr);
   });
 }
+
 
