@@ -16,7 +16,7 @@ async function convertData() {
     if (!res.ok) {
       if (res.status === 429 || res.status === 503) {
         alert(
-          "Service temporarily unavailable. Please try later after 5am."
+          "Service temporarily unavailable. Please try later after 5am IST."
         );
         return;
       }
@@ -74,5 +74,6 @@ function renderPreview(rows, columns) {
     tbody.appendChild(tr);
   });
 }
+
 
 
