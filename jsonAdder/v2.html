@@ -5,22 +5,20 @@
     <title>JSON Step Adder</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-      * {
-        box-sizing: border-box;
-      }
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
+    <style>
       body {
         font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
         background: #f4f6fb;
-        margin: 0;
-        padding: 16px;
         color: #1f2937;
       }
 
-      .container {
-        max-width: 1200px;
-        margin: auto;
+      .app-card {
         background: #fff;
         border-radius: 12px;
         padding: 16px;
@@ -28,9 +26,12 @@
         margin-bottom: 16px;
       }
 
-      h2,
-      h3 {
-        margin: 0 0 12px 0;
+      /* Header */
+      .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
       }
 
       .howto {
@@ -38,85 +39,22 @@
         border-left: 4px solid #0ea5e9;
         padding: 14px 16px;
         border-radius: 8px;
-        margin-bottom: 16px;
         font-size: 14px;
-      }
-
-      .howto ul {
-        margin: 8px 0 0 18px;
-        padding: 0;
-      }
-
-      label {
-        font-weight: 600;
-        font-size: 14px;
-        margin-bottom: 6px;
-        display: block;
       }
 
       textarea {
-        width: 100%;
-        min-height: 110px;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid #cbd5e1;
         font-family: Consolas, monospace;
         font-size: 13px;
-        margin-bottom: 12px;
-      }
-
-      .btn-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 12px;
-      }
-
-      button {
-        padding: 10px 14px;
-        border-radius: 8px;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .btn-primary {
-        background: #2563eb;
-        color: #fff;
-      }
-      .btn-success {
-        background: #16a34a;
-        color: #fff;
-      }
-      .btn-toggle {
-        background: #7c3aed;
-        color: #fff;
       }
 
       table {
-        width: 100%;
-        border-collapse: collapse;
         font-size: 13px;
-        margin-top: 10px;
-      }
-
-      th,
-      td {
-        border: 1px solid #e5e7eb;
-        padding: 8px;
-      }
-
-      th {
-        background: #f1f5f9;
       }
 
       td.editable {
         background: #fefce8;
       }
+
       td.readonly {
         background: #f8fafc;
         color: #6b7280;
@@ -128,20 +66,22 @@
       }
 
       .panel {
-        margin-top: 12px;
         padding: 12px;
         border-radius: 8px;
         font-size: 14px;
+        margin-top: 10px;
       }
 
       .ok {
         background: #dcfce7;
         color: #065f46;
       }
+
       .warn {
         background: #fef3c7;
         color: #92400e;
       }
+
       .err {
         background: #fee2e2;
         color: #991b1b;
@@ -151,6 +91,28 @@
         text-align: center;
         color: #9ca3af;
         padding: 20px;
+      }
+
+      /* Button animations */
+      .btn-animate {
+        animation: btnPop 0.25s ease;
+      }
+
+      @keyframes btnPop {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(0.94);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .copied {
+        background-color: #16a34a !important;
+        border-color: #16a34a !important;
       }
 
       .sticky-bar {
@@ -171,68 +133,81 @@
       .sticky-bar.show {
         display: flex;
       }
-
-      @media (max-width: 768px) {
-        button {
-          flex: 1;
-          justify-content: center;
-        }
-        table {
-          font-size: 14px;
-        }
-      }
     </style>
   </head>
+
   <body>
-    <div class="container">
-      <h2>📊 JSON Step Adder</h2>
+    <div class="container my-3">
+      <div class="app-card">
+        <div class="top-bar">
+          <h2 class="mb-0">📊 JSON Step Adder</h2>
+          <a
+            href="https://krishnaanalytics.tech/jsonviewer"
+            class="btn btn-outline-primary btn-sm"
+          >
+            JSON Viewer
+          </a>
+        </div>
 
-      <div class="howto">
-        <strong>How to use:</strong>
-        <ul>
-          <li>Paste your existing JSON array in the first textarea</li>
-          <li>Enter new step numbers (comma or newline separated)</li>
-          <li>
-            Click <strong>Add Steps</strong> to process and update your data
-          </li>
-          <li>Edit any cell directly (except <strong>Steps</strong>)</li>
-          <li>Copy the final JSON output when done</li>
-        </ul>
-      </div>
+        <div class="howto mb-3">
+          <strong>How to use:</strong>
+          <ul class="mb-0 mt-2">
+            <li>Paste Step Adder JSON only</li>
+            <li>Enter step numbers (comma or newline separated)</li>
+            <li>Edit cells except <strong>Steps</strong></li>
+            <li>Copy final JSON output</li>
+          </ul>
+        </div>
 
-      <label>Existing JSON</label>
-      <textarea id="jsonInput"></textarea>
+        <label class="form-label">Existing JSON</label>
+        <textarea id="jsonInput" class="form-control mb-3" rows="6"></textarea>
 
-      <div class="btn-row">
-        <button class="btn-primary" onclick="loadInput()">
+        <button class="btn btn-primary mb-3" onclick="animateBtn(this); loadInput();">
           📥 Load Preview
         </button>
+<BR>
+        <label class="form-label">New Steps</label>
+        <textarea id="stepsInput" class="form-control mb-3" rows="3"></textarea>
+
+        <div class="d-flex flex-wrap gap-2 mb-3" id="actionButtons">
+          <button class="btn btn-primary" onclick="animateBtn(this); addSteps();">
+            ➕ Add Steps
+          </button>
+          <button
+            class="btn btn-warning text-white"
+            onclick="animateBtn(this); toggleFormat();"
+          >
+            📄 Minify
+          </button>
+          <button
+            class="btn btn-success"
+            onclick="copyOutput(this)"
+          >
+            📋 Copy Output
+          </button>
+        </div>
+
+        <label class="form-label">Output JSON</label>
+        <textarea id="output" class="form-control" rows="6" readonly></textarea>
       </div>
 
-      <label>New Steps</label>
-      <textarea id="stepsInput"></textarea>
-
-      <div class="btn-row" id="actionButtons">
-        <button class="btn-primary" onclick="addSteps()">➕ Add Steps</button>
-        <button class="btn-toggle" onclick="toggleFormat()">📄 Minify</button>
-        <button class="btn-success" onclick="copyOutput()">
-          📋 Copy Output
-        </button>
+      <div class="app-card">
+        <h3 class="mb-2">👀 Preview (Editable)</h3>
+        <div id="tableContainer" class="empty">No data loaded</div>
+        <div id="summary" class="panel"></div>
       </div>
-
-      <label>Output JSON</label>
-      <textarea id="output" readonly></textarea>
-    </div>
-
-    <div class="container">
-      <h3>👀 Preview (Editable)</h3>
-      <div id="tableContainer" class="empty">No data loaded</div>
-      <div id="summary" class="panel"></div>
     </div>
 
     <div class="sticky-bar" id="stickyBar">
-      <button class="btn-toggle" onclick="toggleFormat()">📄 Minify</button>
-      <button class="btn-success" onclick="copyOutput()">📋 Copy Output</button>
+      <button
+        class="btn btn-warning text-white"
+        onclick="animateBtn(this); toggleFormat();"
+      >
+        📄 Minify
+      </button>
+      <button class="btn btn-success" onclick="copyOutput(this)">
+        📋 Copy Output
+      </button>
     </div>
 
     <script>
@@ -240,7 +215,11 @@
       let data = [];
       let isMinified = false;
 
-      /* IST DATE */
+      function animateBtn(btn) {
+        btn.classList.add("btn-animate");
+        setTimeout(() => btn.classList.remove("btn-animate"), 250);
+      }
+
       function today() {
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
@@ -250,98 +229,103 @@
 
       function normalizeRow(row) {
         const obj = {};
-        SCHEMA.forEach((k) => (obj[k] = row.hasOwnProperty(k) ? row[k] : null));
+        SCHEMA.forEach(k => (obj[k] = row.hasOwnProperty(k) ? row[k] : null));
         return obj;
       }
 
-      /* LOAD */
       function loadInput() {
         try {
           const parsed = JSON.parse(jsonInput.value);
-          if (!Array.isArray(parsed)) throw "";
+          if (!Array.isArray(parsed) || parsed.length === 0) throw "";
+
+          const isValid = parsed.every(row =>
+            typeof row === "object" &&
+            row !== null &&
+            SCHEMA.some(col => Object.prototype.hasOwnProperty.call(row, col))
+          );
+
+          if (!isValid) {
+            alert("❌ This JSON is for Step Adder only. Columns do not match.");
+            data = [];
+            tableContainer.innerHTML = `<div class="empty">No data loaded</div>`;
+            output.value = "";
+            summary.innerHTML = "";
+            return;
+          }
+
           data = parsed.map(normalizeRow);
           renderTable();
           summary.className = "panel ok";
-          summary.innerHTML = `<span>✅</span> Loaded ${data.length} rows`;
+          summary.innerHTML = `✅ Loaded ${data.length} rows`;
         } catch {
-          summary.className = "panel err";
-          summary.innerHTML = `<span>❌</span> Invalid JSON`;
+          alert("❌ Invalid JSON format");
         }
       }
 
-      /* TABLE */
       function renderTable() {
-        if (!data.length) {
-          tableContainer.innerHTML = `<div class="empty">No rows</div>`;
-          output.value = "";
-          return;
-        }
+        if (!data.length) return;
 
-        let html = "<table><thead><tr>";
-        SCHEMA.forEach((c) => (html += `<th>${c}</th>`));
+        let html = "<table class='table table-bordered'><thead><tr>";
+        SCHEMA.forEach(c => (html += `<th>${c}</th>`));
         html += "</tr></thead><tbody>";
 
         data.forEach((row, i) => {
           html += "<tr>";
-          SCHEMA.forEach((col) => {
+          SCHEMA.forEach(col => {
             const editable = col !== "Steps";
             html += `
-        <td class="${editable ? "editable" : "readonly"}"
-            contenteditable="${editable}"
-            onblur="updateCell(${i}, '${col}', this.innerText)">
-          ${row[col] ?? ""}
-        </td>`;
+              <td class="${editable ? "editable" : "readonly"}"
+                  contenteditable="${editable}"
+                  onblur="updateCell(${i}, '${col}', this.innerText)">
+                ${row[col] ?? ""}
+              </td>`;
           });
           html += "</tr>";
         });
 
         html += "</tbody></table>";
-        tableContainer.innerHTML = html;
+        tableContainer.innerHTML = `<div class="table-responsive">${html}</div>`;
         syncOutput();
       }
 
-      /* EDIT */
       function updateCell(index, col, val) {
         if (col === "Steps") return;
         data[index][col] = val.trim() === "" ? null : val.trim();
         syncOutput();
       }
 
-      /* ADD STEPS – FINAL SAFE LOGIC */
       function addSteps() {
         const steps = stepsInput.value
           .split(/[\n,]+/)
-          .map((s) => Number(s.trim()))
-          .filter((n) => !isNaN(n));
+          .map(s => Number(s.trim()))
+          .filter(n => !isNaN(n));
 
         const added = [];
         const updated = [];
         const skipped = [];
 
-        steps.forEach((step) => {
-          const row = data.find((r) => r.Steps === step);
+        steps.forEach(step => {
+          const row = data.find(r => r.Steps === step);
 
           if (row) {
             const reasons = [];
-
             if (row.Date !== null) reasons.push("Date already set");
             if (row.UpdatedBy !== null) reasons.push("UpdatedBy already set");
 
-            // Strict rule: update ONLY if both are null
-            if (reasons.length > 0) {
+            if (reasons.length) {
               skipped.push({ step, reasons });
             } else {
-              row.Date = today(); // IST date
+              row.Date = today();
               row.IsCompleted = 1;
               row.UpdatedBy = "System";
               updated.push(step);
             }
-          } else if (data.length < 32) {
+          } else {
             data.push({
               Date: today(),
               IsCompleted: 1,
               Steps: step,
-              UpdatedBy: "System",
+              UpdatedBy: "System"
             });
             added.push(step);
           }
@@ -350,32 +334,19 @@
         renderTable();
 
         let html = "";
-
-        if (added.length) {
-          html += `<div class="ok"><span>✅</span> Added: ${added.join(
-            ", "
-          )}</div>`;
-        }
-
-        if (updated.length) {
-          html += `<div class="ok"><span>🔄</span> Updated: ${updated.join(
-            ", "
-          )}</div>`;
-        }
-
+        if (added.length) html += `<div class="ok mb-1">✅ Added: ${added.join(", ")}</div>`;
+        if (updated.length) html += `<div class="ok mb-1">🔄 Updated: ${updated.join(", ")}</div>`;
         if (skipped.length) {
-          html += `<div class="warn"><span>⚠️</span> Skipped:</div><ul>`;
-          skipped.forEach((s) => {
+          html += `<div class="warn">⚠️ Skipped:</div><ul>`;
+          skipped.forEach(s => {
             html += `<li>Step ${s.step} (${s.reasons.join(" & ")})</li>`;
           });
-          html += `</ul>`;
+          html += "</ul>";
         }
 
-        summary.innerHTML =
-          html || `<div class="warn">ℹ️ No changes made</div>`;
+        summary.innerHTML = html || `<div class="warn">ℹ️ No changes made</div>`;
       }
 
-      /* OUTPUT */
       function syncOutput() {
         output.value = isMinified
           ? JSON.stringify(data)
@@ -387,11 +358,19 @@
         syncOutput();
       }
 
-      function copyOutput() {
+      function copyOutput(btn) {
         navigator.clipboard.writeText(output.value);
+
+        const original = btn.innerHTML;
+        btn.classList.add("btn-animate", "copied");
+        btn.innerHTML = "✅ Copied";
+
+        setTimeout(() => {
+          btn.classList.remove("btn-animate", "copied");
+          btn.innerHTML = original;
+        }, 1000);
       }
 
-      /* STICKY BAR */
       const observer = new IntersectionObserver(
         ([e]) => stickyBar.classList.toggle("show", !e.isIntersecting),
         { threshold: 0 }
