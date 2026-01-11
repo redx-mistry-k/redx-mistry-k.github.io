@@ -108,10 +108,11 @@
       let jsonKey = "";
 
       function getJsonKey(data) {
-        return (
-          "json_columns_" +
-          btoa(JSON.stringify(Object.keys(data[0]))).slice(0, 50)
+        const allKeys = Array.from(
+          new Set(data.flatMap((obj) => Object.keys(obj)))
         );
+
+        return "json_columns_" + btoa(JSON.stringify(allKeys)).slice(0, 50);
       }
 
       function loadColumns() {
@@ -129,7 +130,10 @@
           jsonData = parsed;
           jsonKey = getJsonKey(parsed);
 
-          const columns = Object.keys(parsed[0]);
+          const columns = Array.from(
+            new Set(parsed.flatMap((obj) => Object.keys(obj)))
+          );
+
           const saved = JSON.parse(localStorage.getItem(jsonKey) || "[]");
 
           const container = document.getElementById("columnContainer");
