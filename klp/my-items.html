@@ -27,33 +27,32 @@
     </div>
 
     <script>
-      const user = getCurrentUser();
-      const itemsDiv = document.getElementById("items");
+async function loadMyKnowledge() {
+  const itemsDiv = document.getElementById("items");
+  const items = await api("/knowledge");
 
-      knowledgeItems
-        .filter((i) => i.owner === user)
-        .forEach((i) => {
-          itemsDiv.innerHTML += `
+  itemsDiv.innerHTML = "";
+
+  items.forEach(i => {
+    itemsDiv.innerHTML += `
       <div class="col-md-4">
         <div class="card h-100 shadow-sm">
           <div class="card-body">
             <h5 class="card-title">${i.title}</h5>
-            <p class="text-muted mb-2">${i.system}</p>
-            <span class="badge bg-${
-              i.status === "Approved" ? "success" : "secondary"
-            }">
+            <p class="text-muted mb-2">${i.system || ""}</p>
+            <span class="badge bg-${i.status === "Approved" ? "success" : "secondary"}">
               ${i.status}
             </span>
-          </div>
-          <div class="card-footer bg-white">
-            <a href="detail.html?id=${
-              i.id
-            }" class="btn btn-sm btn-primary">View</a>
           </div>
         </div>
       </div>
     `;
-        });
-    </script>
+  });
+}
+
+loadMyKnowledge();
+</script>
+
   </body>
 </html>
+
