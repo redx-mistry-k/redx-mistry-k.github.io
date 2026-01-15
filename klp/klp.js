@@ -1,52 +1,70 @@
-// ===== CONFIG =====
-const TEST_MODE = true;
+// =======================================
+// KLP Frontend API Client (Production)
+// =======================================
 
-// ===== AUTH =====
-function login(email) {
-  sessionStorage.setItem("klpUser", email);
-  window.location.href = "index.html";
+// Base API path (same domain, Worker route)
+const API_BASE = "/api";
+
+// ---------------------------------------
+// Low-level API helper
+// ---------------------------------------
+async function api(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    credentials: "include", // important for Cloudflare Access cookies
+    ...options
+  });
+
+  // Not authenticated → trigger Cloudflare Access
+  if (res.status === 401 || res.status === 403) {
+    window.location.href = "/cdn-cgi/access/login";
+    return;
+  }
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API error: ${text}`);
+  }
+
+  // No content
+  if (res.status === 204) return null;
+
+  return res.json();
 }
 
-function logout() {
-  sessionStorage.removeItem("klpUser");
-  window.location.href = "login.html";
-}
-
-function getCurrentUser() {
-  return sessionStorage.getItem("klpUser");
-}
-
-function requireAuth() {
-  if (!getCurrentUser()) {
-    window.location.href = "login.html";
+// ---------------------------------------
+// Auth (Cloudflare Access)
+// ---------------------------------------
+async function requireAuth() {
+  try {
+    await api("/me");
+  } catch (e) {
+    console.error("Auth check failed", e);
   }
 }
 
-// ===== MOCK DATA =====
-const knowledgeItems = [
-  {
-    id: 1,
-    title: "Server restart order",
-    system: "Windows",
-    process: "IT",
-    status: "Approved",
-    owner: "user@example.com",
-  },
-  {
-    id: 2,
-    title: "Payroll cutoff rule",
-    system: "SAP",
-    process: "Finance",
-    status: "Draft",
-    owner: "user@example.com",
-  },
-];
-
-// ===== HELPERS =====
-function getParam(name) {
-  return new URLSearchParams(window.location.search).get(name);
+function logout() {
+  // Cloudflare Access logout endpoint
+  window.location.href = "/cdn-cgi/access/logout";
 }
 
-function statusClass(status) {
-  return "status-" + status.toLowerCase();
+// ---------------------------------------
+// Data APIs
+// ---------------------------------------
+async function getKnowledge() {
+  return api("/knowledge");
+}
+
+async function approveKnowledge(id) {
+  return api("/knowledge/approve", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  });
+}
+
+// ---------------------------------------
+// Helpers
+// ---------------------------------------
+function getParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
 }
