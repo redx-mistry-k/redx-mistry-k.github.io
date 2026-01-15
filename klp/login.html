@@ -35,19 +35,27 @@
       </div>
     </div>
 
-    <script src="klp.js"></script>
-    <script>
-      function doLogin() {
-        const email = document.getElementById("email").value;
-        const pin = document.getElementById("pin").value;
+   <script src="klp.js"></script>
+<script>
+  async function doLogin() {
+    const email = document.getElementById("email").value;
+    const pin = document.getElementById("pin").value;
 
-        if (!email || !pin) {
-          alert("Email and PIN required");
-          return;
-        }
+    if (!email || !pin) {
+      alert("Email and PIN required");
+      return;
+    }
 
-        login(email, pin);
-      }
-    </script>
+    try {
+      await login(email, pin);
+      window.location.href = "/index.html";
+    } catch (err) {
+      alert("Invalid email or PIN");
+      console.error(err);
+    }
+  }
+</script>
+
   </body>
 </html>
+
