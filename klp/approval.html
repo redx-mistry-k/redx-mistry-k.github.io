@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Approval Queue</title>
+    <meta charset="utf-8" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body onload="requireAuth()">
+    <script src="klp.js"></script>
+    <script>
+      requireAuth();
+    </script>
+
+    <nav class="navbar navbar-dark bg-dark mb-4">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="index.html">KLP</a>
+        <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h3 class="mb-4">Approval Queue</h3>
+
+      <div class="list-group" id="queue"></div>
+    </div>
+
+    <script>
+      const queue = document.getElementById("queue");
+
+      const pending = knowledgeItems.filter((i) => i.status === "Pending");
+
+      if (pending.length === 0) {
+        queue.innerHTML = `<div class="text-muted">No items pending approval.</div>`;
+      }
+
+      pending.forEach((i) => {
+        queue.innerHTML += `
+    <div class="list-group-item d-flex justify-content-between align-items-center">
+      <div>
+        <strong>${i.title}</strong><br>
+        <small class="text-muted">${i.system} • ${i.process}</small>
+      </div>
+      <div>
+        <button class="btn btn-sm btn-success me-2" onclick="alert('Approved (mock)')">
+          Approve
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="alert('Rejected (mock)')">
+          Reject
+        </button>
+      </div>
+    </div>
+  `;
+      });
+    </script>
+  </body>
+</html>
