@@ -19,9 +19,19 @@
           id="email"
           class="form-control mb-3"
           placeholder="Email address"
+          type="email"
         />
 
-        <button class="btn btn-primary w-100" onclick="doLogin()">Login</button>
+        <input
+          id="pin"
+          class="form-control mb-3"
+          placeholder="4-digit PIN"
+          type="password"
+        />
+
+        <button class="btn btn-primary w-100" onclick="doLogin()">
+          Login
+        </button>
       </div>
     </div>
 
@@ -29,8 +39,14 @@
     <script>
       function doLogin() {
         const email = document.getElementById("email").value;
-        if (!email) return alert("Email required");
-        login(email);
+        const pin = document.getElementById("pin").value;
+
+        if (!email || !pin) {
+          alert("Email and PIN required");
+          return;
+        }
+
+        login(email, pin);
       }
     </script>
   </body>
