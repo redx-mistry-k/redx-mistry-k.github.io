@@ -32,7 +32,7 @@ async function loadApprovals() {
   const queue = document.getElementById("queue");
   const items = await api("/approvals");
 
-  if (items.length === 0) {
+  if (!items || items.length === 0) {
     queue.innerHTML = `<div class="text-muted">No items pending approval.</div>`;
     return;
   }
@@ -44,9 +44,7 @@ async function loadApprovals() {
       <div class="list-group-item d-flex justify-content-between align-items-center">
         <div>
           <strong>${i.title}</strong><br>
-          <small class="text-muted">
-            ${i.system || ""} • ${i.process_area || ""}
-          </small>
+          <small class="text-muted">Status: ${i.status}</small>
         </div>
         <div>
           <button class="btn btn-sm btn-success me-2"
@@ -70,12 +68,14 @@ async function decide(id, action) {
     body: JSON.stringify({ id, action })
   });
 
-  loadApprovals(); // refresh list
+  loadApprovals();
 }
 
 loadApprovals();
 </script>
 
+
   </body>
 </html>
+
 
