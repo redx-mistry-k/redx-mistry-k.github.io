@@ -1,22 +1,50 @@
 // =======================================
-// KLP Frontend API Client (Production)
+// KLP Frontend API Client (Email + PIN Auth)
 // =======================================
 
-// Base API path (same domain, Worker route)
 const API_BASE = "/api";
+
+// ---------------------------------------
+// Session helpers
+// ---------------------------------------
+function getAuthHeaders() {
+  const email = sessionStorage.getItem("klp_email");
+  const pin = sessionStorage.getItem("klp_pin");
+
+  if (!email || !pin) return null;
+
+  return {
+    "x-user-email": email,
+    "x-user-pin": pin
+  };
+}
+
+function redirectToLogin() {
+  window.location.href = "/login.html";
+}
 
 // ---------------------------------------
 // Low-level API helper
 // ---------------------------------------
 async function api(path, options = {}) {
+  const authHeaders = getAuthHeaders();
+
+  if (!authHeaders) {
+    redirectToLogin();
+    return;
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
-    credentials: "include", // important for Cloudflare Access cookies
-    ...options
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      ...authHeaders
+    }
   });
 
-  // Not authenticated → trigger Cloudflare Access
   if (res.status === 401 || res.status === 403) {
-    window.location.href = "/cdn-cgi/access/login";
+    sessionStorage.clear();
+    redirectToLogin();
     return;
   }
 
@@ -25,26 +53,39 @@ async function api(path, options = {}) {
     throw new Error(`API error: ${text}`);
   }
 
-  // No content
   if (res.status === 204) return null;
 
   return res.json();
 }
 
 // ---------------------------------------
-// Auth (Cloudflare Access)
+// Auth
 // ---------------------------------------
-async function requireAuth() {
-  try {
-    await api("/me");
-  } catch (e) {
-    console.error("Auth check failed", e);
+async function login(email, pin) {
+  const res = await fetch(`${API_BASE}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, pin })
+  });
+
+  if (!res.ok) {
+    throw new Error("Invalid email or PIN");
+  }
+
+  sessionStorage.setItem("klp_email", email);
+  sessionStorage.setItem("klp_pin", pin);
+}
+
+function requireAuth() {
+  const authHeaders = getAuthHeaders();
+  if (!authHeaders) {
+    redirectToLogin();
   }
 }
 
 function logout() {
-  // Cloudflare Access logout endpoint
-  window.location.href = "/cdn-cgi/access/logout";
+  sessionStorage.clear();
+  redirectToLogin();
 }
 
 // ---------------------------------------
