@@ -14,10 +14,24 @@
       requireAuth();
     </script>
 
-    <nav class="navbar navbar-dark bg-dark mb-4">
+     <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
       <div class="container-fluid">
         <a class="navbar-brand" href="index.html">KLP</a>
-        <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
+        <div>
+          <a class="btn btn-sm btn-outline-light me-2" href="submit.html">
+            Submit
+          </a>
+          <a class="btn btn-sm btn-outline-light me-2" href="my-items.html">
+            My Knowledge
+          </a>
+          <a class="btn btn-sm btn-outline-light me-2" href="approval.html">
+            Approvals
+          </a>
+          <button class="btn btn-sm btn-danger" onclick="logout()">
+            Logout
+          </button>
+        </div>
       </div>
     </nav>
 
@@ -55,4 +69,5 @@ loadMyKnowledge();
 
   </body>
 </html>
+
 
