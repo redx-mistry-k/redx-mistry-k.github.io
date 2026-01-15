@@ -67,22 +67,6 @@ async function api(path, options = {}) {
 }
 
 
-  if (res.status === 401 || res.status === 403) {
-    sessionStorage.clear();
-    redirectToLogin();
-    return;
-  }
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API error: ${text}`);
-  }
-
-  if (res.status === 204) return null;
-
-  return res.json();
-}
-
 // ---------------------------------------
 // Auth
 // ---------------------------------------
@@ -134,5 +118,6 @@ async function approveKnowledge(id) {
 function getParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
+
 
 
