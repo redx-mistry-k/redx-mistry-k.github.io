@@ -20,7 +20,8 @@ function getAuthHeaders() {
 }
 
 function redirectToLogin() {
-  window.location.href = "login.html";
+  // replace() avoids back-button returning to protected pages
+  window.location.replace("login.html");
 }
 
 // ---------------------------------------
@@ -30,17 +31,16 @@ async function api(path, options = {}) {
   const authHeaders = getAuthHeaders();
   if (!authHeaders) {
     redirectToLogin();
-    return;
+    return null;
   }
 
-  const projectId = sessionStorage.getItem("activeProjectId");
-
   const headers = {
-    ...(options.headers || {}),
-    ...authHeaders
+    ...authHeaders,
+    ...(options.headers || {})
   };
 
-  // 🔑 attach active project if available
+  // optional project context
+  const projectId = sessionStorage.getItem("activeProjectId");
   if (projectId) {
     headers["x-project-id"] = projectId;
   }
@@ -53,19 +53,18 @@ async function api(path, options = {}) {
   if (res.status === 401 || res.status === 403) {
     sessionStorage.clear();
     redirectToLogin();
-    return;
-  }
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API error: ${text}`);
+    return null;
   }
 
   if (res.status === 204) return null;
 
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "API error");
+  }
+
   return res.json();
 }
-
 
 // ---------------------------------------
 // Auth
@@ -86,8 +85,7 @@ async function login(email, pin) {
 }
 
 function requireAuth() {
-  const authHeaders = getAuthHeaders();
-  if (!authHeaders) {
+  if (!getAuthHeaders()) {
     redirectToLogin();
   }
 }
@@ -104,11 +102,12 @@ async function getKnowledge() {
   return api("/knowledge");
 }
 
-async function approveKnowledge(id) {
-  return api("/knowledge/approve", {
+async function decideKnowledge(id, action) {
+  // action: "approve" | "reject"
+  return api("/knowledge/decision", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id })
+    body: JSON.stringify({ id, action })
   });
 }
 
@@ -118,6 +117,3 @@ async function approveKnowledge(id) {
 function getParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
-
-
-
