@@ -10,7 +10,7 @@
   </head>
 
   <body>
-    <!-- Load shared JS -->
+    <!-- Shared JS -->
     <script src="klp.js"></script>
 
     <!-- NAVBAR -->
@@ -36,18 +36,31 @@
 
     <!-- MAIN -->
     <div class="container">
-      <input
-        id="search"
-        class="form-control mb-4"
-        placeholder="Search knowledge..."
-      />
+      <!-- Search + Filter -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <input
+          id="search"
+          class="form-control me-3"
+          placeholder="Search knowledge..."
+        />
 
+        <select id="statusFilter" class="form-select w-auto">
+          <option value="all">All</option>
+          <option value="Approved">Approved only</option>
+          <option value="Draft">Draft only</option>
+        </select>
+      </div>
+
+      <!-- Results -->
       <div id="results" class="row g-3"></div>
     </div>
 
     <!-- PAGE SCRIPT -->
     <script>
       const results = document.getElementById("results");
+      const searchInput = document.getElementById("search");
+      const statusFilter = document.getElementById("statusFilter");
+
       let allItems = [];
 
       // Render cards
@@ -84,21 +97,35 @@
         });
       }
 
-      // Search handler
-      document.getElementById("search").oninput = (e) => {
-        const q = e.target.value.toLowerCase();
-        render(
-          allItems.filter((i) =>
+      // Apply search + status filter together
+      function applyFilters() {
+        const q = searchInput.value.toLowerCase();
+        const status = statusFilter.value;
+
+        let filtered = allItems;
+
+        if (status !== "all") {
+          filtered = filtered.filter(i => i.status === status);
+        }
+
+        if (q) {
+          filtered = filtered.filter(i =>
             i.title.toLowerCase().includes(q)
-          )
-        );
-      };
+          );
+        }
+
+        render(filtered);
+      }
+
+      // Event handlers
+      searchInput.oninput = applyFilters;
+      statusFilter.onchange = applyFilters;
 
       // Page init
       async function init() {
-        await requireAuth();              // 🔐 Cloudflare Access check
-        allItems = await getKnowledge();  // 📡 Fetch from Worker
-        render(allItems);
+        await requireAuth();              // 🔐 Auth
+        allItems = await getKnowledge();  // 📡 API
+        applyFilters();                   // Initial render
       }
 
       init();
