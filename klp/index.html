@@ -64,6 +64,20 @@
       color: #fff;
       box-shadow: none;
     }
+    /* Fix dropdown options (opened state) */
+select option {
+  background-color: rgba(31, 47, 56, 0.95);
+  color: #fff;
+}
+
+
+/* Hovered / selected option */
+select option:hover,
+select option:checked {
+  background-color: #0d6efd;   /* Bootstrap primary */
+  color: #ffffff;
+}
+
   </style>
 </head>
 
@@ -261,4 +275,5 @@ results.innerHTML += `
     </script>
   </body>
 </html>
+
 
