@@ -1,46 +1,52 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Submit Knowledge</title>
-    <meta charset="utf-8" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-  </head>
-  <body onload="requireAuth()">
-    <script src="klp.js"></script>
-    <script>
-      requireAuth();
-    </script>
+<head>
+  <title>Submit Knowledge</title>
+  <meta charset="utf-8">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body onload="requireAuth()">
 
-    <div class="container">
-      <h3 class="mb-4">Submit Knowledge</h3>
+<script src="klp.js"></script>
+<script>requireAuth();</script>
 
-      <form onsubmit="submitForm(event)" class="card p-4 shadow-sm">
-        <input class="form-control mb-3" placeholder="Title" required />
-        <input class="form-control mb-3" placeholder="System / Tool" />
-
-        <select class="form-select mb-3">
-          <option>IT</option>
-          <option>Finance</option>
-          <option>HR</option>
-        </select>
-
-        <textarea
-          class="form-control mb-3"
-          placeholder="Description"
-        ></textarea>
-
-        <button class="btn btn-primary">Save Draft</button>
-      </form>
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">KLP</a>
+    <div>
+      <a class="btn btn-sm btn-outline-light me-2" href="submit.html">Submit</a>
+      <a class="btn btn-sm btn-outline-light me-2" href="my-items.html">My Knowledge</a>
+      <a class="btn btn-sm btn-outline-light me-2" href="approval.html">Approvals</a>
+      <button class="btn btn-sm btn-danger" onclick="logout()">Logout</button>
     </div>
+  </div>
+</nav>
 
-    <script>
-      function submitForm(e) {
-        e.preventDefault();
-        alert("Draft saved (mock)");
-      }
-    </script>
-  </body>
+<div class="container">
+  <h3 class="mb-4">Submit Knowledge</h3>
+
+  <form onsubmit="submitForm(event)" class="card p-4 shadow-sm">
+    <input class="form-control mb-3" placeholder="Title" required>
+    <input class="form-control mb-3" placeholder="System / Tool">
+
+    <select class="form-select mb-3">
+      <option>IT</option>
+      <option>Finance</option>
+      <option>HR</option>
+    </select>
+
+    <textarea class="form-control mb-3" placeholder="Description"></textarea>
+
+    <button class="btn btn-primary">Save Draft</button>
+  </form>
+</div>
+
+<script>
+function submitForm(e) {
+  e.preventDefault();
+  alert("Draft saved (mock)");
+}
+</script>
+</body>
 </html>
