@@ -26,34 +26,50 @@
     </div>
 
     <script>
-      const id = Number(getParam("id"));
-      const item = knowledgeItems.find((i) => i.id === id);
+async function loadDetail() {
+  const id = Number(getParam("id"));
+  const detailDiv = document.getElementById("detail");
 
-      document.getElementById("detail").innerHTML = `
-  <h3 class="mb-3">${item.title}</h3>
+  if (!id) {
+    detailDiv.innerHTML = "<div class='text-danger'>Invalid item</div>";
+    return;
+  }
 
-  <dl class="row">
-    <dt class="col-sm-3">System / Tool</dt>
-    <dd class="col-sm-9">${item.system}</dd>
+  const items = await api("/knowledge");
+  const item = items.find(i => i.id === id);
 
-    <dt class="col-sm-3">Process Area</dt>
-    <dd class="col-sm-9">${item.process}</dd>
+  if (!item) {
+    detailDiv.innerHTML = "<div class='text-muted'>Item not found.</div>";
+    return;
+  }
 
-    <dt class="col-sm-3">Status</dt>
-    <dd class="col-sm-9">
-      <span class="badge bg-${
-        item.status === "Approved" ? "success" : "secondary"
-      }">
-        ${item.status}
-      </span>
-    </dd>
+  detailDiv.innerHTML = `
+    <h3 class="mb-3">${item.title}</h3>
 
-    <dt class="col-sm-3">Owner</dt>
-    <dd class="col-sm-9">${item.owner}</dd>
-  </dl>
+    <dl class="row">
+      <dt class="col-sm-3">System / Tool</dt>
+      <dd class="col-sm-9">${item.system || "-"}</dd>
 
-  <a href="index.html" class="btn btn-outline-primary">Back</a>
-`;
-    </script>
+      <dt class="col-sm-3">Process Area</dt>
+      <dd class="col-sm-9">${item.process_area || "-"}</dd>
+
+      <dt class="col-sm-3">Status</dt>
+      <dd class="col-sm-9">
+        <span class="badge bg-${
+          item.status === "Approved" ? "success" : "secondary"
+        }">
+          ${item.status}
+        </span>
+      </dd>
+    </dl>
+
+    <a href="index.html" class="btn btn-outline-primary">Back</a>
+  `;
+}
+
+loadDetail();
+</script>
+
   </body>
 </html>
+
