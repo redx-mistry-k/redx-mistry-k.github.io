@@ -28,32 +28,54 @@
     </div>
 
     <script>
-      const queue = document.getElementById("queue");
+async function loadApprovals() {
+  const queue = document.getElementById("queue");
+  const items = await api("/approvals");
 
-      const pending = knowledgeItems.filter((i) => i.status === "Pending");
+  if (items.length === 0) {
+    queue.innerHTML = `<div class="text-muted">No items pending approval.</div>`;
+    return;
+  }
 
-      if (pending.length === 0) {
-        queue.innerHTML = `<div class="text-muted">No items pending approval.</div>`;
-      }
+  queue.innerHTML = "";
 
-      pending.forEach((i) => {
-        queue.innerHTML += `
-    <div class="list-group-item d-flex justify-content-between align-items-center">
-      <div>
-        <strong>${i.title}</strong><br>
-        <small class="text-muted">${i.system} • ${i.process}</small>
+  items.forEach(i => {
+    queue.innerHTML += `
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>${i.title}</strong><br>
+          <small class="text-muted">
+            ${i.system || ""} • ${i.process_area || ""}
+          </small>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-success me-2"
+            onclick="decide(${i.id}, 'approve')">
+            Approve
+          </button>
+          <button class="btn btn-sm btn-outline-danger"
+            onclick="decide(${i.id}, 'reject')">
+            Reject
+          </button>
+        </div>
       </div>
-      <div>
-        <button class="btn btn-sm btn-success me-2" onclick="alert('Approved (mock)')">
-          Approve
-        </button>
-        <button class="btn btn-sm btn-outline-danger" onclick="alert('Rejected (mock)')">
-          Reject
-        </button>
-      </div>
-    </div>
-  `;
-      });
-    </script>
+    `;
+  });
+}
+
+async function decide(id, action) {
+  await api("/knowledge/decision", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, action })
+  });
+
+  loadApprovals(); // refresh list
+}
+
+loadApprovals();
+</script>
+
   </body>
 </html>
+
