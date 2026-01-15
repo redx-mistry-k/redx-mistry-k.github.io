@@ -20,7 +20,7 @@ function getAuthHeaders() {
 }
 
 function redirectToLogin() {
-  window.location.href = "/login.html";
+  window.location.href = "login.html";
 }
 
 // ---------------------------------------
@@ -109,3 +109,4 @@ async function approveKnowledge(id) {
 function getParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
+
