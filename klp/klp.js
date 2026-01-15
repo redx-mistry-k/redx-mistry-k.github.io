@@ -28,19 +28,44 @@ function redirectToLogin() {
 // ---------------------------------------
 async function api(path, options = {}) {
   const authHeaders = getAuthHeaders();
-
   if (!authHeaders) {
     redirectToLogin();
     return;
   }
 
+  const projectId = sessionStorage.getItem("activeProjectId");
+
+  const headers = {
+    ...(options.headers || {}),
+    ...authHeaders
+  };
+
+  // 🔑 attach active project if available
+  if (projectId) {
+    headers["x-project-id"] = projectId;
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
-    headers: {
-      ...(options.headers || {}),
-      ...authHeaders
-    }
+    headers
   });
+
+  if (res.status === 401 || res.status === 403) {
+    sessionStorage.clear();
+    redirectToLogin();
+    return;
+  }
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API error: ${text}`);
+  }
+
+  if (res.status === 204) return null;
+
+  return res.json();
+}
+
 
   if (res.status === 401 || res.status === 403) {
     sessionStorage.clear();
@@ -109,4 +134,5 @@ async function approveKnowledge(id) {
 function getParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
+
 
