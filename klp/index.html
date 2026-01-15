@@ -36,6 +36,12 @@
             Admin
           </a>
 
+          <select
+            id="projectSwitcher"
+            class="form-select form-select-sm d-inline-block me-2"
+            style="width: 180px; display: none;"
+          ></select>
+
           <button class="btn btn-sm btn-danger" onclick="logout()">
             Logout
           </button>
@@ -69,10 +75,13 @@
       const results = document.getElementById("results");
       const searchInput = document.getElementById("search");
       const statusFilter = document.getElementById("statusFilter");
+      const projectSwitcher = document.getElementById("projectSwitcher");
 
       let allItems = [];
 
+      // ----------------------------
       // Render cards
+      // ----------------------------
       function render(items) {
         results.innerHTML = "";
 
@@ -106,7 +115,9 @@
         });
       }
 
-      // Apply search + status filter
+      // ----------------------------
+      // Filters (search + status)
+      // ----------------------------
       function applyFilters() {
         const q = searchInput.value.toLowerCase();
         const status = statusFilter.value;
@@ -126,7 +137,9 @@
         render(filtered);
       }
 
-      // Init navbar (admin visibility)
+      // ----------------------------
+      // Navbar: Admin visibility
+      // ----------------------------
       async function initNavbar() {
         const me = await api("/me");
 
@@ -136,14 +149,48 @@
         }
       }
 
+      // ----------------------------
+      // Project switcher
+      // ----------------------------
+      async function initProjectSwitcher() {
+        const projects = await api("/projects");
+
+        if (!projects || projects.length <= 1) return;
+
+        projectSwitcher.style.display = "inline-block";
+        projectSwitcher.innerHTML = "";
+
+        const saved = sessionStorage.getItem("activeProjectId");
+
+        projects.forEach(p => {
+          const opt = document.createElement("option");
+          opt.value = p.id;
+          opt.textContent = `${p.name} (${p.role})`;
+          projectSwitcher.appendChild(opt);
+        });
+
+        projectSwitcher.value = saved || projects[0].id;
+        sessionStorage.setItem("activeProjectId", projectSwitcher.value);
+
+        projectSwitcher.onchange = () => {
+          sessionStorage.setItem("activeProjectId", projectSwitcher.value);
+          location.reload();
+        };
+      }
+
+      // ----------------------------
       // Event handlers
+      // ----------------------------
       searchInput.oninput = applyFilters;
       statusFilter.onchange = applyFilters;
 
+      // ----------------------------
       // Page init (ORDER MATTERS)
+      // ----------------------------
       async function init() {
-        await requireAuth();      // 🔐 must come first
-        await initNavbar();       // 👑 admin check
+        await requireAuth();           // 🔐 auth first
+        await initNavbar();            // 👑 admin check
+        await initProjectSwitcher();   // 📁 project UI
         allItems = await getKnowledge();
         applyFilters();
       }
