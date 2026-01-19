@@ -12,7 +12,7 @@ function requestOTP() {
   // In real version: call Worker API here
   console.log("Requesting OTP for:", email);
 
-  window.location.href = "/verify.html";
+  window.location.href = "verify.html";
 }
 
 function verifyOTP() {
@@ -31,6 +31,7 @@ function verifyOTP() {
   status.textContent = "Verified. Redirecting…";
 
   setTimeout(() => {
-    window.location.href = "/index.html";
+    window.location.href = "index.html";
   }, 800);
 }
+
