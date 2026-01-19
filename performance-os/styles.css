@@ -1,0 +1,240 @@
+/* ---------------------------
+   Global reset
+--------------------------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background: #0b0d12;
+  color: #e5e7eb;
+}
+
+/* ---------------------------
+   AUTH PAGES (login / verify)
+--------------------------- */
+
+.auth-body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  background: #11141c;
+  padding: 32px;
+  width: 320px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.auth-card h1 {
+  margin-bottom: 8px;
+}
+
+.auth-card p {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin-bottom: 20px;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #1b2030;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.auth-card input::placeholder {
+  color: #6b7280;
+}
+
+.auth-card button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #3b82f6;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.auth-card button:hover {
+  background: #2563eb;
+}
+
+.auth-card small {
+  display: block;
+  margin-top: 12px;
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+/* ---------------------------
+   DASHBOARD LAYOUT
+--------------------------- */
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 220px;
+  height: 100vh;
+  background: #11141c;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.sidebar nav button {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  padding: 10px;
+  margin-bottom: 6px;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sidebar nav button.active,
+.sidebar nav button:hover {
+  background: #1b2030;
+  color: #fff;
+}
+
+/* ---------------------------
+   MAIN CONTENT
+--------------------------- */
+
+.main {
+  margin-left: 220px;
+  padding: 24px;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.topbar h1 {
+  font-size: 1.6rem;
+}
+
+.topbar p {
+  margin-top: 6px;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* ---------------------------
+   XP BAR
+--------------------------- */
+
+.xp-container {
+  text-align: right;
+}
+
+.xp-bar {
+  width: 220px;
+  height: 8px;
+  background: #1f2937;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.xp-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #22c55e, #3b82f6);
+}
+
+/* ---------------------------
+   DASHBOARD GRID
+--------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #11141c;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.card h3 {
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* ---------------------------
+   LISTS
+--------------------------- */
+
+ul {
+  list-style: none;
+}
+
+li {
+  background: #1b2030;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: default;
+}
+
+li:hover {
+  background: #22283a;
+}
+
+.badge {
+  font-size: 0.75rem;
+  color: #93c5fd;
+}
+
+/* ---------------------------
+   RESPONSIVE
+--------------------------- */
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+  }
+
+  .main {
+    margin-left: 0;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .xp-container {
+    text-align: left;
+  }
+}
