@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify · Performance OS</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="auth-body">
+    <div class="auth-card">
+      <h1>🔐 Verify</h1>
+      <p>Enter the 6-digit code sent to your email</p>
+
+      <input
+        type="text"
+        id="otp"
+        placeholder="6-digit code"
+        inputmode="numeric"
+        maxlength="6"
+      />
+
+      <button onclick="verifyOTP()">Verify & Continue</button>
+
+      <small id="status"></small>
+    </div>
+
+    <script src="auth.js"></script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign in · Performance OS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="auth-body">
+
+  <div class="auth-card">
+    <h1>⚡ Performance OS</h1>
+    <p>Sign in to continue</p>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Enter your email"
+      autocomplete="email"
+      required
+    />
+
+    <button onclick="requestOTP()">Send verification code</button>
+
+    <small>
+      We’ll send a 6-digit code to your email.
+      No passwords.
+    </small>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Performance OS</title>
+
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>⚡ Performance OS</h2>
+      <nav>
+        <button class="active">Overview</button>
+        <button>Focus</button>
+        <button>Systems</button>
+        <button>Rewards</button>
+        <button>Time Blocks</button>
+        <button id="logoutBtn">Logout</button>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- Top bar -->
+      <header class="topbar">
+        <div>
+          <h1>Welcome back</h1>
+          <p>
+            Level <span id="level">3</span> · <span id="xp">120</span> XP ·
+            Consistency <strong>82%</strong>
+          </p>
+        </div>
+
+        <div class="xp-container">
+          <div class="xp-bar">
+            <div class="xp-fill" style="width: 40%"></div>
+          </div>
+          <small>Progress to next level</small>
+        </div>
+      </header>
+
+      <!-- Dashboard grid -->
+      <section class="grid">
+        <!-- Focus -->
+        <div class="card">
+          <h3>Today’s Focus</h3>
+          <ul id="focusList"></ul>
+        </div>
+
+        <!-- Chart -->
+        <div class="card">
+          <h3>Performance Overview</h3>
+          <canvas id="performanceChart"></canvas>
+        </div>
+
+        <!-- Systems -->
+        <div class="card">
+          <h3>Systems</h3>
+          <ul id="systemsList"></ul>
+        </div>
+
+        <!-- Rewards -->
+        <div class="card">
+          <h3>Rewards</h3>
+          <ul id="rewardsList"></ul>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+
+    <script>
+      // TEMP logout (frontend only for now)
+      document.getElementById("logoutBtn").onclick = () => {
+        localStorage.removeItem("auth_email");
+        window.location.href = "/login.html";
+      };
+    </script>
+  </body>
+</html>
