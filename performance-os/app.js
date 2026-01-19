@@ -1,149 +1,138 @@
-// -----------------------------
-// Mock state (will come from API later)
-// -----------------------------
+const API_BASE = "https://api.krishnaanalytics.tech"
 
+// -----------------------------
+// Auth guard (REAL)
+// -----------------------------
+async function checkAuth() {
+  try {
+    const res = await fetch(`${API_BASE}/auth/me`, {
+      credentials: "include"
+    })
+
+    const data = await res.json()
+
+    if (!data.loggedIn) {
+      window.location.href = "login.html"
+    }
+  } catch {
+    window.location.href = "login.html"
+  }
+}
+
+// -----------------------------
+// Mock state (UI only for now)
+// -----------------------------
 const state = {
-  level: 3,
-  xp: 120,
-  nextLevelXP: 300,
-  consistency: 82,
+  level: 1,
+  xp: 0,
+  nextLevelXP: 200,
 
   focus: [
-    { id: 1, title: "Primary objective", area: "Core", xp: 40, done: false },
-    {
-      id: 2,
-      title: "Secondary objective",
-      area: "Support",
-      xp: 25,
-      done: false,
-    },
-    {
-      id: 3,
-      title: "Maintenance action",
-      area: "Baseline",
-      xp: 15,
-      done: true,
-    },
+    { id: 1, title: "Primary objective", xp: 40, done: false },
+    { id: 2, title: "Secondary objective", xp: 25, done: false }
   ],
 
   systems: [
-    { id: 1, title: "Daily movement", streak: 6 },
-    { id: 2, title: "Deep focus block", streak: 4 },
-    { id: 3, title: "Wind-down routine", streak: 5 },
+    { id: 1, title: "Daily movement", streak: 0 },
+    { id: 2, title: "Deep focus block", streak: 0 }
   ],
 
   rewards: [
-    { id: 1, title: "Guilt-free leisure", cost: 100 },
-    { id: 2, title: "Extended break", cost: 150 },
+    { id: 1, title: "Guilt-free leisure", cost: 100 }
   ],
 
   performance: {
     labels: ["Focus", "Consistency", "Energy", "Output", "Recovery"],
-    values: [78, 82, 65, 74, 70],
-  },
-};
+    values: [60, 0, 50, 55, 65]
+  }
+}
 
 // -----------------------------
-// DOM references
+// DOM refs
 // -----------------------------
-
-const focusEl = document.getElementById("focusList");
-const systemsEl = document.getElementById("systemsList");
-const rewardsEl = document.getElementById("rewardsList");
+const focusEl = document.getElementById("focusList")
+const systemsEl = document.getElementById("systemsList")
+const rewardsEl = document.getElementById("rewardsList")
 
 // -----------------------------
 // Render functions
 // -----------------------------
-
 function renderHeader() {
-  document.getElementById("level").textContent = state.level;
-  document.getElementById("xp").textContent = state.xp;
+  document.getElementById("level").textContent = state.level
+  document.getElementById("xp").textContent = state.xp
 
-  const percent = Math.min((state.xp / state.nextLevelXP) * 100, 100);
+  const percent = Math.min(
+    (state.xp / state.nextLevelXP) * 100,
+    100
+  )
 
-  document.querySelector(".xp-fill").style.width = percent + "%";
+  document.querySelector(".xp-fill").style.width = percent + "%"
 }
 
 function renderFocus() {
-  focusEl.innerHTML = "";
+  focusEl.innerHTML = ""
 
-  state.focus.forEach((item) => {
-    const li = document.createElement("li");
-
+  state.focus.forEach(item => {
+    const li = document.createElement("li")
     li.innerHTML = `
-      <span>
-        ${item.done ? "✅" : "⬜"} ${item.title}
-      </span>
-      <span class="badge">
-        ${item.area} · +${item.xp} XP
-      </span>
-    `;
-
-    li.style.opacity = item.done ? 0.6 : 1;
-    li.style.cursor = "pointer";
-
-    li.onclick = () => toggleFocus(item.id);
-
-    focusEl.appendChild(li);
-  });
+      <span>${item.done ? "✅" : "⬜"} ${item.title}</span>
+      <span class="badge">+${item.xp} XP</span>
+    `
+    li.onclick = () => toggleFocus(item.id)
+    li.style.opacity = item.done ? 0.6 : 1
+    focusEl.appendChild(li)
+  })
 }
 
 function renderSystems() {
-  systemsEl.innerHTML = "";
+  systemsEl.innerHTML = ""
 
-  state.systems.forEach((sys) => {
-    const li = document.createElement("li");
-
+  state.systems.forEach(sys => {
+    const li = document.createElement("li")
     li.innerHTML = `
       <span>${sys.title}</span>
       <span>${sys.streak} 🔁</span>
-    `;
-
-    systemsEl.appendChild(li);
-  });
+    `
+    systemsEl.appendChild(li)
+  })
 }
 
 function renderRewards() {
-  rewardsEl.innerHTML = "";
+  rewardsEl.innerHTML = ""
 
-  state.rewards.forEach((r) => {
-    const li = document.createElement("li");
-
+  state.rewards.forEach(r => {
+    const li = document.createElement("li")
     li.innerHTML = `
       <span>${r.title}</span>
       <span>${r.cost} XP</span>
-    `;
-
-    rewardsEl.appendChild(li);
-  });
+    `
+    rewardsEl.appendChild(li)
+  })
 }
 
 // -----------------------------
 // Interactions
 // -----------------------------
-
 function toggleFocus(id) {
-  const item = state.focus.find((f) => f.id === id);
-  if (!item || item.done) return;
+  const item = state.focus.find(f => f.id === id)
+  if (!item || item.done) return
 
-  item.done = true;
-  state.xp += item.xp;
+  item.done = true
+  state.xp += item.xp
 
-  // simple level-up logic
   if (state.xp >= state.nextLevelXP) {
-    state.level++;
-    state.xp = state.xp - state.nextLevelXP;
-    state.nextLevelXP += 200;
+    state.level++
+    state.xp -= state.nextLevelXP
+    state.nextLevelXP += 100
   }
 
-  renderHeader();
-  renderFocus();
+  renderHeader()
+  renderFocus()
 }
 
 // -----------------------------
 // Chart
 // -----------------------------
-
 function renderChart() {
   new Chart(document.getElementById("performanceChart"), {
     type: "radar",
@@ -152,40 +141,31 @@ function renderChart() {
       datasets: [
         {
           data: state.performance.values,
-          fill: true,
-        },
-      ],
+          fill: true
+        }
+      ]
     },
     options: {
       plugins: { legend: { display: false } },
       scales: {
         r: {
-          grid: { color: "#374151" },
-          angleLines: { color: "#374151" },
-          ticks: { display: false },
-        },
-      },
-    },
-  });
+          ticks: { display: false }
+        }
+      }
+    }
+  })
 }
 
 // -----------------------------
 // Init
 // -----------------------------
-
-function init() {
-  // basic client-side guard (temporary)
-  if (!localStorage.getItem("auth_email")) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  renderHeader();
-  renderFocus();
-  renderSystems();
-  renderRewards();
-  renderChart();
+async function init() {
+  await checkAuth()
+  renderHeader()
+  renderFocus()
+  renderSystems()
+  renderRewards()
+  renderChart()
 }
 
-init();
-
+init()
