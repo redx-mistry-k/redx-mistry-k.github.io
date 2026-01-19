@@ -1,4 +1,9 @@
-function requestOTP() {
+const API_BASE = "https://api.krishnaanalytics.tech";
+
+// -----------------------------
+// Request OTP
+// -----------------------------
+async function requestOTP() {
   const email = document.getElementById("email").value.trim();
 
   if (!email) {
@@ -6,32 +11,52 @@ function requestOTP() {
     return;
   }
 
-  // Save email temporarily (later session-based)
-  localStorage.setItem("auth_email", email);
+  const res = await fetch(`${API_BASE}/auth/request-otp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    credentials: "include",
+    body: JSON.stringify({ email })
+  });
 
-  // In real version: call Worker API here
-  console.log("Requesting OTP for:", email);
+  if (!res.ok) {
+    alert("Failed to send code. Try again.");
+    return;
+  }
+
+  // store email temporarily for verification step
+  sessionStorage.setItem("login_email", email);
 
   window.location.href = "verify.html";
 }
 
-function verifyOTP() {
-  const otp = document.getElementById("otp").value.trim();
-  const status = document.getElementById("status");
+// -----------------------------
+// Verify OTP
+// -----------------------------
+async function verifyOTP() {
+  const code = document.getElementById("otp").value.trim();
+  const email = sessionStorage.getItem("login_email");
 
-  if (otp.length !== 6) {
-    status.textContent = "Please enter a valid 6-digit code";
+  if (!email || code.length !== 6) {
+    alert("Invalid code");
     return;
   }
 
-  // In real version: verify via Worker API
-  console.log("Verifying OTP:", otp);
+  const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    credentials: "include",
+    body: JSON.stringify({ email, code })
+  });
 
-  // Mock success
-  status.textContent = "Verified. Redirecting…";
+  if (!res.ok) {
+    alert("Invalid or expired code");
+    return;
+  }
 
-  setTimeout(() => {
-    window.location.href = "index.html";
-  }, 800);
+  sessionStorage.removeItem("login_email");
+  window.location.href = "index.html";
 }
-
