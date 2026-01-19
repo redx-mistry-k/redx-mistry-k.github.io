@@ -176,7 +176,7 @@ function renderChart() {
 function init() {
   // basic client-side guard (temporary)
   if (!localStorage.getItem("auth_email")) {
-    window.location.href = "/login.html";
+    window.location.href = "login.html";
     return;
   }
 
@@ -188,3 +188,4 @@ function init() {
 }
 
 init();
+
