@@ -76,6 +76,10 @@
             <button class="btn btn-success btn-sm" onclick="renderTable()">
               Render Table
             </button>
+            <button class="btn btn-outline-primary btn-sm" onclick="copyRenderedTable()">
+  Copy Table
+</button>
+
           </div>
 
           <div id="error" class="text-danger small mt-2"></div>
@@ -207,6 +211,33 @@
 
         document.getElementById("tableContainer").innerHTML = html;
       }
+      async function copyRenderedTable() {
+    const table = document.querySelector("#tableContainer table");
+    if (!table) return;
+
+    const rows = Array.from(table.querySelectorAll("tr")).map((tr) =>
+      Array.from(tr.querySelectorAll("th, td"))
+        .map((cell) => cell.innerText.replace(/\s+/g, " ").trim())
+        .join("\t")
+    );
+
+    const text = rows.join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      // fallback for older browsers
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+  }
     </script>
   </body>
 </html>
+
