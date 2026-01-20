@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Excel → Grouped JSON → Excel Export</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    h1 { margin-top: 0; font-size: 22px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+    label { font-size: 14px; font-weight: 600; display: block; margin-bottom: 6px; }
+    input[type="file"], select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    .col { flex: 1; min-width: 220px; }
+    button {
+      padding: 12px 16px;
+      border: none;
+      background: #4f46e5;
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background: #3f38c9; }
+    button.secondary { background: #111827; }
+    button.secondary:hover { background: #000; }
+    .status {
+      background: #f3f4f6;
+      border: 1px dashed #cbd5e1;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-top: 16px;
+      white-space: pre-wrap;
+    }
+    .preview {
+      margin-top: 16px;
+      max-height: 280px;
+      overflow: auto;
+      background: #0b1020;
+      color: #dbeafe;
+      padding: 12px;
+      border-radius: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+    .note {
+      font-size: 13px;
+      color: #334155;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      background: #eef2ff;
+      color: #3730a3;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Excel → Group by Selected Column → JSON List → Export Excel ✅</h1>
+    <div class="note">
+      Upload your <span class="pill">.xlsx</span> file, select the column you want to group by.
+      Output Excel will have: <b>[same selected column]</b> + <b>json_list</b>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Upload Excel (.xlsx)</label>
+        <input type="file" id="fileInput" accept=".xlsx" />
+      </div>
+
+      <div class="col">
+        <label>Sheet</label>
+        <select id="sheetSelect" disabled>
+          <option value="">Upload a file first</option>
+        </select>
+      </div>
+
+      <div class="col">
+        <label>Group By Column (Number column)</label>
+        <select id="groupColSelect" disabled>
+          <option value="">Select sheet first</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <button id="processBtn" disabled>Process & Generate JSON</button>
+      <button id="exportBtn" class="secondary" disabled>Export Excel</button>
+      <button id="copyBtn" disabled>Copy Preview JSON</button>
+    </div>
+
+    <div class="status" id="statusBox">Status: Waiting for Excel file...</div>
+    <div class="preview" id="previewBox">No preview yet.</div>
+  </div>
+
+  <!-- SheetJS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const sheetSelect = document.getElementById("sheetSelect");
+    const groupColSelect = document.getElementById("groupColSelect");
+    const processBtn = document.getElementById("processBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const statusBox = document.getElementById("statusBox");
+    const previewBox = document.getElementById("previewBox");
+
+    let workbook = null;
+    let currentRows = [];
+    let outputRows = [];  // final output [{ [groupCol]: value, json_list: "..." }]
+    let selectedGroupCol = "";
+
+    function setStatus(msg) {
+      statusBox.textContent = "Status: " + msg;
+    }
+
+    function safeJsonStringify(obj) {
+      try { return JSON.stringify(obj); }
+      catch { return "[]"; }
+    }
+
+    function parseSheetToRows(sheet) {
+      return XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    }
+
+    function getHeadersFromRows(rows) {
+      if (!rows.length) return [];
+      const keys = new Set();
+      rows.forEach(r => Object.keys(r).forEach(k => keys.add(k)));
+      return [...keys];
+    }
+
+    function fillSelect(selectEl, options, placeholder = "Select...") {
+      selectEl.innerHTML = "";
+      const ph = document.createElement("option");
+      ph.value = "";
+      ph.textContent = placeholder;
+      selectEl.appendChild(ph);
+
+      options.forEach(opt => {
+        const o = document.createElement("option");
+        o.value = opt;
+        o.textContent = opt;
+        selectEl.appendChild(o);
+      });
+    }
+
+    // ✅ GROUPING FUNCTION (keeps group column in JSON objects)
+    function groupBySelectedColumn(rows, groupCol) {
+      const groups = new Map();
+
+      rows.forEach(row => {
+        const keyRaw = row[groupCol];
+        const key = String(keyRaw).trim();
+
+        if (!key) return;
+
+        if (!groups.has(key)) groups.set(key, []);
+        // ✅ Keep full row (INCLUDING groupCol) inside JSON list
+        groups.get(key).push({ ...row });
+      });
+
+      // build output rows for excel
+      const result = [];
+      for (const [groupValue, list] of groups.entries()) {
+        const outRow = {};
+        outRow[groupCol] = groupValue; // ✅ column name same as selected
+        outRow.json_list = safeJsonStringify(list); // list contains groupCol too
+        result.push(outRow);
+      }
+
+      // Sort by numeric if possible
+      result.sort((a, b) => {
+        const av = a[groupCol], bv = b[groupCol];
+        const an = Number(av), bn = Number(bv);
+        const aIsNum = !Number.isNaN(an);
+        const bIsNum = !Number.isNaN(bn);
+
+        if (aIsNum && bIsNum) return an - bn;
+        return String(av).localeCompare(String(bv));
+      });
+
+      return result;
+    }
+
+    function renderPreview(data, groupCol) {
+      const preview = data.slice(0, 5).map(r => ({
+        [groupCol]: r[groupCol],
+        json_list: JSON.parse(r.json_list)
+      }));
+      previewBox.textContent = JSON.stringify(preview, null, 2);
+    }
+
+    function exportToExcel(rows, groupCol) {
+      const headers = [groupCol, "json_list"];
+      const ws = XLSX.utils.json_to_sheet(rows, { header: headers });
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Grouped_JSON");
+
+      XLSX.writeFile(wb, "grouped_json_output.xlsx");
+    }
+
+    // --- Events ---
+
+    fileInput.addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setStatus("Reading file...");
+      outputRows = [];
+      exportBtn.disabled = true;
+      copyBtn.disabled = true;
+      processBtn.disabled = true;
+      groupColSelect.disabled = true;
+      sheetSelect.disabled = true;
+
+      const arrayBuffer = await file.arrayBuffer();
+      workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+      const sheetNames = workbook.SheetNames || [];
+      fillSelect(sheetSelect, sheetNames, "Select sheet");
+      sheetSelect.disabled = false;
+
+      setStatus(`Loaded file. Sheets found: ${sheetNames.length}`);
+      previewBox.textContent = "Select a sheet to load columns...";
+    });
+
+    sheetSelect.addEventListener("change", () => {
+      const sheetName = sheetSelect.value;
+      if (!sheetName || !workbook) return;
+
+      const sheet = workbook.Sheets[sheetName];
+      currentRows = parseSheetToRows(sheet);
+
+      const headers = getHeadersFromRows(currentRows);
+      fillSelect(groupColSelect, headers, "Select group column");
+      groupColSelect.disabled = false;
+
+      processBtn.disabled = false;
+      exportBtn.disabled = true;
+      copyBtn.disabled = true;
+
+      setStatus(`Sheet "${sheetName}" loaded. Rows: ${currentRows.length}. Choose group column.`);
+      previewBox.textContent = "Waiting to process...";
+    });
+
+    processBtn.addEventListener("click", () => {
+      const groupCol = groupColSelect.value;
+      if (!groupCol) {
+        setStatus("Please select the group column.");
+        return;
+      }
+
+      selectedGroupCol = groupCol;
+
+      setStatus("Processing groups...");
+      outputRows = groupBySelectedColumn(currentRows, groupCol);
+
+      setStatus(`Done ✅ Groups created: ${outputRows.length}. You can export now.`);
+      renderPreview(outputRows, groupCol);
+
+      exportBtn.disabled = outputRows.length === 0;
+      copyBtn.disabled = outputRows.length === 0;
+    });
+
+    exportBtn.addEventListener("click", () => {
+      if (!outputRows.length) return;
+      exportToExcel(outputRows, selectedGroupCol);
+      setStatus("Exported ✅ grouped_json_output.xlsx downloaded.");
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      if (!outputRows.length) return;
+
+      const full = outputRows.map(r => ({
+        [selectedGroupCol]: r[selectedGroupCol],
+        json_list: JSON.parse(r.json_list)
+      }));
+
+      const text = JSON.stringify(full, null, 2);
+
+      try {
+        await navigator.clipboard.writeText(text);
+        setStatus("Copied ✅ JSON preview to clipboard.");
+      } catch {
+        setStatus("Clipboard copy blocked. You can copy manually from preview box.");
+      }
+    });
+  </script>
+</body>
+</html>
