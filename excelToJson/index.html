@@ -5,12 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Excel → Grouped JSON → Excel Export</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f6f7fb;
-      margin: 0;
-      padding: 0;
-    }
+    body { font-family: Arial, sans-serif; background: #f6f7fb; margin: 0; padding: 0; }
     .container {
       max-width: 900px;
       margin: 40px auto;
@@ -65,12 +60,7 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
     }
-    .note {
-      font-size: 13px;
-      color: #334155;
-      margin-top: 8px;
-      line-height: 1.4;
-    }
+    .note { font-size: 13px; color: #334155; margin-top: 8px; line-height: 1.4; }
     .pill {
       display: inline-block;
       padding: 4px 8px;
@@ -86,8 +76,7 @@
   <div class="container">
     <h1>Excel → Group by Selected Column → JSON List → Export Excel ✅</h1>
     <div class="note">
-      Upload your <span class="pill">.xlsx</span> file, select the column you want to group by.
-      Output Excel will have: <b>[same selected column]</b> + <b>json_list</b>
+      Dates will be formatted as <span class="pill">yyyy-mm-dd</span> inside the JSON output.
     </div>
 
     <div class="row">
@@ -104,7 +93,7 @@
       </div>
 
       <div class="col">
-        <label>Group By Column (Number column)</label>
+        <label>Group By Column</label>
         <select id="groupColSelect" disabled>
           <option value="">Select sheet first</option>
         </select>
@@ -121,7 +110,7 @@
     <div class="preview" id="previewBox">No preview yet.</div>
   </div>
 
-  <!-- SheetJS CDN -->
+  <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script>
@@ -136,7 +125,7 @@
 
     let workbook = null;
     let currentRows = [];
-    let outputRows = [];  // final output [{ [groupCol]: value, json_list: "..." }]
+    let outputRows = [];
     let selectedGroupCol = "";
 
     function setStatus(msg) {
@@ -148,8 +137,72 @@
       catch { return "[]"; }
     }
 
+    // ✅ format Date -> yyyy-mm-dd
+    function formatDateYYYYMMDD(dateObj) {
+      const yyyy = dateObj.getFullYear();
+      const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const dd = String(dateObj.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // ✅ Excel serial (45855) -> JS Date
+    // Excel epoch starts at 1899-12-30 for most cases
+    function excelSerialToDate(serial) {
+      const utc_days = Math.floor(serial - 25569);
+      const utc_value = utc_days * 86400;
+      const date_info = new Date(utc_value * 1000);
+
+      // keep only date part (remove time drift)
+      return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate());
+    }
+
+    // ✅ convert dates in every row
+    function normalizeRowDates(row) {
+  const out = { ...row };
+
+  for (const key of Object.keys(out)) {
+    const val = out[key];
+
+    // ✅ If empty -> keep as null (don't convert)
+    if (val === "" || val === null || val === undefined) {
+      out[key] = null;
+      continue;
+    }
+
+    // ✅ If SheetJS gives a real Date object
+    if (val instanceof Date && !isNaN(val)) {
+      out[key] = formatDateYYYYMMDD(val);
+      continue;
+    }
+
+    // ✅ If it's numeric and looks like an Excel date serial
+    // - we only convert if it's an integer (dates are mostly whole numbers)
+    // - and inside a safe date range
+    if (
+      typeof val === "number" &&
+      Number.isInteger(val) &&
+      val >= 25569 &&   // ~1970-01-01
+      val <= 90000      // ~2146 range
+    ) {
+      const converted = excelSerialToDate(val);
+      out[key] = formatDateYYYYMMDD(converted);
+      continue;
+    }
+
+    // ✅ else keep value as-is
+    out[key] = val;
+  }
+
+  return out;
+}
+
+
     function parseSheetToRows(sheet) {
-      return XLSX.utils.sheet_to_json(sheet, { defval: "" });
+      // ✅ defval keeps empty cells, raw:true keeps numbers
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: true });
+
+      // ✅ normalize dates for each row
+      return rows.map(normalizeRowDates);
     }
 
     function getHeadersFromRows(rows) {
@@ -174,40 +227,25 @@
       });
     }
 
-    // ✅ GROUPING FUNCTION (keeps group column in JSON objects)
     function groupBySelectedColumn(rows, groupCol) {
       const groups = new Map();
 
       rows.forEach(row => {
         const keyRaw = row[groupCol];
         const key = String(keyRaw).trim();
-
         if (!key) return;
 
         if (!groups.has(key)) groups.set(key, []);
-        // ✅ Keep full row (INCLUDING groupCol) inside JSON list
-        groups.get(key).push({ ...row });
+        groups.get(key).push({ ...row }); // ✅ keep group column in JSON objects
       });
 
-      // build output rows for excel
       const result = [];
       for (const [groupValue, list] of groups.entries()) {
         const outRow = {};
-        outRow[groupCol] = groupValue; // ✅ column name same as selected
-        outRow.json_list = safeJsonStringify(list); // list contains groupCol too
+        outRow[groupCol] = groupValue;         // ✅ keep same column name
+        outRow.json_list = safeJsonStringify(list);
         result.push(outRow);
       }
-
-      // Sort by numeric if possible
-      result.sort((a, b) => {
-        const av = a[groupCol], bv = b[groupCol];
-        const an = Number(av), bn = Number(bv);
-        const aIsNum = !Number.isNaN(an);
-        const bIsNum = !Number.isNaN(bn);
-
-        if (aIsNum && bIsNum) return an - bn;
-        return String(av).localeCompare(String(bv));
-      });
 
       return result;
     }
@@ -230,8 +268,7 @@
       XLSX.writeFile(wb, "grouped_json_output.xlsx");
     }
 
-    // --- Events ---
-
+    // ---- UI events ----
     fileInput.addEventListener("change", async (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -245,7 +282,9 @@
       sheetSelect.disabled = true;
 
       const arrayBuffer = await file.arrayBuffer();
-      workbook = XLSX.read(arrayBuffer, { type: "array" });
+
+      // ✅ MOST IMPORTANT FIX: cellDates: true
+      workbook = XLSX.read(arrayBuffer, { type: "array", cellDates: true });
 
       const sheetNames = workbook.SheetNames || [];
       fillSelect(sheetSelect, sheetNames, "Select sheet");
@@ -286,7 +325,7 @@
       setStatus("Processing groups...");
       outputRows = groupBySelectedColumn(currentRows, groupCol);
 
-      setStatus(`Done ✅ Groups created: ${outputRows.length}. You can export now.`);
+      setStatus(`Done ✅ Groups created: ${outputRows.length}. Dates formatted as yyyy-mm-dd.`);
       renderPreview(outputRows, groupCol);
 
       exportBtn.disabled = outputRows.length === 0;
