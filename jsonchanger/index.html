@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>JSON Column Value Changer</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f7f7f7;
+        padding: 20px;
+        max-width: 900px;
+        margin: auto;
+      }
+
+      h2 {
+        margin-bottom: 10px;
+      }
+
+      label {
+        font-weight: bold;
+        display: block;
+        margin-top: 15px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 200px;
+        margin-top: 5px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      input {
+        flex: 1;
+        padding: 8px;
+        font-size: 14px;
+      }
+
+      button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .hint {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>JSON Column Value Changer</h2>
+
+    <label>Input JSON (array of objects)</label>
+    <textarea
+      id="jsonInput"
+      placeholder='[
+  { "id": 1, "status": "old", "dept": "SD" },
+  { "id": 2, "status": "old", "dept": "TFM" }
+]'
+    ></textarea>
+
+    <div class="row">
+      <input id="columnName" placeholder="Column / key name (eg: status)" />
+      <input id="newValue" placeholder="New value (eg: active)" />
+    </div>
+
+    <button onclick="updateJSON()">Update Column</button>
+
+    <label>Updated JSON</label>
+    <textarea id="jsonOutput" readonly></textarea>
+
+    <script>
+      function updateJSON() {
+        try {
+          const input = document.getElementById("jsonInput").value;
+          const column = document.getElementById("columnName").value.trim();
+          const newValueRaw = document.getElementById("newValue").value;
+
+          if (!column) {
+            alert("Please enter a column name");
+            return;
+          }
+
+          let data = JSON.parse(input);
+
+          if (!Array.isArray(data)) {
+            alert("JSON must be an array of objects");
+            return;
+          }
+
+          // Try to auto-detect value type
+          let newValue;
+          if (newValueRaw === "true") newValue = true;
+          else if (newValueRaw === "false") newValue = false;
+          else if (!isNaN(newValueRaw) && newValueRaw !== "")
+            newValue = Number(newValueRaw);
+          else newValue = newValueRaw;
+
+          const updated = data.map((obj) => {
+            if (typeof obj === "object" && obj !== null) {
+              obj[column] = newValue;
+            }
+            return obj;
+          });
+
+          document.getElementById("jsonOutput").value = JSON.stringify(
+            updated,
+            null,
+            2,
+          );
+        } catch (e) {
+          alert("Invalid JSON input");
+        }
+      }
+    </script>
+  </body>
+</html>
