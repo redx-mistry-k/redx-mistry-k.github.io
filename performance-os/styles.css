@@ -93,6 +93,11 @@ body {
   transform: scale(0.97);
 }
 
+.auth-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .auth-card small {
   display: block;
   margin-top: 14px;
@@ -294,6 +299,11 @@ li:active {
   border-color: #3b82f6;
 }
 
+.add-focus input[type="number"] {
+  width: 70px;
+  flex: 0 0 auto;
+}
+
 .add-focus button {
   background: #2563eb;
   border: none;
@@ -302,6 +312,7 @@ li:active {
   color: #fff;
   cursor: pointer;
   transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
 }
 
 .add-focus button:hover {
@@ -310,6 +321,83 @@ li:active {
 
 .add-focus button:active {
   transform: scale(0.97);
+}
+
+/* ===========================
+   NOTIFICATIONS
+=========================== */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(400px);
+  transition: all 0.3s ease;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.notification-success {
+  background: #22c55e;
+  color: #fff;
+}
+
+.notification-error {
+  background: #ef4444;
+  color: #fff;
+}
+
+.notification-info {
+  background: #3b82f6;
+  color: #fff;
+}
+
+/* ===========================
+   ADDITIONAL BUTTON STYLES
+=========================== */
+.undo-btn,
+.delete-btn {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-left: 6px;
+}
+
+.undo-btn {
+  background: #fbbf24;
+  color: #000;
+}
+
+.undo-btn:hover {
+  background: #f59e0b;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+li > div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* ===========================
@@ -334,5 +422,19 @@ li:active {
 
   .xp-container {
     width: 100%;
+  }
+
+  .notification {
+    left: 20px;
+    right: 20px;
+    top: 20px;
+  }
+
+  .add-focus {
+    flex-wrap: wrap;
+  }
+
+  .add-focus input[type="number"] {
+    width: 60px;
   }
 }
