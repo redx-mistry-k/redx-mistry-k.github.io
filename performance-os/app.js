@@ -33,6 +33,8 @@ async function init() {
   await checkAuth()
 
   try {
+    if (window.showLoading) window.showLoading()
+
     const res = await fetch(`${API}/dashboard/init`, {
       credentials: "include"
     })
@@ -53,8 +55,11 @@ async function init() {
     renderFocus()
     renderSystems()
     setupNav()
+
+    if (window.hideLoading) window.hideLoading()
   } catch (error) {
     console.error("Init failed:", error)
+    if (window.hideLoading) window.hideLoading()
     showNotification("Failed to load data", "error")
   }
 }
@@ -67,10 +72,28 @@ function renderHeader(xpGained = 0) {
   document.getElementById("level").textContent = state.level
   document.getElementById("xp").textContent = state.xp
 
+  // Update sidebar level if exists
+  const sidebarLevel = document.getElementById("sidebarLevel")
+  if (sidebarLevel) {
+    sidebarLevel.textContent = state.level
+  }
+
+  // Update XP progress info if exists
+  const xpProgress = document.getElementById("xpProgress")
+  const xpTarget = document.getElementById("xpTarget")
+  if (xpProgress) xpProgress.textContent = state.xp
+  if (xpTarget) xpTarget.textContent = state.nextLevelXP
+
   const percent = Math.min(
     (state.xp / state.nextLevelXP) * 100,
     100
   )
+
+  // Update XP percent if exists
+  const xpPercentEl = document.querySelector(".xp-percent")
+  if (xpPercentEl) {
+    xpPercentEl.textContent = Math.round(percent) + "%"
+  }
 
   const fill = document.querySelector(".xp-fill")
   fill.style.width = percent + "%"
@@ -84,9 +107,9 @@ function renderHeader(xpGained = 0) {
     const float = document.createElement("div")
     float.className = "xp-float"
     float.textContent = `+${xpGained} XP`
-    document.querySelector(".xp-container").appendChild(float)
+    document.body.appendChild(float)
 
-    setTimeout(() => float.remove(), 1000)
+    setTimeout(() => float.remove(), 1500)
   }
 }
 
@@ -117,20 +140,41 @@ function switchView(view) {
 function renderFocus() {
   const overview = document.getElementById("focusList")
   const full = document.getElementById("focusListFull")
+  const emptyOverview = document.getElementById("focusEmpty")
+  const emptyFull = document.getElementById("focusEmptyFull")
+  const countOverview = document.getElementById("focusCount")
+  const countFull = document.getElementById("focusCountFull")
 
   overview.innerHTML = ""
   full.innerHTML = ""
 
+  // Update counts
+  const totalCount = state.focus.length
+  const incompleteCount = state.focus.filter(item => !item.done).length
+  
+  if (countOverview) {
+    countOverview.textContent = `${incompleteCount} task${incompleteCount !== 1 ? 's' : ''}`
+  }
+  if (countFull) {
+    countFull.textContent = `${totalCount} task${totalCount !== 1 ? 's' : ''}`
+  }
+
   if (state.focus.length === 0) {
-    overview.innerHTML = '<li style="opacity:0.5; cursor:default;">No focus items yet. Add one above!</li>'
-    full.innerHTML = '<li style="opacity:0.5; cursor:default;">No focus items yet. Add one above!</li>'
+    if (emptyOverview) emptyOverview.style.display = "block"
+    if (emptyFull) emptyFull.style.display = "block"
     return
   }
 
+  if (emptyOverview) emptyOverview.style.display = "none"
+  if (emptyFull) emptyFull.style.display = "none"
+
   state.focus.forEach(item => {
-    const li = createFocusItem(item)
-    overview.appendChild(li.cloneNode(true))
-    full.appendChild(li)
+    // Create two separate items instead of cloning
+    const overviewItem = createFocusItem(item)
+    const fullItem = createFocusItem(item)
+    
+    overview.appendChild(overviewItem)
+    full.appendChild(fullItem)
   })
 }
 
@@ -326,33 +370,54 @@ async function deleteFocus(id, event) {
 function renderSystems() {
   const overview = document.getElementById("systemsList")
   const full = document.getElementById("systemsListFull")
+  const emptyOverview = document.getElementById("systemsEmpty")
+  const emptyFull = document.getElementById("systemsEmptyFull")
+  const countOverview = document.getElementById("systemsCount")
+  const countFull = document.getElementById("systemsCountFull")
 
   overview.innerHTML = ""
   full.innerHTML = ""
 
+  // Update counts
+  const totalCount = state.systems.length
+  
+  if (countOverview) {
+    countOverview.textContent = `${totalCount} habit${totalCount !== 1 ? 's' : ''}`
+  }
+  if (countFull) {
+    countFull.textContent = `${totalCount} habit${totalCount !== 1 ? 's' : ''}`
+  }
+
   if (state.systems.length === 0) {
-    overview.innerHTML = '<li style="opacity:0.5; cursor:default;">No systems yet. Add one above!</li>'
-    full.innerHTML = '<li style="opacity:0.5; cursor:default;">No systems yet. Add one above!</li>'
+    if (emptyOverview) emptyOverview.style.display = "block"
+    if (emptyFull) emptyFull.style.display = "block"
     return
   }
 
+  if (emptyOverview) emptyOverview.style.display = "none"
+  if (emptyFull) emptyFull.style.display = "none"
+
   state.systems.forEach(sys => {
-    const li = document.createElement("li")
-    li.innerHTML = `
-      <span>${escapeHtml(sys.title)}</span>
-      <div>
-        <span>${sys.streak || 0} 🔥</span>
-        <button class="delete-btn" onclick="deleteSystem(${sys.id}, event)">🗑️</button>
-      </div>
-    `
-    li.onclick = (e) => {
-      if (!e.target.classList.contains('delete-btn')) {
-        completeSystem(sys.id)
+    // Create function to make system item
+    const createSystemItem = () => {
+      const li = document.createElement("li")
+      li.innerHTML = `
+        <span>${escapeHtml(sys.title)}</span>
+        <div>
+          <span>${sys.streak || 0} 🔥</span>
+          <button class="delete-btn" onclick="deleteSystem(${sys.id}, event)">🗑️</button>
+        </div>
+      `
+      li.onclick = (e) => {
+        if (!e.target.classList.contains('delete-btn')) {
+          completeSystem(sys.id)
+        }
       }
+      return li
     }
 
-    overview.appendChild(li.cloneNode(true))
-    full.appendChild(li)
+    overview.appendChild(createSystemItem())
+    full.appendChild(createSystemItem())
   })
 }
 
