@@ -14,7 +14,7 @@
       <p>Gamified productivity system</p>
     </div>
 
-    <form id="loginForm" onsubmit="handleLogin(event)">
+    <form id="loginForm">
       <div class="input-group">
         <label for="email">Email Address</label>
         <input
@@ -50,10 +50,11 @@
   <script src="auth.js"></script>
   
   <script>
-    function handleLogin(event) {
+    // Handle form submission
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
       event.preventDefault();
       requestOTP();
-    }
+    });
 
     // Auto-focus email input on page load
     document.addEventListener('DOMContentLoaded', () => {
