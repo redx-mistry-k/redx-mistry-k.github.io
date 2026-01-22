@@ -51,12 +51,19 @@ function renderFocus() {
 
   state.focus.forEach(item => {
     const li = document.createElement("li")
+
     li.innerHTML = `
       <span>${item.done ? "✅" : "⬜"} ${item.title}</span>
       <span class="badge">+${item.xp} XP</span>
+      <div class="actions">
+        ${item.done ? `<button onclick="undoFocus(${item.id})">Undo</button>` : ""}
+        <button onclick="deleteFocus(${item.id})">✕</button>
+      </div>
     `
+
     li.style.opacity = item.done ? 0.6 : 1
-    li.onclick = () => toggleFocus(item.id)
+    if (!item.done) li.onclick = () => toggleFocus(item.id)
+
     el.appendChild(li)
   })
 }
@@ -70,16 +77,18 @@ function renderSystems() {
     li.innerHTML = `
       <span>${sys.title}</span>
       <span>${sys.streak} 🔁</span>
+      <button onclick="deleteSystem(${sys.id})">✕</button>
     `
     li.onclick = () => completeSystem(sys.id)
     el.appendChild(li)
   })
 }
 
+/* ---------- actions ---------- */
+
 async function addFocus() {
   const title = document.getElementById("newFocusTitle").value.trim()
   const xp = parseInt(document.getElementById("newFocusXP").value, 10)
-
   if (!title || isNaN(xp)) return
 
   await fetch(`${API}/focus/add`, {
@@ -90,8 +99,6 @@ async function addFocus() {
   })
 
   document.getElementById("newFocusTitle").value = ""
-  document.getElementById("newFocusXP").value = "25"
-
   init()
 }
 
@@ -102,7 +109,26 @@ async function toggleFocus(id) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id })
   })
+  init()
+}
 
+async function undoFocus(id) {
+  await fetch(`${API}/focus/undo`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  })
+  init()
+}
+
+async function deleteFocus(id) {
+  await fetch(`${API}/focus/delete`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  })
   init()
 }
 
@@ -116,8 +142,6 @@ async function addSystem() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ title })
   })
-
-  document.getElementById("newSystemTitle").value = ""
   init()
 }
 
@@ -128,7 +152,16 @@ async function completeSystem(id) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id })
   })
+  init()
+}
 
+async function deleteSystem(id) {
+  await fetch(`${API}/systems/delete`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id })
+  })
   init()
 }
 
