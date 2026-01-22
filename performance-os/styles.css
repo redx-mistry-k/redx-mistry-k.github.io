@@ -307,3 +307,11 @@ li:active {
     text-align: left;
   }
 }
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
