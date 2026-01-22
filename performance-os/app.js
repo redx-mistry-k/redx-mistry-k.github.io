@@ -13,9 +13,16 @@ let state = {
 --------------------------- */
 
 async function checkAuth() {
-  const res = await fetch(`${API}/auth/me`, { credentials: "include" })
-  const data = await res.json()
-  if (!data.loggedIn) window.location.href = "login.html"
+  try {
+    const res = await fetch(`${API}/auth/me`, { credentials: "include" })
+    const data = await res.json()
+    if (!data.loggedIn) {
+      window.location.href = "login.html"
+    }
+  } catch (error) {
+    console.error("Auth check failed:", error)
+    window.location.href = "login.html"
+  }
 }
 
 /* ---------------------------
@@ -25,22 +32,31 @@ async function checkAuth() {
 async function init() {
   await checkAuth()
 
-  const res = await fetch(`${API}/dashboard/init`, {
-    credentials: "include"
-  })
+  try {
+    const res = await fetch(`${API}/dashboard/init`, {
+      credentials: "include"
+    })
 
-  const data = await res.json()
+    if (!res.ok) {
+      throw new Error("Failed to load dashboard")
+    }
 
-  state.level = data.stats.level
-  state.xp = data.stats.xp
-  state.nextLevelXP = data.nextLevelXP
-  state.focus = data.focus
-  state.systems = data.systems
+    const data = await res.json()
 
-  renderHeader()
-  renderFocus()
-  renderSystems()
-  setupNav()
+    state.level = data.stats.level
+    state.xp = data.stats.xp
+    state.nextLevelXP = data.nextLevelXP
+    state.focus = data.focus
+    state.systems = data.systems.results || data.systems
+
+    renderHeader()
+    renderFocus()
+    renderSystems()
+    setupNav()
+  } catch (error) {
+    console.error("Init failed:", error)
+    showNotification("Failed to load data", "error")
+  }
 }
 
 /* ---------------------------
@@ -105,6 +121,12 @@ function renderFocus() {
   overview.innerHTML = ""
   full.innerHTML = ""
 
+  if (state.focus.length === 0) {
+    overview.innerHTML = '<li style="opacity:0.5; cursor:default;">No focus items yet. Add one above!</li>'
+    full.innerHTML = '<li style="opacity:0.5; cursor:default;">No focus items yet. Add one above!</li>'
+    return
+  }
+
   state.focus.forEach(item => {
     const li = createFocusItem(item)
     overview.appendChild(li.cloneNode(true))
@@ -114,60 +136,187 @@ function renderFocus() {
 
 function createFocusItem(item) {
   const li = document.createElement("li")
+  const checkbox = item.done ? "✅" : "⬜"
+  
   li.innerHTML = `
-    <span>${item.done ? "✅" : "⬜"} ${item.title}</span>
-    <span class="badge">+${item.xp} XP</span>
+    <span>${checkbox} ${escapeHtml(item.title)}</span>
+    <div>
+      <span class="badge">+${item.xp} XP</span>
+      ${item.done ? '<button class="undo-btn" onclick="undoFocus('+item.id+', event)">↶ Undo</button>' : ''}
+      <button class="delete-btn" onclick="deleteFocus(${item.id}, event)">🗑️</button>
+    </div>
   `
   li.style.opacity = item.done ? 0.6 : 1
-  if (!item.done) li.onclick = () => toggleFocus(item.id, item.xp)
+  
+  if (!item.done) {
+    li.onclick = (e) => {
+      if (!e.target.classList.contains('delete-btn')) {
+        toggleFocus(item.id, item.xp)
+      }
+    }
+  }
+  
   return li
 }
 
 async function addFocus() {
-  const title = document.getElementById("newFocusTitle").value.trim()
-  const xp = parseInt(document.getElementById("newFocusXP").value, 10)
-  if (!title || isNaN(xp)) return
+  const titleInput = document.getElementById("newFocusTitle")
+  const xpInput = document.getElementById("newFocusXP")
+  const title = titleInput.value.trim()
+  const xp = parseInt(xpInput.value, 10)
+  
+  if (!title || isNaN(xp) || xp < 1) {
+    showNotification("Please enter a valid title and XP value", "error")
+    return
+  }
 
-  await fetch(`${API}/focus/add`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, xp })
-  })
+  try {
+    const res = await fetch(`${API}/focus/add`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, xp })
+    })
 
-  document.getElementById("newFocusTitle").value = ""
-  init()
+    const data = await res.json()
+    
+    if (!data.ok) {
+      throw new Error("Failed to add focus item")
+    }
+
+    titleInput.value = ""
+    xpInput.value = "25"
+    showNotification("Focus item added!", "success")
+    await init()
+  } catch (error) {
+    console.error("Add focus failed:", error)
+    showNotification("Failed to add focus item", "error")
+  }
 }
 
 async function addFocusFromFocus() {
-  const title = document.getElementById("newFocusTitleFocus").value.trim()
-  const xp = parseInt(document.getElementById("newFocusXPFocus").value, 10)
-  if (!title || isNaN(xp)) return
+  const titleInput = document.getElementById("newFocusTitleFocus")
+  const xpInput = document.getElementById("newFocusXPFocus")
+  const title = titleInput.value.trim()
+  const xp = parseInt(xpInput.value, 10)
+  
+  if (!title || isNaN(xp) || xp < 1) {
+    showNotification("Please enter a valid title and XP value", "error")
+    return
+  }
 
-  await fetch(`${API}/focus/add`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title, xp })
-  })
+  try {
+    const res = await fetch(`${API}/focus/add`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, xp })
+    })
 
-  document.getElementById("newFocusTitleFocus").value = ""
-  init()
+    const data = await res.json()
+    
+    if (!data.ok) {
+      throw new Error("Failed to add focus item")
+    }
+
+    titleInput.value = ""
+    xpInput.value = "25"
+    showNotification("Focus item added!", "success")
+    await init()
+  } catch (error) {
+    console.error("Add focus failed:", error)
+    showNotification("Failed to add focus item", "error")
+  }
 }
 
 async function toggleFocus(id, xp) {
-  await fetch(`${API}/focus/toggle`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id })
-  })
+  try {
+    const res = await fetch(`${API}/focus/toggle`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    })
 
-  // optimistic XP animation
-  state.xp += xp
-  renderHeader(xp)
+    const data = await res.json()
+    
+    if (!data.ok) {
+      throw new Error("Failed to toggle focus item")
+    }
 
-  setTimeout(init, 300)
+    // optimistic XP animation
+    state.xp += xp
+    renderHeader(xp)
+    showNotification(`+${xp} XP earned!`, "success")
+
+    setTimeout(() => init(), 300)
+  } catch (error) {
+    console.error("Toggle focus failed:", error)
+    showNotification("Failed to complete focus item", "error")
+  }
+}
+
+async function undoFocus(id, event) {
+  event.stopPropagation()
+  
+  if (!confirm("Undo this completion? You'll lose the XP gained.")) {
+    return
+  }
+
+  try {
+    const res = await fetch(`${API}/focus/undo`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    })
+
+    const data = await res.json()
+    
+    if (data.error) {
+      showNotification(data.error, "error")
+      return
+    }
+    
+    if (!data.ok) {
+      throw new Error("Failed to undo focus item")
+    }
+
+    showNotification("Focus item undone", "success")
+    await init()
+  } catch (error) {
+    console.error("Undo focus failed:", error)
+    showNotification("Failed to undo focus item", "error")
+  }
+}
+
+async function deleteFocus(id, event) {
+  event.stopPropagation()
+  
+  if (!confirm("Delete this focus item permanently?")) {
+    return
+  }
+
+  try {
+    const res = await fetch(`${API}/focus/delete`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    })
+
+    const data = await res.json()
+    
+    if (!data.ok) {
+      throw new Error("Failed to delete focus item")
+    }
+
+    showNotification("Focus item deleted", "success")
+    await init()
+  } catch (error) {
+    console.error("Delete focus failed:", error)
+    showNotification("Failed to delete focus item", "error")
+  }
 }
 
 /* ---------------------------
@@ -181,13 +330,26 @@ function renderSystems() {
   overview.innerHTML = ""
   full.innerHTML = ""
 
+  if (state.systems.length === 0) {
+    overview.innerHTML = '<li style="opacity:0.5; cursor:default;">No systems yet. Add one above!</li>'
+    full.innerHTML = '<li style="opacity:0.5; cursor:default;">No systems yet. Add one above!</li>'
+    return
+  }
+
   state.systems.forEach(sys => {
     const li = document.createElement("li")
     li.innerHTML = `
-      <span>${sys.title}</span>
-      <span>${sys.streak} 🔁</span>
+      <span>${escapeHtml(sys.title)}</span>
+      <div>
+        <span>${sys.streak || 0} 🔥</span>
+        <button class="delete-btn" onclick="deleteSystem(${sys.id}, event)">🗑️</button>
+      </div>
     `
-    li.onclick = () => completeSystem(sys.id)
+    li.onclick = (e) => {
+      if (!e.target.classList.contains('delete-btn')) {
+        completeSystem(sys.id)
+      }
+    }
 
     overview.appendChild(li.cloneNode(true))
     full.appendChild(li)
@@ -195,28 +357,129 @@ function renderSystems() {
 }
 
 async function addSystem() {
-  const title = document.getElementById("newSystemTitle").value.trim()
-  if (!title) return
+  const titleInput = document.getElementById("newSystemTitle")
+  const title = titleInput.value.trim()
+  
+  if (!title) {
+    showNotification("Please enter a system title", "error")
+    return
+  }
 
-  await fetch(`${API}/systems/add`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title })
-  })
+  try {
+    const res = await fetch(`${API}/systems/add`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title })
+    })
 
-  document.getElementById("newSystemTitle").value = ""
-  init()
+    const data = await res.json()
+    
+    if (!data.ok) {
+      throw new Error("Failed to add system")
+    }
+
+    titleInput.value = ""
+    showNotification("System added!", "success")
+    await init()
+  } catch (error) {
+    console.error("Add system failed:", error)
+    showNotification("Failed to add system", "error")
+  }
 }
 
 async function completeSystem(id) {
-  await fetch(`${API}/systems/complete`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id })
-  })
-  init()
+  try {
+    const res = await fetch(`${API}/systems/complete`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    })
+
+    const data = await res.json()
+    
+    if (!data.ok) {
+      throw new Error("Failed to complete system")
+    }
+
+    showNotification("System completed! 🔥", "success")
+    await init()
+  } catch (error) {
+    console.error("Complete system failed:", error)
+    showNotification("Failed to complete system", "error")
+  }
 }
 
+async function deleteSystem(id, event) {
+  event.stopPropagation()
+  
+  if (!confirm("Delete this system permanently?")) {
+    return
+  }
+
+  try {
+    const res = await fetch(`${API}/systems/delete`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id })
+    })
+
+    const data = await res.json()
+    
+    if (!data.ok) {
+      throw new Error("Failed to delete system")
+    }
+
+    showNotification("System deleted", "success")
+    await init()
+  } catch (error) {
+    console.error("Delete system failed:", error)
+    showNotification("Failed to delete system", "error")
+  }
+}
+
+/* ---------------------------
+   Utilities
+--------------------------- */
+
+function showNotification(message, type = "info") {
+  const notification = document.createElement("div")
+  notification.className = `notification notification-${type}`
+  notification.textContent = message
+  document.body.appendChild(notification)
+
+  setTimeout(() => notification.classList.add("show"), 10)
+  setTimeout(() => {
+    notification.classList.remove("show")
+    setTimeout(() => notification.remove(), 300)
+  }, 3000)
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div')
+  div.textContent = text
+  return div.innerHTML
+}
+
+/* ---------------------------
+   Keyboard shortcuts
+--------------------------- */
+
+document.addEventListener("keydown", (e) => {
+  // Ctrl/Cmd + Enter to add focus item
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    const activeView = document.querySelector(".view.active")
+    if (activeView.id === "view-overview") {
+      addFocus()
+    } else if (activeView.id === "view-focus") {
+      addFocusFromFocus()
+    } else if (activeView.id === "view-systems") {
+      addSystem()
+    }
+  }
+})
+
+// Initialize app
 init()
