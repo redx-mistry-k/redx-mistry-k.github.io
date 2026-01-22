@@ -7,108 +7,64 @@
   <title>Performance OS</title>
 
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <h2>⚡ Performance OS</h2>
-    <nav>
-      <button class="active">Overview</button>
-      <button>Focus</button>
-      <button>Systems</button>
-      <button>Rewards</button>
-      <button>Time Blocks</button>
-      <button id="logoutBtn">Logout</button>
-    </nav>
-  </aside>
+<aside class="sidebar">
+  <h2>⚡ Performance OS</h2>
+  <nav>
+    <button class="active">Overview</button>
+    <button>Focus</button>
+    <button>Systems</button>
+    <button>Rewards</button>
+    <button>Time Blocks</button>
+    <button id="logoutBtn">Logout</button>
+  </nav>
+</aside>
 
-  <!-- Main -->
-  <main class="main">
-    <!-- Top bar -->
-    <header class="topbar">
-      <div>
-        <h1>Welcome back</h1>
-        <p>
-          Level <span id="level">1</span> ·
-          <span id="xp">0</span> XP ·
-          Consistency <strong>—</strong>
-        </p>
-      </div>
+<main class="main">
 
-      <div class="xp-container">
-        <div class="xp-bar">
-          <div class="xp-fill"></div>
-        </div>
-        <small>Progress to next level</small>
-      </div>
-    </header>
+<header class="topbar">
+  <h1>Welcome back</h1>
+  <p>Level <span id="level">1</span> · <span id="xp">0</span> XP</p>
+  <div class="xp-bar"><div class="xp-fill"></div></div>
+</header>
 
-    <!-- Dashboard grid -->
-    <section class="grid">
+<section class="grid">
 
-      <!-- Focus -->
-      <div class="card">
-        <h3>Today’s Focus</h3>
+<div class="card">
+  <h3>Focus</h3>
+  <div class="add-focus">
+    <input id="newFocusTitle" placeholder="New focus item">
+    <input id="newFocusXP" type="number" value="25">
+    <button onclick="addFocus()">Add</button>
+  </div>
+  <ul id="focusList"></ul>
+</div>
 
-        <!-- Add Focus Item -->
-        <div class="add-focus">
-          <input
-            id="newFocusTitle"
-            type="text"
-            placeholder="New focus item"
-          />
+<div class="card">
+  <h3>Systems</h3>
+  <div class="add-focus">
+    <input id="newSystemTitle" placeholder="New system / habit">
+    <button onclick="addSystem()">Add</button>
+  </div>
+  <ul id="systemsList"></ul>
+</div>
 
-          <input
-            id="newFocusXP"
-            type="number"
-            value="25"
-            min="1"
-          />
+</section>
+</main>
 
-          <button onclick="addFocus()">Add</button>
-        </div>
+<script src="app.js"></script>
 
-        <ul id="focusList"></ul>
-      </div>
-
-      <!-- Performance -->
-      <div class="card">
-        <h3>Performance Overview</h3>
-        <canvas id="performanceChart"></canvas>
-      </div>
-
-      <!-- Systems -->
-      <div class="card">
-        <h3>Systems</h3>
-        <ul id="systemsList">
-          <li style="opacity:0.6">Coming soon</li>
-        </ul>
-      </div>
-
-      <!-- Rewards -->
-      <div class="card">
-        <h3>Rewards</h3>
-        <ul id="rewardsList">
-          <li style="opacity:0.6">Coming soon</li>
-        </ul>
-      </div>
-
-    </section>
-  </main>
-
-  <script src="app.js"></script>
-
-  <script>
-    document.getElementById("logoutBtn").onclick = async () => {
-      await fetch("https://api.krishnaanalytics.tech/auth/logout", {
-        method: "POST",
-        credentials: "include"
-      })
-      window.location.href = "login.html"
-    }
-  </script>
+<script>
+document.getElementById("logoutBtn").onclick = async () => {
+  await fetch("https://api.krishnaanalytics.tech/auth/logout", {
+    method: "POST",
+    credentials: "include"
+  })
+  window.location.href = "login.html"
+}
+</script>
 
 </body>
 </html>
