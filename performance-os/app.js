@@ -43,7 +43,11 @@ async function init() {
   setupNav()
 }
 
-function renderHeader() {
+/* ---------------------------
+   Header + XP animation
+--------------------------- */
+
+function renderHeader(xpGained = 0) {
   document.getElementById("level").textContent = state.level
   document.getElementById("xp").textContent = state.xp
 
@@ -51,7 +55,23 @@ function renderHeader() {
     (state.xp / state.nextLevelXP) * 100,
     100
   )
-  document.querySelector(".xp-fill").style.width = percent + "%"
+
+  const fill = document.querySelector(".xp-fill")
+  fill.style.width = percent + "%"
+
+  // XP gain animation
+  if (xpGained > 0) {
+    fill.classList.remove("pulse")
+    void fill.offsetWidth
+    fill.classList.add("pulse")
+
+    const float = document.createElement("div")
+    float.className = "xp-float"
+    float.textContent = `+${xpGained} XP`
+    document.querySelector(".xp-container").appendChild(float)
+
+    setTimeout(() => float.remove(), 1000)
+  }
 }
 
 /* ---------------------------
@@ -99,7 +119,7 @@ function createFocusItem(item) {
     <span class="badge">+${item.xp} XP</span>
   `
   li.style.opacity = item.done ? 0.6 : 1
-  if (!item.done) li.onclick = () => toggleFocus(item.id)
+  if (!item.done) li.onclick = () => toggleFocus(item.id, item.xp)
   return li
 }
 
@@ -135,14 +155,19 @@ async function addFocusFromFocus() {
   init()
 }
 
-async function toggleFocus(id) {
+async function toggleFocus(id, xp) {
   await fetch(`${API}/focus/toggle`, {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id })
   })
-  init()
+
+  // optimistic XP animation
+  state.xp += xp
+  renderHeader(xp)
+
+  setTimeout(init, 300)
 }
 
 /* ---------------------------
