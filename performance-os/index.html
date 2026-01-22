@@ -9,51 +9,114 @@
 </head>
 <body>
 
+<!-- Sidebar -->
 <aside class="sidebar">
   <h2>⚡ Performance OS</h2>
   <nav>
-    <button class="active">Overview</button>
-    <button>Focus</button>
-    <button>Systems</button>
-    <button>Rewards</button>
-    <button>Time Blocks</button>
+    <button class="nav-btn active" data-view="overview">Overview</button>
+    <button class="nav-btn" data-view="focus">Focus</button>
+    <button class="nav-btn" data-view="systems">Systems</button>
+    <button class="nav-btn" data-view="rewards">Rewards</button>
+    <button class="nav-btn" data-view="timeblocks">Time Blocks</button>
     <button id="logoutBtn">Logout</button>
   </nav>
 </aside>
 
+<!-- Main -->
 <main class="main">
 
-<header class="topbar">
-  <h1>Welcome back</h1>
-  <p>Level <span id="level">1</span> · <span id="xp">0</span> XP</p>
-  <div class="xp-bar"><div class="xp-fill"></div></div>
-</header>
+  <!-- Topbar -->
+  <header class="topbar">
+    <div>
+      <h1>Welcome back</h1>
+      <p>
+        Level <span id="level">1</span> ·
+        <span id="xp">0</span> XP
+      </p>
+    </div>
 
-<section class="grid">
+    <div class="xp-container">
+      <div class="xp-bar">
+        <div class="xp-fill"></div>
+      </div>
+      <small>Progress to next level</small>
+    </div>
+  </header>
 
-<div class="card">
-  <h3>Focus</h3>
-  <div class="add-focus">
-    <input id="newFocusTitle" placeholder="New focus item">
-    <input id="newFocusXP" type="number" value="25">
-    <button onclick="addFocus()">Add</button>
-  </div>
-  <ul id="focusList"></ul>
-</div>
+  <!-- VIEWS -->
 
-<div class="card">
-  <h3>Systems</h3>
-  <div class="add-focus">
-    <input id="newSystemTitle" placeholder="New system">
-    <button onclick="addSystem()">Add</button>
-  </div>
-  <ul id="systemsList"></ul>
-</div>
+  <!-- Overview -->
+  <section class="view active" id="view-overview">
+    <div class="grid">
 
-</section>
+      <div class="card">
+        <h3>Today’s Focus</h3>
+
+        <div class="add-focus">
+          <input id="newFocusTitle" placeholder="New focus item">
+          <input id="newFocusXP" type="number" value="25">
+          <button onclick="addFocus()">Add</button>
+        </div>
+
+        <ul id="focusList"></ul>
+      </div>
+
+      <div class="card">
+        <h3>Systems (Today)</h3>
+        <ul id="systemsList"></ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Focus View -->
+  <section class="view" id="view-focus">
+    <div class="card">
+      <h3>Focus</h3>
+
+      <div class="add-focus">
+        <input id="newFocusTitleFocus" placeholder="New focus item">
+        <input id="newFocusXPFocus" type="number" value="25">
+        <button onclick="addFocusFromFocus()">Add</button>
+      </div>
+
+      <ul id="focusListFull"></ul>
+    </div>
+  </section>
+
+  <!-- Systems View -->
+  <section class="view" id="view-systems">
+    <div class="card">
+      <h3>Systems / Habits</h3>
+
+      <div class="add-focus">
+        <input id="newSystemTitle" placeholder="New system">
+        <button onclick="addSystem()">Add</button>
+      </div>
+
+      <ul id="systemsListFull"></ul>
+    </div>
+  </section>
+
+  <!-- Placeholder Views -->
+  <section class="view" id="view-rewards">
+    <div class="card">
+      <h3>Rewards</h3>
+      <p style="opacity:.6">Coming soon</p>
+    </div>
+  </section>
+
+  <section class="view" id="view-timeblocks">
+    <div class="card">
+      <h3>Time Blocks</h3>
+      <p style="opacity:.6">Coming soon</p>
+    </div>
+  </section>
+
 </main>
 
 <script src="app.js"></script>
+
 <script>
 document.getElementById("logoutBtn").onclick = async () => {
   await fetch("https://api.krishnaanalytics.tech/auth/logout", {
