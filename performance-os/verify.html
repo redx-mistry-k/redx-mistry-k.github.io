@@ -14,7 +14,7 @@
       <p id="emailDisplay">Enter the 6-digit code sent to your email</p>
     </div>
 
-    <form id="verifyForm" onsubmit="handleVerify(event)">
+    <form id="verifyForm">
       <div class="input-group">
         <label for="otp">Verification Code</label>
         <input
@@ -54,10 +54,11 @@
   <script src="auth.js"></script>
   
   <script>
-    function handleVerify(event) {
+    // Handle form submission
+    document.getElementById('verifyForm').addEventListener('submit', function(event) {
       event.preventDefault();
       verifyOTP();
-    }
+    });
 
     // Display email and auto-focus OTP input
     document.addEventListener('DOMContentLoaded', () => {
@@ -78,7 +79,7 @@
         // Auto-submit when 6 digits entered
         if (e.target.value.length === 6) {
           setTimeout(() => {
-            document.getElementById('verifyForm').requestSubmit();
+            document.getElementById('verifyForm').dispatchEvent(new Event('submit'));
           }, 300);
         }
       });
@@ -91,7 +92,7 @@
         
         if (pastedData.length === 6) {
           setTimeout(() => {
-            document.getElementById('verifyForm').requestSubmit();
+            document.getElementById('verifyForm').dispatchEvent(new Event('submit'));
           }, 300);
         }
       });
