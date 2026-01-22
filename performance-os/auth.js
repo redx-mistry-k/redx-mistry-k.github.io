@@ -5,8 +5,11 @@ const API_BASE = "https://api.krishnaanalytics.tech";
 // -----------------------------
 async function requestOTP() {
   const emailInput = document.getElementById("email");
-  const button = event.target;
+  const button = document.getElementById("submitBtn");
+  const statusEl = document.getElementById("status");
   const email = emailInput.value.trim();
+
+  console.log("requestOTP called with email:", email);
 
   if (!email) {
     showStatus("Please enter your email", "error");
@@ -18,11 +21,14 @@ async function requestOTP() {
     return;
   }
 
-  // Disable button during request
+  // Show loading state
   button.disabled = true;
-  button.textContent = "Sending...";
+  button.classList.add("loading");
+  if (statusEl) statusEl.classList.remove("show");
 
   try {
+    console.log("Sending OTP request to:", `${API_BASE}/auth/request-otp`);
+    
     const res = await fetch(`${API_BASE}/auth/request-otp`, {
       method: "POST",
       headers: {
@@ -32,24 +38,29 @@ async function requestOTP() {
       body: JSON.stringify({ email })
     });
 
+    console.log("Response status:", res.status);
     const data = await res.json();
+    console.log("Response data:", data);
 
     if (!res.ok || !data.ok) {
       showStatus("Failed to send code. Try again.", "error");
       button.disabled = false;
-      button.textContent = "Send verification code";
+      button.classList.remove("loading");
       return;
     }
 
     // store email temporarily for verification step
     sessionStorage.setItem("login_email", email);
+    console.log("Stored email in sessionStorage, redirecting to verify.html");
+    
+    // Redirect to verify page
     window.location.href = "verify.html";
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error in requestOTP:", error);
     showStatus("Network error. Please try again.", "error");
     button.disabled = false;
-    button.textContent = "Send verification code";
+    button.classList.remove("loading");
   }
 }
 
@@ -58,7 +69,8 @@ async function requestOTP() {
 // -----------------------------
 async function verifyOTP() {
   const codeInput = document.getElementById("otp");
-  const button = event.target;
+  const button = document.getElementById("submitBtn");
+  const statusEl = document.getElementById("status");
   const code = codeInput.value.trim();
   const email = sessionStorage.getItem("login_email");
 
@@ -73,9 +85,10 @@ async function verifyOTP() {
     return;
   }
 
-  // Disable button during request
+  // Show loading state
   button.disabled = true;
-  button.textContent = "Verifying...";
+  button.classList.add("loading");
+  if (statusEl) statusEl.classList.remove("show");
 
   try {
     const res = await fetch(`${API_BASE}/auth/verify-otp`, {
@@ -92,7 +105,7 @@ async function verifyOTP() {
     if (!res.ok || data.error) {
       showStatus(data.error || "Invalid or expired code", "error");
       button.disabled = false;
-      button.textContent = "Verify & Continue";
+      button.classList.remove("loading");
       return;
     }
 
@@ -104,7 +117,7 @@ async function verifyOTP() {
     console.error("Error:", error);
     showStatus("Network error. Please try again.", "error");
     button.disabled = false;
-    button.textContent = "Verify & Continue";
+    button.classList.remove("loading");
   }
 }
 
@@ -119,12 +132,7 @@ function showStatus(message, type = "info") {
   const statusEl = document.getElementById("status");
   if (statusEl) {
     statusEl.textContent = message;
-    const colors = {
-      error: "#ef4444",
-      success: "#22c55e",
-      info: "#9ca3af"
-    };
-    statusEl.style.color = colors[type] || colors.info;
+    statusEl.className = `status-message ${type} show`;
   }
 }
 
