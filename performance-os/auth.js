@@ -1,159 +1,98 @@
 const API_BASE = "https://api.krishnaanalytics.tech";
 
-// -----------------------------
-// Request OTP
-// -----------------------------
 async function requestOTP() {
-  const emailInput = document.getElementById("email");
+  const email = document.getElementById("email").value.trim();
   const button = document.getElementById("submitBtn");
-  const statusEl = document.getElementById("status");
-  const email = emailInput.value.trim();
-
-  console.log("requestOTP called with email:", email);
 
   if (!email) {
-    showStatus("Please enter your email", "error");
+    alert("Please enter your email");
     return;
   }
 
-  if (!isValidEmail(email)) {
-    showStatus("Please enter a valid email", "error");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    alert("Please enter a valid email");
     return;
   }
 
-  // Show loading state
   button.disabled = true;
-  button.classList.add("loading");
-  if (statusEl) statusEl.classList.remove("show");
+  button.textContent = "Sending...";
 
   try {
-    console.log("Sending OTP request to:", `${API_BASE}/auth/request-otp`);
-    
     const res = await fetch(`${API_BASE}/auth/request-otp`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ email })
     });
 
-    console.log("Response status:", res.status);
     const data = await res.json();
-    console.log("Response data:", data);
+    console.log("Status:", res.status, "Data:", data);
 
-    if (!res.ok || !data.ok) {
-      showStatus("Failed to send code. Try again.", "error");
+    if (data.ok) {
+      // Email sent successfully
+      sessionStorage.setItem("login_email", email);
+      alert("Code sent! Check your email.");
+      
+      // Force redirect
+      window.location.replace("verify.html");
+    } else {
+      alert("Failed to send code: " + (data.error || "Unknown error"));
       button.disabled = false;
-      button.classList.remove("loading");
-      return;
+      button.textContent = "Send verification code";
     }
 
-    // store email temporarily for verification step
-    sessionStorage.setItem("login_email", email);
-    console.log("Stored email in sessionStorage, redirecting to verify.html");
-    
-    // Redirect to verify page
-    window.location.href = "verify.html";
-
   } catch (error) {
-    console.error("Error in requestOTP:", error);
-    showStatus("Network error. Please try again.", "error");
+    console.error("Error:", error);
+    alert("Network error: " + error.message);
     button.disabled = false;
-    button.classList.remove("loading");
+    button.textContent = "Send verification code";
   }
 }
 
-// -----------------------------
-// Verify OTP
-// -----------------------------
 async function verifyOTP() {
-  const codeInput = document.getElementById("otp");
-  const button = document.getElementById("submitBtn");
-  const statusEl = document.getElementById("status");
-  const code = codeInput.value.trim();
+  const code = document.getElementById("otp").value.trim();
   const email = sessionStorage.getItem("login_email");
+  const button = document.getElementById("submitBtn");
 
   if (!email) {
-    showStatus("Session expired. Please start again.", "error");
-    setTimeout(() => window.location.href = "login.html", 2000);
+    alert("Session expired. Please login again.");
+    window.location.href = "login.html";
     return;
   }
 
-  if (code.length !== 6 || !/^\d+$/.test(code)) {
-    showStatus("Please enter a valid 6-digit code", "error");
+  if (code.length !== 6) {
+    alert("Please enter a 6-digit code");
     return;
   }
 
-  // Show loading state
   button.disabled = true;
-  button.classList.add("loading");
-  if (statusEl) statusEl.classList.remove("show");
+  button.textContent = "Verifying...";
 
   try {
     const res = await fetch(`${API_BASE}/auth/verify-otp`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({ email, code })
     });
 
     const data = await res.json();
+    console.log("Status:", res.status, "Data:", data);
 
-    if (!res.ok || data.error) {
-      showStatus(data.error || "Invalid or expired code", "error");
+    if (data.ok) {
+      sessionStorage.removeItem("login_email");
+      alert("Success! Logging you in...");
+      window.location.replace("index.html");
+    } else {
+      alert("Invalid code: " + (data.error || "Please try again"));
       button.disabled = false;
-      button.classList.remove("loading");
-      return;
+      button.textContent = "Verify & Continue";
     }
-
-    sessionStorage.removeItem("login_email");
-    showStatus("Success! Redirecting...", "success");
-    setTimeout(() => window.location.href = "index.html", 500);
 
   } catch (error) {
     console.error("Error:", error);
-    showStatus("Network error. Please try again.", "error");
+    alert("Network error: " + error.message);
     button.disabled = false;
-    button.classList.remove("loading");
+    button.textContent = "Verify & Continue";
   }
 }
-
-// -----------------------------
-// Helper Functions
-// -----------------------------
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function showStatus(message, type = "info") {
-  const statusEl = document.getElementById("status");
-  if (statusEl) {
-    statusEl.textContent = message;
-    statusEl.className = `status-message ${type} show`;
-  }
-}
-
-// Allow Enter key to submit
-document.addEventListener("DOMContentLoaded", () => {
-  const emailInput = document.getElementById("email");
-  const otpInput = document.getElementById("otp");
-
-  if (emailInput) {
-    emailInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") requestOTP();
-    });
-  }
-
-  if (otpInput) {
-    otpInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") verifyOTP();
-    });
-    // Auto-format OTP input (digits only)
-    otpInput.addEventListener("input", (e) => {
-      e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6);
-    });
-  }
-});
