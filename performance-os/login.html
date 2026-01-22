@@ -9,27 +9,56 @@
 </head>
 <body class="auth-body">
   <div class="auth-card">
-    <h1>⚡ Performance OS</h1>
-    <p>Sign in to continue</p>
+    <div class="auth-header">
+      <h1>⚡ Performance OS</h1>
+      <p>Gamified productivity system</p>
+    </div>
 
-    <input
-      type="email"
-      id="email"
-      placeholder="Enter your email"
-      autocomplete="email"
-      required
-    />
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="input-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          placeholder="your@email.com"
+          autocomplete="email"
+          required
+          autofocus
+        />
+        <small class="input-hint">We'll send you a verification code</small>
+      </div>
 
-    <button onclick="requestOTP()">Send verification code</button>
+      <button type="submit" id="submitBtn" class="btn-primary">
+        <span class="btn-text">Send verification code</span>
+        <span class="btn-loader" style="display: none;">
+          <span class="spinner"></span>
+          Sending...
+        </span>
+      </button>
 
-    <small>
-      We’ll send a 6-digit code to your email.
-      No passwords.
-    </small>
+      <div id="status" class="status-message"></div>
+    </form>
+
+    <div class="auth-footer">
+      <small>
+        🔒 Passwordless authentication via email<br>
+        No passwords to remember or manage
+      </small>
+    </div>
   </div>
 
   <script src="auth.js"></script>
+  
+  <script>
+    function handleLogin(event) {
+      event.preventDefault();
+      requestOTP();
+    }
+
+    // Auto-focus email input on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('email').focus();
+    });
+  </script>
 </body>
 </html>
-
-
