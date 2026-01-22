@@ -3,6 +3,7 @@ const API = "https://api.krishnaanalytics.tech"
 let state = {
   level: 1,
   xp: 0,
+  nextLevelXP: 200,
   focus: []
 }
 
@@ -26,9 +27,10 @@ async function init() {
 
   const data = await res.json()
 
-  state.level = data.stats?.level || 1
-  state.xp = data.stats?.xp || 0
-  state.focus = data.focus || []
+  state.level = data.stats.level
+  state.xp = data.stats.xp
+  state.nextLevelXP = data.nextLevelXP
+  state.focus = data.focus
 
   renderHeader()
   renderFocus()
@@ -38,7 +40,11 @@ function renderHeader() {
   document.getElementById("level").textContent = state.level
   document.getElementById("xp").textContent = state.xp
 
-  const percent = Math.min((state.xp / 200) * 100, 100)
+  const percent = Math.min(
+    (state.xp / state.nextLevelXP) * 100,
+    100
+  )
+
   document.querySelector(".xp-fill").style.width = percent + "%"
 }
 
