@@ -48,24 +48,51 @@
     <!-- Dashboard grid -->
     <section class="grid">
 
+      <!-- Focus -->
       <div class="card">
         <h3>Today’s Focus</h3>
+
+        <!-- Add Focus Item -->
+        <div class="add-focus">
+          <input
+            id="newFocusTitle"
+            type="text"
+            placeholder="New focus item"
+          />
+
+          <input
+            id="newFocusXP"
+            type="number"
+            value="25"
+            min="1"
+          />
+
+          <button onclick="addFocus()">Add</button>
+        </div>
+
         <ul id="focusList"></ul>
       </div>
 
+      <!-- Performance -->
       <div class="card">
         <h3>Performance Overview</h3>
         <canvas id="performanceChart"></canvas>
       </div>
 
+      <!-- Systems -->
       <div class="card">
         <h3>Systems</h3>
-        <ul id="systemsList"></ul>
+        <ul id="systemsList">
+          <li style="opacity:0.6">Coming soon</li>
+        </ul>
       </div>
 
+      <!-- Rewards -->
       <div class="card">
         <h3>Rewards</h3>
-        <ul id="rewardsList"></ul>
+        <ul id="rewardsList">
+          <li style="opacity:0.6">Coming soon</li>
+        </ul>
       </div>
 
     </section>
