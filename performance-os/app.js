@@ -58,6 +58,25 @@ function renderFocus() {
   })
 }
 
+async function addFocus() {
+  const title = document.getElementById("newFocusTitle").value.trim()
+  const xp = parseInt(document.getElementById("newFocusXP").value, 10)
+
+  if (!title || isNaN(xp)) return
+
+  await fetch(`${API}/focus/add`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title, xp })
+  })
+
+  document.getElementById("newFocusTitle").value = ""
+  document.getElementById("newFocusXP").value = "25"
+
+  init()
+}
+
 async function toggleFocus(id) {
   await fetch(`${API}/focus/toggle`, {
     method: "POST",
