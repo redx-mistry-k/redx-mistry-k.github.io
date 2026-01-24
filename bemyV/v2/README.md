@@ -29,52 +29,11 @@ A fun and interactive Valentine's Day web application where the "No" button shri
 - Node.js (v16 or higher)
 - npm or yarn
 - Cloudflare account (free tier works!)
-- Wrangler CLI
 
-### Installation
 
-1. **Install Wrangler CLI**:
-```bash
-npm install -g wrangler
-```
-
-2. **Login to Cloudflare**:
-```bash
-wrangler login
-```
-
-3. **Create D1 Database**:
-```bash
-wrangler d1 create valentine_db
-```
-
-This will output something like:
-```
-✅ Successfully created DB 'valentine_db'
-
-[[d1_databases]]
-binding = "DB"
-database_name = "valentine_db"
-database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-```
-
-4. **Update wrangler.toml**:
-   - Copy the `database_id` from the output above
-   - Replace `YOUR_DATABASE_ID` in `wrangler.toml` with your actual database ID
-
-5. **Initialize the Database Schema**:
-```bash
-wrangler d1 execute valentine_db --file=./schema.sql
-```
-
-6. **Install Dependencies**:
-```bash
-npm install
-```
 
 ## 📝 Configuration
 
-### wrangler.toml
 The configuration file contains:
 - Worker name
 - D1 database binding
