@@ -169,23 +169,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .counter {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            padding: 20px;
-            border-radius: 15px;
-            font-size: 1.2rem;
-            color: #0d47a1;
-            margin-top: 30px;
-            border: 3px solid #2196F3;
-            font-weight: bold;
-        }
-
-        .counter-number {
-            font-size: 2rem;
-            color: #1976d2;
-            font-weight: bold;
-        }
-        
         .celebration {
             position: fixed;
             top: 0;
@@ -298,15 +281,6 @@
                 font-size: 1.1rem;
             }
 
-            .counter {
-                font-size: 1rem;
-                padding: 15px;
-            }
-
-            .counter-number {
-                font-size: 1.6rem;
-            }
-
             .heartbeat {
                 font-size: 100px;
             }
@@ -365,7 +339,7 @@
             </div>
             
             <div class="hint" id="hint"></div>
-            
+        </div>
         
         <footer>
             <i class="fas fa-heart"></i> Made with love for the most special person <i class="fas fa-heart"></i>
@@ -464,22 +438,11 @@
             const yesButton = document.getElementById('yesButton');
             yesButton.textContent = 'YES! 💖🥰';
             
-            // Save to database
-            try {
-                await saveResponseToDatabase('yes', noHoverCount);
-                
-                const statsText = document.getElementById('statsText');
-                if (noHoverCount > 0) {
-                    statsText.textContent = `(You hesitated ${noHoverCount} time${noHoverCount > 1 ? 's' : ''} before deciding 😄)`;
-                }
-            } catch (error) {
-                console.error('Failed to save response:', error);
+            // Show stats if they hesitated
+            const statsText = document.getElementById('statsText');
+            if (noHoverCount > 0) {
+                statsText.textContent = `(You hesitated ${noHoverCount} time${noHoverCount > 1 ? 's' : ''} before deciding 😄)`;
             }
-            
-            // Update counter
-            const responseCount = document.getElementById('responseCount');
-            let currentCount = parseInt(responseCount.textContent);
-            responseCount.textContent = currentCount + 1;
             
             setTimeout(() => {
                 yesAnimation.classList.remove('show');
@@ -522,44 +485,8 @@
             }
         }
 
-        // Save to database
-        async function saveResponseToDatabase(response, hesitationCount) {
-            const data = {
-                response: response,
-                noHoverCount: hesitationCount,
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent
-            };
-
-            try {
-                const result = await fetch('/api/save-response', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-
-                if (result.ok) {
-                    console.log('Response saved successfully');
-                    return await result.json();
-                }
-            } catch (error) {
-                console.log('Demo mode - response:', data);
-            }
-        }
-
-        // Get response count
-        async function getResponseCount() {
-            try {
-                const response = await fetch('/api/stats');
-                const data = await response.json();
-                return data.success ? data.stats.total : Math.floor(Math.random() * 100) + 50;
-            } catch (error) {
-                return Math.floor(Math.random() * 100) + 50;
-            }
-        }
-
         // Initialize
-        async function init() {
+        function init() {
             createHearts();
             
             const yesButton = document.getElementById('yesButton');
@@ -583,10 +510,6 @@
                 noButton.style.animation = 'shake 0.5s';
                 setTimeout(() => noButton.style.animation = '', 500);
             });
-            
-            // Get initial count
-            const count = await getResponseCount();
-            document.getElementById('responseCount').textContent = count;
         }
 
         document.addEventListener('DOMContentLoaded', init);
