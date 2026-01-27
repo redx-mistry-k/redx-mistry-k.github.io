@@ -53,7 +53,8 @@ async function convert() {
   const message = document.getElementById("input").value;
   const usdInclusive = document.getElementById("usdInclusive").checked;
 
-  const res = await fetch("https://YOUR-WORKER-URL.workers.dev", {
+  const res = await fetch("
+smaker.vkrishnaanand.workers.dev", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message, usdInclusive })
@@ -66,3 +67,4 @@ async function convert() {
 
 </body>
 </html>
+
