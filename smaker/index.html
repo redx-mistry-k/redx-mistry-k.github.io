@@ -34,7 +34,7 @@
 <body>
 
 <h3>Paste Teams Message</h3>
-<textarea id="input"></textarea>
+<textarea id="input" placeholder="Paste the Teams message here..."></textarea>
 
 <div class="row">
   <label>
@@ -46,25 +46,51 @@
 <button onclick="convert()">Convert</button>
 
 <h3>SharePoint Row (copy & paste)</h3>
-<pre id="output"></pre>
+<pre id="output">Waiting for input…</pre>
 
 <script>
 async function convert() {
-  const message = document.getElementById("input").value;
+  const inputEl = document.getElementById("input");
+  const outputEl = document.getElementById("output");
+
+  const message = inputEl.value.trim();
   const usdInclusive = document.getElementById("usdInclusive").checked;
 
-  const res = await fetch("
-smaker.vkrishnaanand.workers.dev", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, usdInclusive })
-  });
+  if (!message) {
+    outputEl.innerText = "⚠️ Please paste a Teams message first.";
+    return;
+  }
 
-  const data = await res.json();
-  document.getElementById("output").innerText = data.row;
+  outputEl.innerText = "Processing…";
+
+  try {
+    const res = await fetch("https://smaker.vkrishnaanand.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message, usdInclusive })
+    });
+
+    if (!res.ok) {
+      throw new Error("Worker returned " + res.status);
+    }
+
+    const data = await res.json();
+
+    if (!data.row) {
+      outputEl.innerText = "⚠️ No data extracted. Check message format.";
+      return;
+    }
+
+    outputEl.innerText = data.row;
+
+  } catch (err) {
+    outputEl.innerText =
+      "❌ Error contacting worker:\n" + err.message +
+      "\n\nOpen browser console for details.";
+    console.error(err);
+  }
 }
 </script>
 
 </body>
 </html>
-
