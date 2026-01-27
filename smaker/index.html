@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teams Message → SharePoint Row</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    textarea {
+      width: 100%;
+      height: 160px;
+      font-family: monospace;
+    }
+    button {
+      margin-top: 12px;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .row {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h3>Paste Teams Message</h3>
+<textarea id="input"></textarea>
+
+<div class="row">
+  <label>
+    <input type="checkbox" id="usdInclusive" checked />
+    USD value is inclusive of tax
+  </label>
+</div>
+
+<button onclick="convert()">Convert</button>
+
+<h3>SharePoint Row (copy & paste)</h3>
+<pre id="output"></pre>
+
+<script>
+async function convert() {
+  const message = document.getElementById("input").value;
+  const usdInclusive = document.getElementById("usdInclusive").checked;
+
+  const res = await fetch("https://YOUR-WORKER-URL.workers.dev", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message, usdInclusive })
+  });
+
+  const data = await res.json();
+  document.getElementById("output").innerText = data.row;
+}
+</script>
+
+</body>
+</html>
