@@ -428,7 +428,21 @@ async function parse() {
     document.getElementById("notes").value = parts[3] || "";
     document.getElementById("rateUSD").value = parts[4] || "";
 
-    generate();
+    // Use the worker's calculated row directly
+    const outputEl = document.getElementById("output");
+    outputEl.textContent = data.row;
+    outputEl.classList.remove('empty');
+    document.getElementById("copyBtn").disabled = false;
+
+    addToHistory({ 
+      studyName: parts[0] || "", 
+      rateINR: parts[1] || "", 
+      status: parts[2] || "Active", 
+      notes: parts[3] || "", 
+      rateUSD: parts[4] || "", 
+      row: data.row 
+    });
+
     showStatus('success', 'Parsed successfully');
 
   } catch (err) {
