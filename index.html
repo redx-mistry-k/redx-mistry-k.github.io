@@ -1,1253 +1,1559 @@
 <!DOCTYPE html>
-
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Data Science Portfolio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.iife.min.js"></script>
-    <style>
-      .gradient-bg {
-        background: linear-gradient(135deg, #1e3a8a 0%, #065f46 100%);
-      }
-      .project-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-          0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      }
-      .skill-bar {
-        height: 8px;
-        border-radius: 4px;
-        background-color: #e5e7eb;
-      }
-      .skill-progress {
-        height: 100%;
-        border-radius: 4px;
-        background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
-      }
-    </style>
-  </head>
-  <body class="font-sans antialiased text-gray-800 bg-gray-50">
-    <!-- Navigation -->
-    <nav class="fixed w-full bg-white shadow-sm z-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
-            <span class="text-xl font-bold text-gray-900">DS Portfolio</span>
-          </div>
-          <div class="hidden md:flex items-center space-x-8">
-            <a class="text-gray-900 hover:text-blue-600 transition" href="#home"
-              >Home</a
-            >
-            <a
-              class="text-gray-900 hover:text-blue-600 transition"
-              href="#about"
-              >About</a
-            >
-            <a
-              class="text-gray-900 hover:text-blue-600 transition"
-              href="#projects"
-              >Projects</a
-            >
-            <a
-              class="text-gray-900 hover:text-blue-600 transition"
-              href="#skills"
-              >Skills</a
-            >
-            <a
-              class="text-gray-900 hover:text-blue-600 transition"
-              href="#contact"
-              >Contact</a
-            >
-          </div>
-          <div class="md:hidden flex items-center">
-            <button class="text-gray-900" id="menu-toggle">
-              <i data-feather="menu"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-      <!-- Mobile menu -->
-      <div
-        class="hidden md:hidden bg-white py-2 px-4 shadow-lg"
-        id="mobile-menu"
-      >
-        <a
-          class="block py-2 text-gray-900 hover:text-blue-600 transition"
-          href="#home"
-          >Home</a
-        >
-        <a
-          class="block py-2 text-gray-900 hover:text-blue-600 transition"
-          href="#about"
-          >About</a
-        >
-        <a
-          class="block py-2 text-gray-900 hover:text-blue-600 transition"
-          href="#projects"
-          >Projects</a
-        >
-        <a
-          class="block py-2 text-gray-900 hover:text-blue-600 transition"
-          href="#skills"
-          >Skills</a
-        >
-        <a
-          class="block py-2 text-gray-900 hover:text-blue-600 transition"
-          href="#contact"
-          >Contact</a
-        >
-      </div>
-    </nav>
-    <!-- Hero Section -->
-    <section
-      class="gradient-bg text-white pt-32 pb-20 px-4 sm:px-6 lg:px-8"
-      id="home"
-    >
-      <div class="max-w-7xl mx-auto">
-        <div class="md:flex items-center justify-between">
-          <div class="md:w-1/2 mb-10 md:mb-0" data-aos="fade-right">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4">
-              Hi, I'm Krishnaanand V
-            </h1>
-            <h2 class="text-2xl md:text-3xl font-semibold mb-6">
-              Data Scientist &amp; Analyst
-            </h2>
-            <p class="text-lg mb-8 text-blue-100">
-              Transforming complex data into actionable insights through
-              statistical analysis, machine learning, and compelling
-              visualizations.
-            </p>
-            <div class="flex space-x-4">
-              <a
-                class="bg-white text-blue-800 px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition"
-                href="#projects"
-                >View Projects</a
-              >
-              <a
-                class="border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-blue-800 transition"
-                href="#contact"
-                >Contact Me</a
-              >
-            </div>
-          </div>
-          <div class="md:w-1/2 flex justify-center" data-aos="fade-left">
-            <div class="relative">
-              <div
-                class="absolute -inset-4 bg-blue-400 rounded-2xl opacity-20 blur"
-              ></div>
-              <img
-                alt="Data Visualization"
-                class="relative rounded-2xl shadow-2xl w-full max-w-md"
-                src="http://static.photos/technology/640x360/42"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- About Section -->
-    <!-- About Section -->
-    <section id="about" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
-      <div class="max-w-7xl mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-16" data-aos="fade-up">
-          About Me
-        </h2>
-        <div class="md:flex items-center">
-          <div
-            class="md:w-1/3 mb-10 md:mb-0 flex justify-center"
-            data-aos="fade-right"
-          >
-            <div class="relative">
-              <div
-                class="absolute -inset-2 bg-green-200 rounded-full opacity-30 blur"
-              ></div>
-              <img
-                src="https://media.licdn.com/dms/image/v2/D4E03AQHu3QNOmlfLxQ/profile-displayphoto-scale_200_200/B4EZpljQ25GoAc-/0/1762640335428?e=1770249600&v=beta&t=y_0WGrdeT7vXRgOZ6oWegFLoPZzOwuimIGZ05feCAC0"
-                alt="Profile"
-                class="relative rounded-full w-64 h-64 object-cover border-4 border-white shadow-lg"
-              />
-            </div>
-          </div>
-          <div class="md:w-2/3 md:pl-16" data-aos="fade-left">
-            <h3 class="text-2xl font-semibold mb-4">
-              My Journey in Data Analysis
-            </h3>
-            <p class="text-gray-700 mb-6 leading-relaxed">
-              A diligent and results-driven professional seeking a challenging
-              data analyst role that utilises existing skills and provides
-              opportunities for further career development. A naturally
-              analytical thinker with a methodical approach to problem solving
-              and outstanding organisational skills, adept at balancing a
-              demanding workload of simultaneous tasks.
-            </p>
-            <p class="text-gray-700 mb-6 leading-relaxed">
-              A strong communicator with excellent collaborative skills and a
-              robust work ethic, eager to influence business decision making
-              through effective data analysis, driving favourable business
-              outcomes.
-            </p>
-            <div class="flex flex-wrap gap-4 mt-8">
-              <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
-                <i data-feather="award" class="w-5 h-5 mr-2 text-blue-600"></i>
-                <span>MSc in Data Science</span>
-              </div>
-              <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
-                <i
-                  data-feather="briefcase"
-                  class="w-5 h-5 mr-2 text-blue-600"
-                ></i>
-                <span>Data Analyst Experience</span>
-              </div>
-              <div class="flex items-center bg-gray-100 px-4 py-2 rounded-full">
-                <i
-                  data-feather="database"
-                  class="w-5 h-5 mr-2 text-blue-600"
-                ></i>
-                <span>Multiple Projects</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- Projects Section -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50" id="projects">
-      <div class="max-w-7xl mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-4" data-aos="fade-up">
-          My Projects
-        </h2>
-        <p
-          class="text-center text-gray-600 mb-16 max-w-2xl mx-auto"
-          data-aos="fade-up"
-        >
-          Explore my data-driven projects showcasing analytical skills and
-          technical expertise
-        </p>
-        <!-- Project Filter -->
-        <div class="flex justify-center mb-12" data-aos="fade-up">
-          <div class="inline-flex rounded-md shadow-sm">
-            <button
-              class="filter-btn px-4 py-2 text-sm font-medium rounded-l-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-              data-filter="all"
-              type="button"
-            >
-              All
-            </button>
-            <button
-              class="filter-btn px-4 py-2 text-sm font-medium border-t border-b border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-              data-filter="ml"
-              type="button"
-            >
-              Machine Learning
-            </button>
-            <button
-  class="filter-btn px-4 py-2 text-sm font-medium border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-  data-filter="viz"
-  type="button"
-  onclick="window.location.href='https://dashboards.krishnaanalytics.tech/'"
->
-  Visualization
-</button>
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Krishnaanand V | Data Scientist & Analyst</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-card: #181818;
+      --bg-card-hover: #1e1e1e;
+      --text-primary: #f0ece2;
+      --text-secondary: #9a9590;
+      --text-muted: #5a5550;
+      --accent: #c8ff00;
+      --accent-dim: rgba(200, 255, 0, 0.08);
+      --accent-glow: rgba(200, 255, 0, 0.15);
+      --border: rgba(255,255,255,0.06);
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
 
-            <button
-              class="filter-btn px-4 py-2 text-sm font-medium rounded-r-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-              data-filter="web"
-              type="button"
-            >
-              Web Apps
-            </button>
-          </div>
-        </div>
-        <!-- Projects Grid -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- Alcohol Calendar -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="Alcohol Calendar"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/101"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">Alcohol Calendar</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                A fun calendar to track and plan your drinks
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">HTML</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">CSS</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="tipsy_calendar.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- English to Spanish Translator -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            data-aos-delay="100"
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="English to Spanish Translator"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/102"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">English to Spanish Translator</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                A simple tool to translate text from English to Spanish
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">API</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Translation</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="translator.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- Delagger -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            data-aos-delay="200"
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="Delagger"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/103"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">Delagger</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                A utility to clean up and organize data
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">Data Processing</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Utility</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="delag.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- My GitHub -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="My GitHub"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/104"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">My GitHub</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                Collection of my coding projects and repositories
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">GitHub</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Portfolio</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Code</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="https://github.com/redx-mistry-k"
-                  target="_blank"
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="github"></i> Code
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- Countdown Timer -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            data-aos-delay="100"
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="Countdown Timer"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/105"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">Countdown Timer</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                A customizable countdown timer application
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Timer</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Utility</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="countdownTimer/index.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- Be My Valentine -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            data-aos-delay="200"
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="Be My Valentine"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/106"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">Be My Valentine</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                A playful Valentine's Day-themed page
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">HTML</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">CSS</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Interactive</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="bemyV/index.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- 7 Digits Extractor -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="7 Digits Extractor"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/107"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">7 Digits Extractor</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                Tool to extract 7-digit numbers from text
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">Text Processing</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Regex</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="7digitsextracter.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- Text to Editable Table -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            data-aos-delay="100"
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="Text to Editable Table"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/108"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">Text to Editable Table</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                Convert text data into interactive editable tables
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">Data Processing</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Table</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="remit_adv/index.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- Date Night Generator -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            data-aos-delay="200"
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="Date Night Generator"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/109"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">Date Night Generator</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                A fun date night idea generator
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Random</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Entertainment</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="dateNight/index.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-          <!-- Ovaluation Calculator -->
-<div
-  class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-  data-aos="fade-up"
-  data-aos-delay="100"
-  data-category="web"
->
-  <div class="h-48 overflow-hidden">
-    <!-- Replace src with your project’s thumbnail or screenshot -->
-    <img
-      alt="Ovaluation Calculator"
-      class="w-full h-full object-cover"
-      src="https://www.shutterstock.com/image-photo/female-hand-pen-mark-on-600nw-1392270350.jpg"
-    />
-  </div>
-  <div class="p-6">
-    <div class="flex justify-between items-start mb-2">
-      <!-- Replace with your project’s title -->
-      <h3 class="text-xl font-bold">Ovaluation Calculator</h3>
-      <!-- Change badge text and color as needed -->
-      <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-        Web
-      </span>
-    </div>
-    <!-- Replace with your project’s short description -->
-    <p class="text-gray-600 mb-4">
-      A Smart Ovaluation Calculator: Predicts menstrual cycles, fertile windows, and upcoming periods with smart insights.
-    </p>
-    <!-- Replace or add technology tags -->
-    <div class="flex flex-wrap gap-2 mb-4">
-      <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span>
-      <span class="bg-gray-100 px-2 py-1 text-xs rounded">HTML</span>
-      <span class="bg-gray-100 px-2 py-1 text-xs rounded">CSS</span>
-    </div>
-    <div class="flex space-x-3">
-      <!-- Change href to your project’s page or repo -->
-      <a
-        class="text-blue-600 hover:text-blue-800 flex items-center"
-        href="Ovaluation_Calculator/Smart.html"
-        target="_blank"
-      >
-        <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-      </a>
-    </div>
-  </div>
-</div>
-<div
-  class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-  data-aos="fade-up"
-  data-aos-delay="100"
-  data-category="web"
->
-  <div class="h-48 overflow-hidden">
-    <!-- Replace src with your project’s thumbnail or screenshot -->
-    <img
-      alt="Color Guess Game"
-      class="w-full h-full object-cover"
-      src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/51079a88-30aa-4ade-9f88-0964a9e0334d.png"
-    />
-  </div>
-  <div class="p-6">
-    <div class="flex justify-between items-start mb-2">
-      <!-- Replace with your project’s title -->
-      <h3 class="text-xl font-bold">Color Guess Game</h3>
-      <!-- Change badge text and color as needed -->
-      <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-        Web
-      </span>
-    </div>
-    <!-- Replace with your project’s short description -->
-    <p class="text-gray-600 mb-4">
-      An interactive color-guessing game that challenges players to match random color swatches to their correct names or hex codes.
-    </p>
-    <!-- Replace or add technology tags -->
-    <div class="flex flex-wrap gap-2 mb-4">
-      <span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span>
-      <span class="bg-gray-100 px-2 py-1 text-xs rounded">HTML</span>
-      <span class="bg-gray-100 px-2 py-1 text-xs rounded">CSS</span>
-    </div>
-    <div class="flex space-x-3">
-      <!-- Change href to your project’s page or repo -->
-      <a
-        class="text-blue-600 hover:text-blue-800 flex items-center"
-        href="colorguess/ColorGuess.html"
-        target="_blank"
-      >
-        <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-      </a>
-    </div>
-  </div>
-</div>
-          <!-- Good Things Journal -->
-          <div
-            class="project-card bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl"
-            data-aos="fade-up"
-            
-            data-category="web"
-          >
-            <div class="h-48 overflow-hidden">
-              <img
-                alt="Good Things Journal"
-                class="w-full h-full object-cover"
-                src="http://static.photos/technology/640x360/110"
-              />
-            </div>
-            <div class="p-6">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="text-xl font-bold">Good Things Journal</h3>
-                <span
-                  class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full"
-                  >Web</span
-                >
-              </div>
-              <p class="text-gray-600 mb-4">
-                A journaling tool to record positive moments
-              </p>
-              <div class="flex flex-wrap gap-2 mb-4">
-                <span class="bg-gray-100 px-2 py-1 text-xs rounded">Journaling</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">Personal</span><span class="bg-gray-100 px-2 py-1 text-xs rounded">JavaScript</span>
-              </div>
-              <div class="flex space-x-3">
-                <a
-                  class="text-blue-600 hover:text-blue-800 flex items-center"
-                  href="noteGoodThings/index.html"
-                  
-                >
-                  <i class="w-4 h-4 mr-1" data-feather="external-link"></i> Demo
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>        </div>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: var(--bg-primary);
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      backdrop-filter: blur(20px) saturate(120%);
+      -webkit-backdrop-filter: blur(20px) saturate(120%);
+      background: rgba(10,10,10,0.8);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.4s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(10,10,10,0.95);
+    }
+
+    .nav-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .mobile-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      z-index: 99;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .mobile-menu a:hover { color: var(--accent); }
+
+    .mobile-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 8rem 2rem 4rem;
+    }
+
+    .hero-bg-gradient {
+      position: absolute;
+      top: -30%;
+      right: -20%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-40px, 30px) scale(1.05); }
+    }
+
+    .hero-grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent-dim);
+      border: 1px solid rgba(200,255,0,0.15);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-tag .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: var(--bg-primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.9rem 2rem;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(200,255,0,0.25);
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.9rem 2rem;
+      border-radius: 100px;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .hero-photo-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-photo-frame {
+      position: relative;
+      width: 380px;
+      height: 440px;
+    }
+
+    .hero-photo-frame::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--accent), transparent 60%);
+      opacity: 0.4;
+      z-index: 0;
+    }
+
+    .hero-photo-frame img {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 24px;
+      z-index: 1;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-stat h4 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero-stat p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.25rem;
+    }
+
+    /* ─── SECTIONS ─── */
+    section { padding: 6rem 2rem; }
+
+    .section-inner { max-width: 1280px; margin: 0 auto; }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 30px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      max-width: 560px;
+      margin-bottom: 3rem;
+    }
+
+    /* ─── ABOUT ─── */
+    .about { background: var(--bg-secondary); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-photo {
+      position: relative;
+    }
+
+    .about-photo img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 20px;
+      filter: grayscale(20%);
+      transition: filter 0.4s;
+    }
+
+    .about-photo:hover img { filter: grayscale(0%); }
+
+    .about-photo::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid var(--accent);
+      border-radius: 20px;
+      opacity: 0.3;
+      pointer-events: none;
+      transition: opacity 0.4s;
+    }
+
+    .about-photo:hover::after { opacity: 0.6; }
+
+    .about-text p {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+      font-size: 1.05rem;
+    }
+
+    .about-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+
+    .about-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 0.6rem 1.2rem;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      transition: all 0.3s;
+    }
+
+    .about-badge:hover {
+      border-color: rgba(200,255,0,0.3);
+      background: var(--accent-dim);
+    }
+
+    .about-badge svg { color: var(--accent); }
+
+    /* ─── PROJECTS ─── */
+    .projects { background: var(--bg-primary); }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 0.5rem 1.25rem;
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: var(--font-body);
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent);
+      color: var(--bg-primary);
+      border-color: var(--accent);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      cursor: default;
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(200,255,0,0.2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .project-card .card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      opacity: 0.85;
+      transition: opacity 0.4s;
+    }
+
+    .project-card:hover .card-img { opacity: 1; }
+
+    .card-body { padding: 1.5rem; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--text-primary);
+    }
+
+    .card-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--accent-dim);
+      color: var(--accent);
+      padding: 0.3rem 0.75rem;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .card-desc {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .card-techs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-tech {
+      font-size: 0.72rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+    }
+
+    .card-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .card-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.3s;
+    }
+
+    .card-links a:hover { opacity: 0.7; }
+
+    /* ─── SKILLS ─── */
+    .skills { background: var(--bg-secondary); }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+
+    .skill-group h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .skill-group h3 svg { color: var(--accent); }
+
+    .skill-item { margin-bottom: 1.75rem; }
+
+    .skill-item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-item-header span:first-child {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .skill-item-header span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .skill-bar-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .skill-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #88cc00);
+      border-radius: 4px;
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .tool-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      transition: all 0.3s;
+    }
+
+    .tool-item:hover {
+      border-color: rgba(200,255,0,0.2);
+      background: var(--accent-dim);
+    }
+
+    .tool-item svg { color: var(--accent); width: 18px; height: 18px; }
+
+    /* ─── CONTACT ─── */
+    .contact { background: var(--bg-primary); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+
+    .contact-form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.9rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      transition: border-color 0.3s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200,255,0,0.08);
+    }
+
+    .form-group textarea { resize: vertical; min-height: 120px; }
+
+    #contactStatus { font-size: 0.85rem; min-height: 1.25rem; }
+    .text-green { color: #4ade80; }
+    .text-red { color: #f87171; }
+
+    .contact-info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      height: fit-content;
+    }
+
+    .contact-info-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      margin-bottom: 2rem;
+    }
+
+    .contact-info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .contact-info-icon {
+      background: var(--accent-dim);
+      border: 1px solid rgba(200,255,0,0.12);
+      padding: 0.75rem;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .contact-info-icon svg { color: var(--accent); width: 18px; height: 18px; }
+
+    .contact-info-item h4 {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.25rem;
+    }
+
+    .contact-info-item p {
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .social-link {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      border-radius: 12px;
+      color: var(--text-secondary);
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+
+    .social-link:hover {
+      color: var(--accent);
+      border-color: rgba(200,255,0,0.3);
+      background: var(--accent-dim);
+    }
+
+    .social-link svg { width: 18px; height: 18px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-inner p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-toggle { display: block; }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero-desc { margin-left: auto; margin-right: auto; }
+      .hero-btns { justify-content: center; }
+      .hero-photo-wrapper { order: -1; }
+
+      .hero-photo-frame {
+        width: 240px;
+        height: 280px;
+      }
+
+      .hero-stats { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .about-photo { max-width: 250px; margin: 0 auto; }
+      .about-badges { justify-content: center; }
+
+      .projects-grid { grid-template-columns: 1fr; }
+
+      .skills-grid { grid-template-columns: 1fr; gap: 3rem; }
+
+      .contact-grid { grid-template-columns: 1fr; }
+
+      .footer-inner { flex-direction: column; gap: 1rem; text-align: center; }
+      .filter-bar { justify-content: center; }
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo">Krishna<span>.</span></a>
+      <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
       </div>
-    </section>
-    <!-- Skills Section -->
-    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white" id="skills">
-      <div class="max-w-7xl mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-4" data-aos="fade-up">
-          My Skills
-        </h2>
-        <p
-          class="text-center text-gray-600 mb-16 max-w-2xl mx-auto"
-          data-aos="fade-up"
-        >
-          Technical expertise across the data science workflow
+      <button class="mobile-toggle" id="menu-toggle" aria-label="Open menu">
+        <i data-feather="menu"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <button class="mobile-close" id="mobile-close" aria-label="Close menu">
+      <i data-feather="x" style="width:28px;height:28px;"></i>
+    </button>
+    <a href="#home" class="mobile-nav-link">Home</a>
+    <a href="#about" class="mobile-nav-link">About</a>
+    <a href="#projects" class="mobile-nav-link">Projects</a>
+    <a href="#skills" class="mobile-nav-link">Skills</a>
+    <a href="#contact" class="mobile-nav-link">Contact</a>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero" id="home">
+    <div class="hero-bg-gradient"></div>
+    <div class="hero-grid-lines"></div>
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag" data-aos="fade-down" data-aos-delay="100">
+          <span class="dot"></span> Open to opportunities
+        </div>
+        <h1 data-aos="fade-up" data-aos-delay="200">
+          Krishnaanand <em>V</em>
+        </h1>
+        <p class="hero-desc" data-aos="fade-up" data-aos-delay="300">
+          I turn messy, complex data into insights people can actually act on. Statistics, machine learning, and visualizations that tell a clear story.
         </p>
-        <div class="grid md:grid-cols-2 gap-12">
-          <!-- Technical Skills -->
-          <div data-aos="fade-right">
-            <h3 class="text-xl font-semibold mb-6 flex items-center">
-              <i class="w-6 h-6 mr-2 text-blue-600" data-feather="code"></i>
-              Technical Skills
-            </h3>
-            <div class="space-y-6">
-              <div>
-                <div class="flex justify-between mb-2">
-                  <span class="font-medium">Python</span>
-                  <span class="text-gray-600">95%</span>
-                </div>
-                <div class="skill-bar">
-                  <div class="skill-progress" style="width: 95%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between mb-2">
-                  <span class="font-medium">SQL</span>
-                  <span class="text-gray-600">90%</span>
-                </div>
-                <div class="skill-bar">
-                  <div class="skill-progress" style="width: 90%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between mb-2">
-                  <span class="font-medium">Machine Learning</span>
-                  <span class="text-gray-600">92%</span>
-                </div>
-                <div class="skill-bar">
-                  <div class="skill-progress" style="width: 92%"></div>
-                </div>
-              </div>
-              <div>
-                <div class="flex justify-between mb-2">
-                  <span class="font-medium">Data Visualization</span>
-                  <span class="text-gray-600">88%</span>
-                </div>
-                <div class="skill-bar">
-                  <div class="skill-progress" style="width: 88%"></div>
-                </div>
-              </div>
-            </div>
+        <div class="hero-btns" data-aos="fade-up" data-aos-delay="400">
+          <a href="#projects" class="btn-primary">
+            <i data-feather="arrow-down" style="width:16px;height:16px;"></i>
+            View Projects
+          </a>
+          <a href="#contact" class="btn-outline">Get in Touch</a>
+        </div>
+        <div class="hero-stats" data-aos="fade-up" data-aos-delay="500">
+          <div class="hero-stat">
+            <h4>MSc</h4>
+            <p>Data Science</p>
           </div>
-          <!-- Tools & Technologies -->
-          <div data-aos="fade-left">
-            <h3 class="text-xl font-semibold mb-6 flex items-center">
-              <i class="w-6 h-6 mr-2 text-blue-600" data-feather="tool"></i>
-              Tools &amp; Technologies
-            </h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <i
-                  class="w-5 h-5 mr-3 text-blue-600"
-                  data-feather="database"
-                ></i>
-                <span>SQL/NoSQL</span>
-              </div>
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <i class="w-5 h-5 mr-3 text-blue-600" data-feather="cpu"></i>
-                <span>TensorFlow</span>
-              </div>
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <i
-                  class="w-5 h-5 mr-3 text-blue-600"
-                  data-feather="git-branch"
-                ></i>
-                <span>Git</span>
-              </div>
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <i class="w-5 h-5 mr-3 text-blue-600" data-feather="box"></i>
-                <span>Docker</span>
-              </div>
-              <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                <i
-                  class="w-5 h-5 mr-3 text-blue-600"
-                  data-feather="terminal"
-                ></i>
-                <span>Linux</span>
-              </div>
+          <div class="hero-stat">
+            <h4>10+</h4>
+            <p>Projects</p>
+          </div>
+          <div class="hero-stat">
+            <h4>DS & ML</h4>
+            <p>Specialization</p>
+          </div>
+        </div>
+      </div>
+      <div class="hero-photo-wrapper" data-aos="fade-left" data-aos-delay="300">
+        <div class="hero-photo-frame">
+          <img
+            src="https://media.licdn.com/dms/image/v2/D4E03AQHu3QNOmlfLxQ/profile-displayphoto-scale_200_200/B4EZpljQ25GoAc-/0/1762640335428?e=1770249600&v=beta&t=y_0WGrdeT7vXRgOZ6oWegFLoPZzOwuimIGZ05feCAC0"
+            alt="Krishnaanand V"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div class="about-photo" data-aos="fade-right">
+          <img
+            src="https://media.licdn.com/dms/image/v2/D4E03AQHu3QNOmlfLxQ/profile-displayphoto-scale_200_200/B4EZpljQ25GoAc-/0/1762640335428?e=1770249600&v=beta&t=y_0WGrdeT7vXRgOZ6oWegFLoPZzOwuimIGZ05feCAC0"
+            alt="Krishnaanand V"
+          />
+        </div>
+        <div class="about-text" data-aos="fade-left">
+          <span class="section-label">About Me</span>
+          <h2 class="section-title">My Journey in<br>Data Analysis</h2>
+          <p>
+            A results-driven professional looking for challenging data analyst roles that put my skills to good use and keep pushing me to grow. I'm a naturally analytical thinker with a methodical approach to problem-solving and strong organizational skills, comfortable juggling multiple tasks at once.
+          </p>
+          <p>
+            A strong communicator who works well with teams and brings a solid work ethic. I'm eager to influence business decisions through effective data analysis that drives real, measurable outcomes.
+          </p>
+          <div class="about-badges">
+            <div class="about-badge">
+              <i data-feather="award" style="width:16px;height:16px;"></i>
+              MSc in Data Science
+            </div>
+            <div class="about-badge">
+              <i data-feather="briefcase" style="width:16px;height:16px;"></i>
+              Data Analyst Experience
+            </div>
+            <div class="about-badge">
+              <i data-feather="database" style="width:16px;height:16px;"></i>
+              Multiple Projects
             </div>
           </div>
         </div>
       </div>
-    </section>
-    <!-- Contact Section -->
-   <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50" id="contact">
-  <div class="max-w-7xl mx-auto">
-    <h2 class="text-3xl font-bold text-center mb-4" data-aos="fade-up">
-      Get In Touch
-    </h2>
-    <p
-      class="text-center text-gray-600 mb-16 max-w-2xl mx-auto"
-      data-aos="fade-up"
-    >
-      Have a project in mind or want to discuss data solutions? Feel free to
-      reach out!
-    </p>
-    <div class="md:flex">
-      <div class="md:w-1/2 mb-10 md:mb-0" data-aos="fade-right">
-        <!-- ADDED id="contactForm" -->
-        <form class="space-y-6" id="contactForm">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="name"
-              >Name</label
-            >
-            <input
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              id="name"
-              name="name"
-              type="text"
-              required
-            />
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="projects" id="projects">
+    <div class="section-inner">
+      <span class="section-label" data-aos="fade-up">Portfolio</span>
+      <h2 class="section-title" data-aos="fade-up">Selected Projects</h2>
+      <p class="section-desc" data-aos="fade-up">
+        A mix of data tools, web apps, and fun experiments I've built along the way.
+      </p>
+
+      <div class="filter-bar" data-aos="fade-up">
+        <button class="filter-btn active" data-filter="all" type="button">All</button>
+        <button class="filter-btn" data-filter="ml" type="button">Machine Learning</button>
+        <button class="filter-btn viz-redirect" data-filter="viz" type="button">Visualization</button>
+        <button class="filter-btn" data-filter="web" type="button">Web Apps</button>
+      </div>
+
+      <div class="projects-grid">
+
+        <!-- Alcohol Calendar -->
+        <div class="project-card" data-category="web" data-aos="fade-up">
+          <img class="card-img" alt="Alcohol Calendar" src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Alcohol Calendar</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">A fun calendar to track and plan your drinks throughout the month.</p>
+            <div class="card-techs">
+              <span class="card-tech">JavaScript</span>
+              <span class="card-tech">HTML</span>
+              <span class="card-tech">CSS</span>
+            </div>
+            <div class="card-links">
+              <a href="tipsy_calendar.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
           </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="email"
-              >Email</label
-            >
-            <input
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              id="email"
-              name="email"
-              type="email"
-              required
-            />
+        </div>
+
+        <!-- English to Spanish Translator -->
+        <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="100">
+          <img class="card-img" alt="Translator" src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>English to Spanish Translator</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">A simple tool to translate text from English to Spanish in real time.</p>
+            <div class="card-techs">
+              <span class="card-tech">JavaScript</span>
+              <span class="card-tech">API</span>
+              <span class="card-tech">Translation</span>
+            </div>
+            <div class="card-links">
+              <a href="translator.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
           </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="subject"
-              >Subject</label
-            >
-            <input
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              id="subject"
-              name="subject"
-              type="text"
-            />
+        </div>
+
+        <!-- Delagger -->
+        <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="200">
+          <img class="card-img" alt="Delagger" src="https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Delagger</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">A utility to clean up and organize data quickly and efficiently.</p>
+            <div class="card-techs">
+              <span class="card-tech">Data Processing</span>
+              <span class="card-tech">JavaScript</span>
+              <span class="card-tech">Utility</span>
+            </div>
+            <div class="card-links">
+              <a href="delag.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
           </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="message"
-              >Message</label
-            >
-            <textarea
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              id="message"
-              name="message"
-              rows="5"
-              required
-            ></textarea>
+        </div>
+
+        <!-- My GitHub -->
+        <div class="project-card" data-category="web" data-aos="fade-up">
+          <img class="card-img" alt="GitHub" src="https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>My GitHub</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">Collection of my coding projects and repositories on GitHub.</p>
+            <div class="card-techs">
+              <span class="card-tech">GitHub</span>
+              <span class="card-tech">Portfolio</span>
+              <span class="card-tech">Code</span>
+            </div>
+            <div class="card-links">
+              <a href="https://github.com/redx-mistry-k" target="_blank"><i data-feather="github" style="width:14px;height:14px;"></i> View Repos</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Countdown Timer -->
+        <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="100">
+          <img class="card-img" alt="Countdown Timer" src="https://images.unsplash.com/photo-1501139083538-0139583c060f?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Countdown Timer</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">A customizable countdown timer application for any event.</p>
+            <div class="card-techs">
+              <span class="card-tech">JavaScript</span>
+              <span class="card-tech">Timer</span>
+              <span class="card-tech">Utility</span>
+            </div>
+            <div class="card-links">
+              <a href="countdownTimer/index.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Be My Valentine -->
+        <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="200">
+          <img class="card-img" alt="Be My Valentine" src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Be My Valentine</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">A playful Valentine's Day-themed interactive page.</p>
+            <div class="card-techs">
+              <span class="card-tech">HTML</span>
+              <span class="card-tech">CSS</span>
+              <span class="card-tech">Interactive</span>
+            </div>
+            <div class="card-links">
+              <a href="bemyV/index.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7 Digits Extractor -->
+        <div class="project-card" data-category="web" data-aos="fade-up">
+          <img class="card-img" alt="7 Digits Extractor" src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>7 Digits Extractor</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">Tool to extract 7-digit numbers from any block of text.</p>
+            <div class="card-techs">
+              <span class="card-tech">Text Processing</span>
+              <span class="card-tech">JavaScript</span>
+              <span class="card-tech">Regex</span>
+            </div>
+            <div class="card-links">
+              <a href="7digitsextracter.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text to Editable Table -->
+        <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="100">
+          <img class="card-img" alt="Text to Table" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Text to Editable Table</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">Convert raw text data into interactive editable tables.</p>
+            <div class="card-techs">
+              <span class="card-tech">Data Processing</span>
+              <span class="card-tech">Table</span>
+              <span class="card-tech">JavaScript</span>
+            </div>
+            <div class="card-links">
+              <a href="remit_adv/index.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date Night Generator -->
+        <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="200">
+          <img class="card-img" alt="Date Night" src="https://images.unsplash.com/photo-1529543544282-ea57407bc2f7?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Date Night Generator</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">A fun date night idea generator for when you're stuck on plans.</p>
+            <div class="card-techs">
+              <span class="card-tech">JavaScript</span>
+              <span class="card-tech">Random</span>
+              <span class="card-tech">Entertainment</span>
+            </div>
+            <div class="card-links">
+              <a href="dateNight/index.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ovulation Calculator -->
+        <div class="project-card" data-category="web" data-aos="fade-up">
+          <img class="card-img" alt="Ovulation Calculator" src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Ovulation Calculator</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">Predicts menstrual cycles, fertile windows, and upcoming periods with smart insights.</p>
+            <div class="card-techs">
+              <span class="card-tech">JavaScript</span>
+              <span class="card-tech">HTML</span>
+              <span class="card-tech">CSS</span>
+            </div>
+            <div class="card-links">
+              <a href="Ovaluation_Calculator/Smart.html" target="_blank"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Color Guess Game -->
+        <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="100">
+          <img class="card-img" alt="Color Guess Game" src="https://images.unsplash.com/photo-1525909002-1b05e0c869d8?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Color Guess Game</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">An interactive game that challenges you to match random color swatches to their names or hex codes.</p>
+            <div class="card-techs">
+              <span class="card-tech">JavaScript</span>
+              <span class="card-tech">HTML</span>
+              <span class="card-tech">CSS</span>
+            </div>
+            <div class="card-links">
+              <a href="colorguess/ColorGuess.html" target="_blank"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Good Things Journal -->
+        <div class="project-card" data-category="web" data-aos="fade-up" data-aos-delay="200">
+          <img class="card-img" alt="Good Things Journal" src="https://images.unsplash.com/photo-1517842645767-c639042777db?w=640&h=360&fit=crop"/>
+          <div class="card-body">
+            <div class="card-header">
+              <h3>Good Things Journal</h3>
+              <span class="card-tag">Web</span>
+            </div>
+            <p class="card-desc">A journaling tool to record positive moments and gratitude.</p>
+            <div class="card-techs">
+              <span class="card-tech">Journaling</span>
+              <span class="card-tech">Personal</span>
+              <span class="card-tech">JavaScript</span>
+            </div>
+            <div class="card-links">
+              <a href="noteGoodThings/index.html"><i data-feather="external-link" style="width:14px;height:14px;"></i> Demo</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section class="skills" id="skills">
+    <div class="section-inner">
+      <span class="section-label" data-aos="fade-up">Expertise</span>
+      <h2 class="section-title" data-aos="fade-up">Skills & Tools</h2>
+      <p class="section-desc" data-aos="fade-up">
+        Technical expertise across the full data science workflow.
+      </p>
+
+      <div class="skills-grid">
+        <div class="skill-group" data-aos="fade-right">
+          <h3><i data-feather="code" style="width:22px;height:22px;"></i> Technical Skills</h3>
+
+          <div class="skill-item">
+            <div class="skill-item-header">
+              <span>Python</span><span>95%</span>
+            </div>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width:0%" data-width="95%"></div>
+            </div>
           </div>
 
-          <!-- ADDED id on button -->
-          <button
-            class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition"
-            type="submit"
-            id="contactSubmit"
-          >
+          <div class="skill-item">
+            <div class="skill-item-header">
+              <span>SQL</span><span>90%</span>
+            </div>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width:0%" data-width="90%"></div>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-item-header">
+              <span>Machine Learning</span><span>92%</span>
+            </div>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width:0%" data-width="92%"></div>
+            </div>
+          </div>
+
+          <div class="skill-item">
+            <div class="skill-item-header">
+              <span>Data Visualization</span><span>88%</span>
+            </div>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width:0%" data-width="88%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="skill-group" data-aos="fade-left">
+          <h3><i data-feather="tool" style="width:22px;height:22px;"></i> Tools & Technologies</h3>
+          <div class="tools-grid">
+            <div class="tool-item">
+              <i data-feather="database"></i> SQL / NoSQL
+            </div>
+            <div class="tool-item">
+              <i data-feather="cpu"></i> TensorFlow
+            </div>
+            <div class="tool-item">
+              <i data-feather="git-branch"></i> Git
+            </div>
+            <div class="tool-item">
+              <i data-feather="box"></i> Docker
+            </div>
+            <div class="tool-item">
+              <i data-feather="terminal"></i> Linux
+            </div>
+            <div class="tool-item">
+              <i data-feather="bar-chart-2"></i> Tableau
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact" id="contact">
+    <div class="section-inner">
+      <span class="section-label" data-aos="fade-up">Say Hello</span>
+      <h2 class="section-title" data-aos="fade-up">Get In Touch</h2>
+      <p class="section-desc" data-aos="fade-up">
+        Have a project in mind or want to discuss data solutions? I'd love to hear from you.
+      </p>
+
+      <div class="contact-grid">
+        <form class="contact-form" id="contactForm" data-aos="fade-right">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required placeholder="Your name"/>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="you@example.com"/>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" placeholder="What's this about?"/>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary" id="contactSubmit" style="width:100%;justify-content:center;">
             Send Message
           </button>
-
-          <!-- ADDED: status text -->
-          <p
-            id="contactStatus"
-            class="text-sm mt-2 min-h-[1.25rem]"
-          ></p>
+          <p id="contactStatus"></p>
         </form>
-      </div>
 
-      <!-- right side stays exactly the same -->
-      <div class="md:w-1/2 md:pl-16" data-aos="fade-left">
-        <div class="bg-white p-8 rounded-xl shadow-md h-full">
-          <h3 class="text-xl font-semibold mb-6">Contact Information</h3>
-          <div class="space-y-6">
-            <div class="flex items-start">
-              <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
-                <i class="w-5 h-5 text-blue-600" data-feather="mail"></i>
-              </div>
-              <div class="ml-4">
-                <h4 class="text-sm font-medium text-gray-500">Email</h4>
-                <p class="text-gray-900">krish@krishnaanalytics.tech</p>
-              </div>
-            </div>
-            <div class="flex items-start">
-              <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
-                <i class="w-5 h-5 text-blue-600" data-feather="phone"></i>
-              </div>
-              <div class="ml-4">
-                <h4 class="text-sm font-medium text-gray-500">Phone</h4>
-                <p class="text-gray-900">+91 7299608572</p>
-              </div>
-            </div>
-            <div class="flex items-start">
-              <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
-                <i class="w-5 h-5 text-blue-600" data-feather="map-pin"></i>
-              </div>
-              <div class="ml-4">
-                <h4 class="text-sm font-medium text-gray-500">Location</h4>
-                <p class="text-gray-900">India</p>
-              </div>
+        <div class="contact-info-card" data-aos="fade-left">
+          <h3>Contact Information</h3>
+          <div class="contact-info-item">
+            <div class="contact-info-icon"><i data-feather="mail"></i></div>
+            <div>
+              <h4>Email</h4>
+              <p>krish@krishnaanalytics.tech</p>
             </div>
           </div>
-          <h3 class="text-xl font-semibold mt-10 mb-6">Connect With Me</h3>
-          <div class="flex space-x-4">
-            <a
-              class="bg-gray-100 p-3 rounded-full hover:bg-blue-100 transition"
-              href="https://github.com/redx-mistry-k"
-            >
-              <i class="w-5 h-5 text-gray-700" data-feather="github"></i>
+          <div class="contact-info-item">
+            <div class="contact-info-icon"><i data-feather="phone"></i></div>
+            <div>
+              <h4>Phone</h4>
+              <p>Prefer through Email</p>
+            </div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon"><i data-feather="map-pin"></i></div>
+            <div>
+              <h4>Location</h4>
+              <p>India</p>
+            </div>
+          </div>
+          <h3 style="margin-top:2rem;">Connect With Me</h3>
+          <div class="social-links">
+            <a class="social-link" href="https://github.com/redx-mistry-k" target="_blank" aria-label="GitHub">
+              <i data-feather="github"></i>
             </a>
-            <a
-              class="bg-gray-100 p-3 rounded-full hover:bg-blue-100 transition"
-              href="https://www.linkedin.com/in/vkrishnaanand/"
-            >
-              <i class="w-5 h-5 text-gray-700" data-feather="linkedin"></i>
+            <a class="social-link" href="https://www.linkedin.com/in/vkrishnaanand/" target="_blank" aria-label="LinkedIn">
+              <i data-feather="linkedin"></i>
             </a>
           </div>
         </div>
       </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto">
-        <div class="md:flex md:justify-between">
-          <div class="mb-8 md:mb-0">
-            <h3 class="text-xl font-bold mb-4">Data Science Portfolio</h3>
-            <p class="text-gray-400 max-w-xs">
-              Transforming data into insights that drive business value and
-              innovation.
-            </p>
-          </div>
-          <div class="grid grid-cols-2 gap-8 sm:grid-cols-3">
-            <div>
-              <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">
-                Navigation
-              </h4>
-              <ul class="space-y-2">
-                <li>
-                  <a
-                    class="text-gray-400 hover:text-white transition"
-                    href="#home"
-                    >Home</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="text-gray-400 hover:text-white transition"
-                    href="#about"
-                    >About</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="text-gray-400 hover:text-white transition"
-                    href="#projects"
-                    >Projects</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="text-gray-400 hover:text-white transition"
-                    href="#skills"
-                    >Skills</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="text-gray-400 hover:text-white transition"
-                    href="#contact"
-                    >Contact</a
-                  >
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">
-                Resources
-              </h4>
-              <ul class="space-y-2">
-                <li>
-                  <a class="text-gray-400 hover:text-white transition" href="#"
-                    >Blog</a
-                  >
-                </li>
-                <li>
-                  <a class="text-gray-400 hover:text-white transition" href="#"
-                    >Tutorials</a
-                  >
-                </li>
-                <li>
-                  <a class="text-gray-400 hover:text-white transition" href="#"
-                    >GitHub</a
-                  >
-                </li>
-                <li>
-                  <a class="text-gray-400 hover:text-white transition" href="#"
-                    >Case Studies</a
-                  >
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 class="text-sm font-semibold uppercase tracking-wider mb-4">
-                Legal
-              </h4>
-              <ul class="space-y-2">
-                <li>
-                  <a class="text-gray-400 hover:text-white transition" href="#"
-                    >Privacy Policy</a
-                  >
-                </li>
-                <li>
-                  <a class="text-gray-400 hover:text-white transition" href="#"
-                    >Terms of Service</a
-                  >
-                </li>
-                <li>
-                  <a class="text-gray-400 hover:text-white transition" href="#"
-                    >Cookie Policy</a
-                  >
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div
-          class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center"
-        >
-          <p class="text-gray-400 text-sm">
-            © 2023 Data Science Portfolio. All rights reserved.
-          </p>
-          <div class="mt-4 md:mt-0 flex space-x-6">
-            <a class="text-gray-400 hover:text-white transition" href="#">
-              <i class="w-5 h-5" data-feather="instagram"></i>
-            </a>
-            <a
-              class="text-gray-400 hover:text-white transition"
-              href="https://www.linkedin.com/in/vkrishnaanand/"
-            >
-              <i class="w-5 h-5" data-feather="linkedin"></i>
-            </a>
-          </div>
-        </div>
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <p>&copy; 2025 Krishnaanand V. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#home">Home</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
       </div>
-    </footer>
-    <script>
-      // Initialize AOS animation
-      AOS.init({
-        duration: 800,
-        easing: "ease-in-out",
-        once: true,
+    </div>
+  </footer>
+
+  <script>
+    // AOS
+    AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 80 });
+
+    // Feather icons
+    feather.replace();
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    // Mobile menu
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+
+    document.getElementById('mobile-close').addEventListener('click', () => {
+      document.getElementById('mobile-menu').classList.remove('open');
+      document.body.style.overflow = '';
+    });
+
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.remove('open');
+        document.body.style.overflow = '';
       });
+    });
 
-      // Mobile menu toggle
-      document
-        .getElementById("menu-toggle")
-        .addEventListener("click", function () {
-          const menu = document.getElementById("mobile-menu");
-          menu.classList.toggle("hidden");
-        });
-
-      // Project filtering
-      document.querySelectorAll(".filter-btn").forEach((button) => {
-        button.addEventListener("click", function () {
-          const filter = this.getAttribute("data-filter");
-
-          // Update active button
-          document.querySelectorAll(".filter-btn").forEach((btn) => {
-            btn.classList.remove("bg-blue-600", "text-white");
-            btn.classList.add("bg-white", "text-gray-700");
-          });
-          this.classList.remove("bg-white", "text-gray-700");
-          this.classList.add("bg-blue-600", "text-white");
-
-          // Filter projects
-          document.querySelectorAll(".project-card").forEach((card) => {
-            if (
-              filter === "all" ||
-              card.getAttribute("data-category") === filter
-            ) {
-              card.style.display = "block";
-            } else {
-              card.style.display = "none";
-            }
-          });
-        });
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+        }
       });
+    });
 
-      // Smooth scrolling for anchor links
-      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-        anchor.addEventListener("click", function (e) {
-          e.preventDefault();
+    // Project filtering
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Handle viz redirect
+        if (this.classList.contains('viz-redirect')) {
+          window.location.href = 'https://dashboards.krishnaanalytics.tech/';
+          return;
+        }
 
-          const targetId = this.getAttribute("href");
-          const targetElement = document.querySelector(targetId);
+        const filter = this.getAttribute('data-filter');
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
 
-          if (targetElement) {
-            window.scrollTo({
-              top: targetElement.offsetTop - 80,
-              behavior: "smooth",
-            });
-
-            // Close mobile menu if open
-            const mobileMenu = document.getElementById("mobile-menu");
-            if (!mobileMenu.classList.contains("hidden")) {
-              mobileMenu.classList.add("hidden");
-            }
+        document.querySelectorAll('.project-card').forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
           }
         });
       });
-
-      // Feather icons replacement
-      feather.replace();
-      document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('contactForm');
-    const statusEl = document.getElementById('contactStatus');
-    const submitBtn = document.getElementById('contactSubmit');
-
-    const N8N_CONTACT_URL = 'https://n8nonline-kz8t.onrender.com/webhook/contact';
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const subject = document.getElementById('subject').value.trim();
-      const message = document.getElementById('message').value.trim();
-
-      if (!name || !email || !message) {
-        statusEl.textContent = 'Please fill in name, email and message.';
-        statusEl.className = 'text-sm mt-2 text-red-600';
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending...';
-      statusEl.textContent = '';
-      statusEl.className = 'text-sm mt-2';
-
-      try {
-        const res = await fetch(N8N_CONTACT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, subject, message })
-        });
-
-        let data;
-        try {
-          data = await res.json();
-        } catch {
-          data = {};
-        }
-
-        if (res.ok && data.success) {
-          statusEl.textContent = data.message || 'Your message has been sent.';
-          statusEl.className = 'text-sm mt-2 text-green-600';
-          form.reset();
-        } else {
-          statusEl.textContent =
-            data.error ||
-            'Something went wrong. Please try again in a moment.';
-          statusEl.className = 'text-sm mt-2 text-red-600';
-        }
-      } catch (err) {
-        console.error(err);
-        statusEl.textContent =
-          'Could not reach the server. Please try again later.';
-        statusEl.className = 'text-sm mt-2 text-red-600';
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Message';
-      }
     });
-  });
-    </script>
-  </body>
+
+    // Skill bar animation on scroll
+    const skillObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
+            bar.style.width = bar.getAttribute('data-width');
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.skill-group').forEach(group => {
+      skillObserver.observe(group);
+    });
+
+    // Contact form
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('contactForm');
+      const statusEl = document.getElementById('contactStatus');
+      const submitBtn = document.getElementById('contactSubmit');
+      const N8N_CONTACT_URL = 'https://n8nonline-kz8t.onrender.com/webhook/contact';
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        if (!name || !email || !message) {
+          statusEl.textContent = 'Please fill in name, email and message.';
+          statusEl.className = 'text-red';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        statusEl.textContent = '';
+
+        try {
+          const res = await fetch(N8N_CONTACT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, subject, message })
+          });
+
+          let data;
+          try { data = await res.json(); } catch { data = {}; }
+
+          if (res.ok && data.success) {
+            statusEl.textContent = data.message || 'Your message has been sent!';
+            statusEl.className = 'text-green';
+            form.reset();
+          } else {
+            statusEl.textContent = data.error || 'Something went wrong. Please try again.';
+            statusEl.className = 'text-red';
+          }
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = 'Could not reach the server. Please try again later.';
+          statusEl.className = 'text-red';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send Message';
+        }
+      });
+    });
+  </script>
+</body>
 </html>
