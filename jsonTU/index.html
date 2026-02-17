@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk JSON Timeline Updater</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface-hover: #222632;
+            --border: #2a2e3b;
+            --border-focus: #5b8def;
+            --text: #e1e4ed;
+            --text-muted: #8b90a0;
+            --accent: #5b8def;
+            --accent-hover: #4a7de0;
+            --success: #34d399;
+            --success-bg: rgba(52, 211, 153, 0.08);
+            --success-border: rgba(52, 211, 153, 0.25);
+            --warn: #fbbf24;
+            --warn-bg: rgba(251, 191, 36, 0.08);
+            --warn-border: rgba(251, 191, 36, 0.25);
+            --error: #f87171;
+            --error-bg: rgba(248, 113, 113, 0.08);
+            --error-border: rgba(248, 113, 113, 0.25);
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'DM Sans', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 24px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .section-label h2 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .section-hint {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            margin-left: 36px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            line-height: 1.6;
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            resize: vertical;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--border-focus);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .btn-update {
+            font-family: var(--sans);
+            font-size: 0.88rem;
+            font-weight: 600;
+            padding: 10px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-update:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-update:active {
+            transform: scale(0.97);
+        }
+
+        .btn-clear {
+            font-family: var(--sans);
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-muted);
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-clear:hover {
+            border-color: var(--text-muted);
+            color: var(--text);
+        }
+
+        .btn-copy {
+            font-family: var(--sans);
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-muted);
+            transition: border-color 0.2s, color 0.2s;
+            margin-left: auto;
+        }
+
+        .btn-copy:hover {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        /* Status Cards */
+        .status-panel {
+            display: none;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            border: 1px solid;
+        }
+
+        .status-panel.visible { display: block; }
+
+        .status-panel.success {
+            background: var(--success-bg);
+            border-color: var(--success-border);
+        }
+
+        .status-panel.warning {
+            background: var(--warn-bg);
+            border-color: var(--warn-border);
+        }
+
+        .status-panel.error {
+            background: var(--error-bg);
+            border-color: var(--error-border);
+        }
+
+        .status-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .status-panel.success .status-title { color: var(--success); }
+        .status-panel.warning .status-title { color: var(--warn); }
+        .status-panel.error .status-title { color: var(--error); }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 8px;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+            padding: 6px 0;
+        }
+
+        .stat-label { color: var(--text-muted); }
+
+        .stat-value {
+            font-family: var(--mono);
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .stat-value.green { color: var(--success); }
+        .stat-value.yellow { color: var(--warn); }
+        .stat-value.red { color: var(--error); }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .output-header h2 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--surface);
+            border: 1px solid var(--success-border);
+            color: var(--success);
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Bulk JSON Timeline Updater</h1>
+        <p>Updates only the <strong>Timeline</strong> field inside JSON blobs where <strong>StepName = "Experiment Ended"</strong> and the StudyName has a match in your mapping. Nothing else gets touched.</p>
+    </div>
+
+    <!-- Step 1: JSON Rows -->
+    <div class="section">
+        <div class="section-label">
+            <span class="step-badge">1</span>
+            <h2>JSON Rows</h2>
+        </div>
+        <div class="section-hint">Paste tab-separated rows from Excel. First row = header. Last column = JSON blob.</div>
+        <textarea id="jsonRows" rows="10" placeholder="Paste your Excel rows here (with headers)..."></textarea>
+    </div>
+
+    <!-- Step 2: Study Mapping -->
+    <div class="section">
+        <div class="section-label">
+            <span class="step-badge">2</span>
+            <h2>Study Mapping</h2>
+        </div>
+        <div class="section-hint">Tab-separated: StudyName → Timeline value. First row = header.</div>
+        <textarea id="mappingRows" rows="6" placeholder="StudyName&#9;Timeline&#10;STUDY-001&#9;Week 12&#10;STUDY-002&#9;Week 24"></textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+        <button class="btn-update" onclick="processBulk()">Update</button>
+        <button class="btn-clear" onclick="clearAll()">Clear All</button>
+    </div>
+
+    <!-- Status -->
+    <div id="statusPanel" class="status-panel"></div>
+
+    <!-- Output -->
+    <div class="section">
+        <div class="output-header">
+            <h2>Updated Rows</h2>
+            <button class="btn-copy" onclick="copyOutput()">Copy to Clipboard</button>
+        </div>
+        <textarea id="outputRows" rows="10" readonly placeholder="Output will appear here after you click Update..."></textarea>
+    </div>
+
+</div>
+
+<div id="toast" class="toast">Copied to clipboard</div>
+
+<script>
+function processBulk() {
+
+    let totalRows = 0;
+    let updatedRows = 0;
+    let jsonErrors = 0;
+    let notFound = 0;
+
+    const statusPanel = document.getElementById("statusPanel");
+    statusPanel.innerHTML = "";
+    statusPanel.className = "status-panel";
+
+    try {
+
+        // ---- Parse Mapping ----
+        const mappingText = document.getElementById("mappingRows").value.trim();
+        if (!mappingText) {
+            showStatus("error", "Missing Input", "Please paste a study mapping in Step 2.");
+            return;
+        }
+
+        const mappingLines = mappingText.split("\n");
+        const mapping = {};
+
+        for (let i = 1; i < mappingLines.length; i++) {
+            const cols = mappingLines[i].split("\t");
+            if (cols[0] && cols[1]) {
+                let val = cols[1].trim();
+                mapping[cols[0].trim()] = isNaN(val) || val === "" ? val : Number(val);
+            }
+        }
+
+        if (Object.keys(mapping).length === 0) {
+            showStatus("warning", "Empty Mapping", "No valid StudyName/Timeline pairs found. Make sure you have a header row and tab-separated values.");
+            return;
+        }
+
+        // ---- Parse JSON Rows ----
+        const jsonText = document.getElementById("jsonRows").value.trim();
+        if (!jsonText) {
+            showStatus("error", "Missing Input", "Please paste your JSON rows in Step 1.");
+            return;
+        }
+
+        const jsonLines = jsonText.split("\n");
+        let output = [];
+        output.push(jsonLines[0]);
+
+        for (let i = 1; i < jsonLines.length; i++) {
+
+            totalRows++;
+            let columns = jsonLines[i].split("\t");
+            let jsonBlob = columns[columns.length - 1];
+            let rowUpdated = false;
+
+            try {
+
+                let jsonData = JSON.parse(jsonBlob);
+
+                if (Array.isArray(jsonData)) {
+
+                    let foundStep = false;
+
+                    jsonData.forEach(item => {
+                        if (item.StepName === "Experiment Ended") {
+                            foundStep = true;
+
+                            if (mapping[item.StudyName] !== undefined) {
+                                item.Timeline = mapping[item.StudyName];
+                                rowUpdated = true;
+                            } else {
+                                notFound++;
+                            }
+                        }
+                    });
+
+                    if (!foundStep) notFound++;
+
+                } else {
+
+                    if (jsonData.StepName === "Experiment Ended") {
+
+                        if (mapping[jsonData.StudyName] !== undefined) {
+                            jsonData.Timeline = mapping[jsonData.StudyName];
+                            rowUpdated = true;
+                        } else {
+                            notFound++;
+                        }
+
+                    } else {
+                        notFound++;
+                    }
+                }
+
+                if (rowUpdated) updatedRows++;
+
+                columns[columns.length - 1] = JSON.stringify(jsonData);
+
+            } catch (err) {
+                jsonErrors++;
+            }
+
+            output.push(columns.join("\t"));
+        }
+
+        document.getElementById("outputRows").value = output.join("\n");
+
+        // ---- Status Display ----
+        const hasIssues = jsonErrors > 0 || notFound > 0;
+        const statusType = jsonErrors > 0 ? "warning" : (updatedRows === 0 ? "warning" : "success");
+        const statusTitle = updatedRows > 0 ? "Update Complete" : "No Rows Updated";
+
+        statusPanel.className = "status-panel visible " + statusType;
+        statusPanel.innerHTML = `
+            <div class="status-title">${statusTitle}</div>
+            <div class="status-grid">
+                <div class="stat">
+                    <span class="stat-label">Total Rows</span>
+                    <span class="stat-value">${totalRows}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Updated</span>
+                    <span class="stat-value green">${updatedRows}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Not Matched</span>
+                    <span class="stat-value ${notFound > 0 ? 'yellow' : ''}">${notFound}</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">JSON Errors</span>
+                    <span class="stat-value ${jsonErrors > 0 ? 'red' : ''}">${jsonErrors}</span>
+                </div>
+            </div>
+        `;
+
+    } catch (error) {
+        showStatus("error", "Unexpected Error", "Something went wrong. Check your input format.");
+    }
+}
+
+function showStatus(type, title, message) {
+    const statusPanel = document.getElementById("statusPanel");
+    statusPanel.className = "status-panel visible " + type;
+    statusPanel.innerHTML = `
+        <div class="status-title">${title}</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">${message}</div>
+    `;
+}
+
+function copyOutput() {
+    const output = document.getElementById("outputRows");
+    if (!output.value) return;
+
+    output.select();
+    output.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(output.value).then(() => {
+        const toast = document.getElementById("toast");
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2000);
+    });
+}
+
+function clearAll() {
+    document.getElementById("jsonRows").value = "";
+    document.getElementById("mappingRows").value = "";
+    document.getElementById("outputRows").value = "";
+    const statusPanel = document.getElementById("statusPanel");
+    statusPanel.className = "status-panel";
+    statusPanel.innerHTML = "";
+}
+</script>
+
+</body>
+</html>
