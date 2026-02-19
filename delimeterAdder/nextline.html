@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Strong JSON Newline Fix</title>
+    <style>
+      body {
+        font-family: Arial;
+        padding: 20px;
+      }
+      textarea {
+        width: 100%;
+        height: 350px;
+        margin-bottom: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Fix Newlines Inside JSON String Values</h3>
+
+    <textarea id="input" placeholder="Paste ALL your JSON here..."></textarea>
+    <button onclick="fixNewlines()">Fix All</button>
+    <textarea id="output" placeholder="Result..."></textarea>
+
+    <script>
+      function fixNewlines() {
+        let raw = document.getElementById("input").value;
+
+        let result = "";
+        let insideString = false;
+
+        for (let i = 0; i < raw.length; i++) {
+          const char = raw[i];
+
+          if (char === '"' && raw[i - 1] !== "\\") {
+            insideString = !insideString;
+            result += char;
+            continue;
+          }
+
+          // If we're inside a string and hit newline → skip it
+          if (insideString && (char === "\n" || char === "\r")) {
+            continue;
+          }
+
+          result += char;
+        }
+
+        document.getElementById("output").value = result;
+      }
+    </script>
+  </body>
+</html>
