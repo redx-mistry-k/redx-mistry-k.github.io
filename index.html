@@ -7,9 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"/>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.2/feather.min.js"></script>
   <style>
     :root {
       --bg-primary: #0a0a0a;
@@ -51,7 +51,7 @@
       inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
       pointer-events: none;
-      z-index: 9999;
+      z-index: 1;
     }
 
     /* ─── NAV ─── */
@@ -883,9 +883,260 @@
     .delay-2 { animation-delay: 0.2s; }
     .delay-3 { animation-delay: 0.3s; }
     .delay-4 { animation-delay: 0.4s; }
+
+    /* ─── SCROLL PROGRESS BAR ─── */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #88cc00, var(--accent));
+      background-size: 200% 100%;
+      animation: shimmerBar 3s ease infinite;
+      z-index: 1000;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    @keyframes shimmerBar {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ─── HERO TEXT REVEAL ─── */
+    .hero h1 .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(40px) rotateX(40deg);
+      animation: wordReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Fallback: if JS fails, still show text */
+    .hero h1 { opacity: 1 !important; visibility: visible !important; }
+
+    @keyframes wordReveal {
+      to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+      }
+    }
+
+    /* ─── ACCENT NAME SHIMMER ─── */
+    .hero h1 em {
+      background: linear-gradient(120deg, var(--accent) 0%, #fff 50%, var(--accent) 100%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: textShimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes textShimmer {
+      0% { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+
+    /* ─── MAGNETIC BUTTON HOVER ─── */
+    .btn-primary, .btn-outline {
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 10px 40px rgba(200,255,0,0.3);
+    }
+
+    /* ─── PROJECT CARD 3D TILT ─── */
+    .project-card {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .project-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(200,255,0,0.05);
+    }
+
+    .project-card .card-img {
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s;
+    }
+
+    .project-card:hover .card-img {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+
+    /* ─── TOOL ITEMS STAGGERED ENTRANCE ─── */
+    .tool-item {
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .tool-item:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    /* ─── ABOUT BADGE HOVER BOUNCE ─── */
+    .about-badge {
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .about-badge:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(200,255,0,0.1);
+    }
+
+    /* ─── FLOATING PARTICLES ─── */
+    .particle-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0;
+      animation: particleFloat linear infinite;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        opacity: 0;
+        transform: translateY(100vh) scale(0);
+      }
+      10% { opacity: 0.4; }
+      90% { opacity: 0.1; }
+      100% {
+        opacity: 0;
+        transform: translateY(-10vh) scale(1);
+      }
+    }
+
+    /* ─── NAV LINK HOVER GLOW ─── */
+    .nav-links a:hover {
+      color: var(--accent);
+      text-shadow: 0 0 15px rgba(200,255,0,0.3);
+    }
+
+    /* ─── HERO TAG BOUNCE ─── */
+    .hero-tag {
+      animation: tagBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes tagBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* ─── SECTION DIVIDER LINE ─── */
+    .section-label::before {
+      animation: lineGrow 1.5s ease-out forwards;
+      transform-origin: left;
+    }
+
+    @keyframes lineGrow {
+      from { width: 0; }
+      to { width: 30px; }
+    }
+
+    /* ─── CONTACT FORM INPUT FOCUS GLOW ─── */
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200,255,0,0.08), 0 0 20px rgba(200,255,0,0.06);
+    }
+
+    /* ─── SOCIAL LINK PULSE ON HOVER ─── */
+    .social-link:hover {
+      animation: socialPulse 0.5s ease;
+    }
+
+    @keyframes socialPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    /* ─── CURSOR GLOW (desktop only) ─── */
+    .cursor-glow {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,255,0,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s;
+    }
+
+    @media (max-width: 768px) {
+      .cursor-glow { display: none; }
+    }
+
+    /* ─── HERO STAT COUNTER ─── */
+    .hero-stat h4 {
+      display: inline-block;
+    }
+
+    /* ─── SMOOTH CARD IMAGE OVERLAY ─── */
+    .project-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 200px;
+      background: linear-gradient(180deg, transparent 60%, var(--bg-card) 100%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .project-card { position: relative; }
+
+    .project-card:hover::after { opacity: 1; }
+
+    /* ─── FILTER BUTTON RIPPLE ─── */
+    .filter-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .filter-btn .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(200,255,0,0.3);
+      transform: scale(0);
+      animation: rippleEffect 0.6s linear;
+      pointer-events: none;
+    }
+
+    @keyframes rippleEffect {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Scroll Progress Bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Cursor Glow -->
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <!-- Floating Particles -->
+  <div class="particle-container" id="particles"></div>
+
   <!-- Navigation -->
   <nav id="navbar">
     <div class="nav-inner">
@@ -1379,7 +1630,7 @@
             <div class="contact-info-icon"><i data-feather="mail"></i></div>
             <div>
               <h4>Email</h4>
-              <p>krish@krishnaanalytics.tech</p>
+              <p><a href="mailto:krish@krishnaanalytics.tech">krish@krishnaanalytics.tech</a></p>
             </div>
           </div>
           <div class="contact-info-item">
@@ -1423,15 +1674,192 @@
   </footer>
 
   <script>
-    // AOS
-    AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 80 });
+    // AOS (with fallback if CDN fails)
+    try {
+      if (typeof AOS !== 'undefined') {
+        AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true, offset: 80 });
+      }
+    } catch(e) { console.warn('AOS not loaded:', e); }
 
-    // Feather icons
-    feather.replace();
+    // Feather icons (with fallback)
+    try {
+      if (typeof feather !== 'undefined') {
+        feather.replace();
+      }
+    } catch(e) { console.warn('Feather not loaded:', e); }
 
-    // Navbar scroll effect
+    // ─── SCROLL PROGRESS BAR ───
     window.addEventListener('scroll', () => {
-      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      document.getElementById('scrollProgress').style.width = progress + '%';
+
+      // Navbar scroll
+      document.getElementById('navbar').classList.toggle('scrolled', scrollTop > 50);
+    });
+
+    // ─── CURSOR GLOW (follows mouse on desktop) ───
+    const cursorGlow = document.getElementById('cursorGlow');
+    let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function animateCursor() {
+      glowX += (mouseX - glowX) * 0.08;
+      glowY += (mouseY - glowY) * 0.08;
+      cursorGlow.style.left = glowX + 'px';
+      cursorGlow.style.top = glowY + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // ─── FLOATING PARTICLES ───
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 15; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (8 + Math.random() * 12) + 's';
+        p.style.animationDelay = (Math.random() * 10) + 's';
+        p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+        container.appendChild(p);
+      }
+    }
+    createParticles();
+
+    // ─── HERO TEXT WORD-BY-WORD REVEAL ───
+    (function() {
+      const heroH1 = document.querySelector('.hero h1');
+      if (heroH1) {
+        const html = heroH1.innerHTML;
+        // Split text nodes into words while preserving HTML tags
+        const wrapped = html.replace(/(<[^>]+>)|(\S+)/g, (match, tag, word) => {
+          if (tag) return tag;
+          return `<span class="word">${word}</span> `;
+        });
+        heroH1.innerHTML = wrapped;
+
+        // Stagger the animation delays
+        heroH1.querySelectorAll('.word').forEach((word, i) => {
+          word.style.animationDelay = (0.4 + i * 0.1) + 's';
+        });
+      }
+    })();
+
+    // ─── PROJECT CARD 3D TILT ───
+    document.querySelectorAll('.project-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -4;
+        const rotateY = ((x - centerX) / centerX) * 4;
+        card.style.transform = `translateY(-8px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'translateY(0) rotateX(0deg) rotateY(0deg)';
+      });
+    });
+
+    // ─── FILTER BUTTON RIPPLE EFFECT ───
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+        this.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 600);
+
+        // Handle viz redirect
+        if (this.classList.contains('viz-redirect')) {
+          window.location.href = 'https://dashboards.krishnaanalytics.tech/';
+          return;
+        }
+
+        const filter = this.getAttribute('data-filter');
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        document.querySelectorAll('.project-card').forEach((card, i) => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'block';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+              card.style.transition = 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0)';
+            }, i * 60);
+          } else {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            setTimeout(() => { card.style.display = 'none'; }, 300);
+          }
+        });
+      });
+    });
+
+    // ─── STAGGERED TOOL ITEMS ───
+    const toolObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.tool-item').forEach((item, i) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+              item.style.transition = 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+              item.style.opacity = '1';
+              item.style.transform = 'translateY(0)';
+            }, i * 100);
+          });
+        }
+      });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.tools-grid').forEach(grid => {
+      toolObserver.observe(grid);
+    });
+
+    // ─── STAGGERED ABOUT BADGES ───
+    const badgeObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.about-badge').forEach((badge, i) => {
+            badge.style.opacity = '0';
+            badge.style.transform = 'translateY(15px) scale(0.9)';
+            setTimeout(() => {
+              badge.style.transition = 'all 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+              badge.style.opacity = '1';
+              badge.style.transform = 'translateY(0) scale(1)';
+            }, i * 120);
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.about-badges').forEach(container => {
+      badgeObserver.observe(container);
+    });
+
+    // ─── PARALLAX HERO GRADIENT ───
+    const heroGradient = document.querySelector('.hero-bg-gradient');
+    window.addEventListener('scroll', () => {
+      if (heroGradient) {
+        const scrolled = window.scrollY;
+        heroGradient.style.transform = `translate(${scrolled * 0.02}px, ${scrolled * 0.05}px) scale(${1 + scrolled * 0.0003})`;
+      }
     });
 
     // Mobile menu
@@ -1463,35 +1891,14 @@
       });
     });
 
-    // Project filtering
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        // Handle viz redirect
-        if (this.classList.contains('viz-redirect')) {
-          window.location.href = 'https://dashboards.krishnaanalytics.tech/';
-          return;
-        }
-
-        const filter = this.getAttribute('data-filter');
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-
-        document.querySelectorAll('.project-card').forEach(card => {
-          if (filter === 'all' || card.getAttribute('data-category') === filter) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
-          }
-        });
-      });
-    });
-
     // Skill bar animation on scroll
     const skillObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          entry.target.querySelectorAll('.skill-bar-fill').forEach(bar => {
-            bar.style.width = bar.getAttribute('data-width');
+          entry.target.querySelectorAll('.skill-bar-fill').forEach((bar, i) => {
+            setTimeout(() => {
+              bar.style.width = bar.getAttribute('data-width');
+            }, i * 150);
           });
         }
       });
@@ -1502,7 +1909,7 @@
     });
 
     // Contact form
-    document.addEventListener('DOMContentLoaded', () => {
+    (function() {
       const form = document.getElementById('contactForm');
       const statusEl = document.getElementById('contactStatus');
       const submitBtn = document.getElementById('contactSubmit');
@@ -1553,7 +1960,7 @@
           submitBtn.textContent = 'Send Message';
         }
       });
-    });
+    })();
   </script>
 </body>
 </html>
