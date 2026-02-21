@@ -3,158 +3,467 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobriety Calendar</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>Alcohol Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,400;9..144,700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface-2: #232733;
+            --border: #2e3240;
+            --text: #e4e6ed;
+            --text-dim: #8b8fa3;
+            --sober: #22c55e;
+            --sober-bg: rgba(34, 197, 94, 0.15);
+            --tipsy: #f59e0b;
+            --tipsy-bg: rgba(245, 158, 11, 0.15);
+            --drunk: #ef4444;
+            --drunk-bg: rgba(239, 68, 68, 0.15);
+            --accent: #818cf8;
+            --radius: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+            min-height: 100vh;
         }
 
-        .calendar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: start;
-        }
-
-        .month {
-            margin: 10px;
-            border: 1px solid #ddd;
-        }
-
-        .month-title {
+        h1 {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 2.2rem;
             text-align: center;
-            font-weight: bold;
-            padding: 5px 0;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
 
-        .day-headers, .days {
+        .subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+
+        /* Stats Banner */
+        .stats-banner {
             display: grid;
-            grid-template-columns: repeat(7, 30px);
-            justify-content: center;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            max-width: 900px;
+            margin: 0 auto 32px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
             text-align: center;
+            transition: transform 0.15s ease, border-color 0.15s ease;
         }
 
-        .day {
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
-            border: 1px solid #ddd;
-            cursor: pointer;
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
         }
 
-        .sober { background-color: green; }
-        .tipsy { background-color: blue; }
-        .drunk { background-color: red; }
+        .stat-value {
+            font-family: 'Fraunces', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 4px;
+        }
+
+        .stat-sober .stat-value { color: var(--sober); }
+        .stat-tipsy .stat-value { color: var(--tipsy); }
+        .stat-drunk .stat-value { color: var(--drunk); }
+        .stat-streak .stat-value { color: var(--accent); }
+
+        /* Legend + Actions */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
 
         .legend {
             display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
+            gap: 16px;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            margin-right: 20px;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
         }
 
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
         }
 
-        .legend-sober { background-color: green; }
-        .legend-tipsy { background-color: blue; }
-        .legend-drunk { background-color: red; }
+        .legend-dot.sober { background: var(--sober); }
+        .legend-dot.tipsy { background: var(--tipsy); }
+        .legend-dot.drunk { background: var(--drunk); }
 
         .actions {
             display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn:hover {
+            background: var(--border);
+            border-color: var(--accent);
+        }
+
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-file input[type="file"] {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Calendar Grid */
+        .calendar {
+            display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 12px;
+            max-width: 1400px;
+            margin: 0 auto 40px;
+        }
+
+        .month {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            width: 250px;
+            transition: border-color 0.2s ease;
+        }
+
+        .month:hover {
+            border-color: var(--accent);
+        }
+
+        .month-title {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 4px 0 8px;
+            color: var(--text);
+        }
+
+        .day-headers, .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+        }
+
+        .day-headers div {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding-bottom: 4px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.12s ease;
+            margin: 1px;
+            position: relative;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .day:hover {
+            transform: scale(1.15);
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .day.sober {
+            background: var(--sober-bg);
+            color: var(--sober);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .day.tipsy {
+            background: var(--tipsy-bg);
+            color: var(--tipsy);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .day.drunk {
+            background: var(--drunk-bg);
+            color: var(--drunk);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .day.today {
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .day.future {
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .day.empty {
+            pointer-events: none;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            display: none;
+            position: fixed;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+        }
+
+        /* Charts */
+        .charts-section {
+            max-width: 1000px;
+            margin: 0 auto 40px;
+        }
+
+        .charts-section h2 {
+            font-family: 'Fraunces', serif;
+            font-size: 1.4rem;
+            text-align: center;
             margin-bottom: 20px;
         }
 
-        .actions button, .actions input {
-            margin-right: 10px;
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
         }
 
-        .charts {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
         }
 
-        .chart-container {
-            width: 400px;
-            height: 400px;
-            margin: 20px;
+        .chart-card h3 {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 12px;
         }
 
-        .probability {
+        /* Day of week heatmap */
+        .dow-heatmap {
+            display: grid;
+            grid-template-columns: 80px repeat(3, 1fr);
+            gap: 4px;
+            font-size: 0.78rem;
+        }
+
+        .dow-heatmap .header {
+            font-weight: 700;
+            color: var(--text-dim);
             text-align: center;
-            margin: 20px;
+            padding: 4px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .dow-heatmap .day-label {
+            color: var(--text-dim);
+            padding: 6px 0;
+        }
+
+        .dow-heatmap .cell {
+            text-align: center;
+            padding: 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            h1 { font-size: 1.6rem; }
+            .month { width: 100%; }
+            .stats-banner { grid-template-columns: repeat(2, 1fr); }
+            .controls { flex-direction: column; }
+        }
+
+        /* Fade-in animation */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .month {
+            animation: fadeUp 0.3s ease both;
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Alcohol Calendar</h1>
-    
-    <div class="legend">
-        <div class="legend-item">
-            <div class="legend-color legend-sober"></div>
-            Sober
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-tipsy"></div>
-            Tipsy
-        </div>
-        <div class="legend-item">
-            <div class="legend-color legend-drunk"></div>
-            Drunk
-        </div>
-    </div>
+    <h1>Alcohol Calendar</h1>
+    <p class="subtitle" id="subtitle">Track your drinking patterns over time</p>
 
-    <div class="actions">
-        <button onclick="exportToCSV()" class="btn btn-primary">Export to CSV</button>
-        <input type="file" id="importFile" accept=".csv" onchange="importFromCSV(event)" class="btn btn-secondary">
+    <div class="stats-banner" id="statsBanner"></div>
+
+    <div class="controls">
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot sober"></div> Sober</div>
+            <div class="legend-item"><div class="legend-dot tipsy"></div> Tipsy</div>
+            <div class="legend-item"><div class="legend-dot drunk"></div> Drunk</div>
+        </div>
+        <div class="actions">
+            <button class="btn" onclick="exportToCSV()">&#x2B07; Export CSV</button>
+            <div class="btn btn-file">
+                &#x2B06; Import CSV
+                <input type="file" accept=".csv" onchange="importFromCSV(event)">
+            </div>
+        </div>
     </div>
 
     <div id="calendar" class="calendar"></div>
 
-    <div class="charts">
-        <div class="chart-container">
-            <canvas id="statusPieChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <canvas id="statusBarChart"></canvas>
+    <div class="charts-section">
+        <h2>Insights</h2>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Overall Breakdown</h3>
+                <canvas id="statusPieChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Monthly Trend</h3>
+                <canvas id="trendChart"></canvas>
+            </div>
+            <div class="chart-card" style="grid-column: 1 / -1;">
+                <h3>Day of Week Patterns</h3>
+                <div class="dow-heatmap" id="dowHeatmap"></div>
+            </div>
         </div>
     </div>
 
-    <div class="probability" id="drunkProbability"></div>
+    <div class="tooltip" id="tooltip"></div>
 
     <script>
+        let pieChart = null;
+        let trendChart = null;
+
+        // Scan localStorage for the earliest date entry (YYYY-MM-DD keys).
+        // If nothing found, start from the current month.
+        function getStartDate() {
+            const dateKeyPattern = /^\d{4}-\d{2}-\d{2}$/;
+            let earliest = null;
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (dateKeyPattern.test(key)) {
+                    if (!earliest || key < earliest) earliest = key;
+                }
+            }
+
+            if (earliest) {
+                const [y, m] = earliest.split('-').map(Number);
+                return { year: y, month: m - 1 }; // month is 0-indexed
+            }
+
+            const today = new Date();
+            return { year: today.getFullYear(), month: today.getMonth() };
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             generateCalendar();
-            generateCharts();
+            updateAll();
         });
 
-        function generateCalendar() {
-            const today = new Date();
-            const calendarEl = document.getElementById('calendar');
+        function getToday() {
+            const t = new Date();
+            return new Date(t.getFullYear(), t.getMonth(), t.getDate());
+        }
 
-            let year = 2023;
-            let month = 11; // December
+        function generateCalendar() {
+            const today = getToday();
+            const calendarEl = document.getElementById('calendar');
+            calendarEl.innerHTML = '';
+
+            const start = getStartDate();
+            let year = start.year;
+            let month = start.month;
+            let idx = 0;
 
             while (year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth())) {
                 const monthEl = document.createElement('div');
                 monthEl.className = 'month';
+                monthEl.style.animationDelay = `${idx * 0.03}s`;
 
-                const monthTitle = createMonthTitle(year, month);
-                monthEl.appendChild(monthTitle);
+                const title = document.createElement('div');
+                title.className = 'month-title';
+                title.textContent = `${getMonthName(month)} ${year}`;
+                monthEl.appendChild(title);
 
-                addDayHeaders(monthEl);
+                const headers = document.createElement('div');
+                headers.className = 'day-headers';
+                ['S','M','T','W','T','F','S'].forEach(d => {
+                    const h = document.createElement('div');
+                    h.textContent = d;
+                    headers.appendChild(h);
+                });
+                monthEl.appendChild(headers);
 
                 const daysEl = document.createElement('div');
                 daysEl.className = 'days';
@@ -164,32 +473,9 @@
                 calendarEl.appendChild(monthEl);
 
                 month++;
-                if (month > 11) {
-                    month = 0;
-                    year++;
-                }
+                if (month > 11) { month = 0; year++; }
+                idx++;
             }
-        }
-
-        function createMonthTitle(year, month) {
-            const monthTitle = document.createElement('div');
-            monthTitle.className = 'month-title';
-            monthTitle.textContent = `${getMonthName(month)} ${year}`;
-            return monthTitle;
-        }
-
-        function addDayHeaders(monthEl) {
-            const dayHeadersEl = document.createElement('div');
-            dayHeadersEl.className = 'day-headers';
-
-            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            daysOfWeek.forEach(dayName => {
-                const dayHeader = document.createElement('div');
-                dayHeader.textContent = dayName;
-                dayHeadersEl.appendChild(dayHeader);
-            });
-
-            monthEl.appendChild(dayHeadersEl);
         }
 
         function addDays(daysEl, year, month, today) {
@@ -197,103 +483,335 @@
             const firstDay = date.getDay();
 
             for (let i = 0; i < firstDay; i++) {
-                daysEl.appendChild(document.createElement('div')); // Fill empty slots
+                const empty = document.createElement('div');
+                empty.className = 'day empty';
+                daysEl.appendChild(empty);
             }
 
             while (date.getMonth() === month) {
                 const dayEl = document.createElement('div');
                 dayEl.className = 'day';
-                const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                const dayKey = formatKey(year, month, date.getDate());
+                const isToday = date.getTime() === today.getTime();
+                const isFuture = date > today;
 
-                const savedColor = loadColor(dayKey);
-                if (savedColor) {
-                    dayEl.classList.add(savedColor);
-                } else if (date <= today) {
-                    dayEl.classList.add('sober');
+                if (isFuture) {
+                    dayEl.classList.add('future');
+                } else {
+                    const saved = loadColor(dayKey);
+                    if (saved) {
+                        dayEl.classList.add(saved);
+                    } else {
+                        dayEl.classList.add('sober');
+                    }
                 }
 
+                if (isToday) dayEl.classList.add('today');
+
                 dayEl.textContent = date.getDate();
-                dayEl.addEventListener('click', function () {
-                    const newColor = getNextColor(this.classList[1]);
-                    this.className = 'day'; // Reset class
-                    if (newColor) {
-                        this.classList.add(newColor);
-                    }
-                    saveColor(dayKey, newColor);
-                    generateCharts(); // Update charts on day color change
-                });
+                dayEl.dataset.key = dayKey;
+                dayEl.dataset.date = date.toDateString();
+
+                if (!isFuture) {
+                    dayEl.addEventListener('click', function() {
+                        const current = this.classList.contains('sober') ? 'sober'
+                            : this.classList.contains('tipsy') ? 'tipsy'
+                            : this.classList.contains('drunk') ? 'drunk' : '';
+                        const next = getNextColor(current);
+                        this.classList.remove('sober', 'tipsy', 'drunk');
+                        if (next) this.classList.add(next);
+                        saveColor(this.dataset.key, next);
+                        updateAll();
+                    });
+
+                    dayEl.addEventListener('mouseenter', function(e) {
+                        const status = this.classList.contains('sober') ? 'Sober'
+                            : this.classList.contains('tipsy') ? 'Tipsy'
+                            : this.classList.contains('drunk') ? 'Drunk' : 'Unmarked';
+                        const tip = document.getElementById('tooltip');
+                        tip.textContent = `${this.dataset.date} — ${status}`;
+                        tip.style.display = 'block';
+                        tip.style.left = e.clientX + 12 + 'px';
+                        tip.style.top = e.clientY - 30 + 'px';
+                    });
+
+                    dayEl.addEventListener('mousemove', function(e) {
+                        const tip = document.getElementById('tooltip');
+                        tip.style.left = e.clientX + 12 + 'px';
+                        tip.style.top = e.clientY - 30 + 'px';
+                    });
+
+                    dayEl.addEventListener('mouseleave', function() {
+                        document.getElementById('tooltip').style.display = 'none';
+                    });
+                }
 
                 daysEl.appendChild(dayEl);
                 date.setDate(date.getDate() + 1);
             }
         }
 
-        function getNextColor(currentClass) {
-            switch (currentClass) {
-                case 'sober':
-                    return 'tipsy';
-                case 'tipsy':
-                    return 'drunk';
-                case 'drunk':
-                    return '';
-                default:
-                    return 'sober';
+        function formatKey(y, m, d) {
+            return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        }
+
+        function getNextColor(current) {
+            switch (current) {
+                case 'sober': return 'tipsy';
+                case 'tipsy': return 'drunk';
+                case 'drunk': return '';
+                default: return 'sober';
             }
         }
 
-        function saveColor(dayKey, color) {
-            if (color) {
-                localStorage.setItem(dayKey, color);
-            } else {
-                localStorage.removeItem(dayKey);
-            }
+        function saveColor(key, color) {
+            if (color) localStorage.setItem(key, color);
+            else localStorage.removeItem(key);
         }
 
-        function loadColor(dayKey) {
-            return localStorage.getItem(dayKey);
+        function loadColor(key) {
+            return localStorage.getItem(key);
         }
 
-        function getMonthName(monthIndex) {
-            const monthNames = [
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
-            return monthNames[monthIndex];
+        function getMonthName(i) {
+            return ["January","February","March","April","May","June",
+                    "July","August","September","October","November","December"][i];
         }
 
-        function exportToCSV() {
-            const today = new Date();
-            let year = 2023;
-            let month = 11; // December
-
-            let csvContent = "data:text/csv;charset=utf-8,Date,Status\n";
+        function getAllDayData() {
+            const today = getToday();
+            const start = getStartDate();
+            let year = start.year, month = start.month;
+            const days = [];
 
             while (year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth())) {
                 let date = new Date(year, month, 1);
-
-                while (date.getMonth() === month) {
-                    const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-                    const status = loadColor(dayKey) || 'sober';
-                    csvContent += `${dayKey},${status}\n`;
-
+                while (date.getMonth() === month && date <= today) {
+                    const key = formatKey(year, month, date.getDate());
+                    const status = loadColor(key) || 'sober';
+                    days.push({ key, status, date: new Date(date), year, month, dow: date.getDay() });
                     date.setDate(date.getDate() + 1);
                 }
-
                 month++;
-                if (month > 11) {
-                    month = 0;
-                    year++;
-                }
+                if (month > 11) { month = 0; year++; }
+            }
+            return days;
+        }
+
+        function updateAll() {
+            const days = getAllDayData();
+            updateStats(days);
+            updateCharts(days);
+            updateDOWHeatmap(days);
+        }
+
+        function updateStats(days) {
+            const counts = { sober: 0, tipsy: 0, drunk: 0 };
+            days.forEach(d => { if (counts[d.status] !== undefined) counts[d.status]++; });
+
+            // Current sober streak
+            let currentStreak = 0;
+            for (let i = days.length - 1; i >= 0; i--) {
+                if (days[i].status === 'sober') currentStreak++;
+                else break;
             }
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "sobriety_calendar.csv");
-            document.body.appendChild(link); // Required for Firefox
+            // Longest sober streak
+            let longestStreak = 0, tempStreak = 0;
+            days.forEach(d => {
+                if (d.status === 'sober') { tempStreak++; longestStreak = Math.max(longestStreak, tempStreak); }
+                else tempStreak = 0;
+            });
 
+            const total = days.length;
+            const soberPct = total ? ((counts.sober / total) * 100).toFixed(1) : 0;
+
+            const banner = document.getElementById('statsBanner');
+            banner.innerHTML = `
+                <div class="stat-card stat-streak">
+                    <div class="stat-value">${currentStreak}</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+                <div class="stat-card stat-streak">
+                    <div class="stat-value">${longestStreak}</div>
+                    <div class="stat-label">Best Streak</div>
+                </div>
+                <div class="stat-card stat-sober">
+                    <div class="stat-value">${soberPct}%</div>
+                    <div class="stat-label">Sober Rate</div>
+                </div>
+                <div class="stat-card stat-sober">
+                    <div class="stat-value">${counts.sober}</div>
+                    <div class="stat-label">Sober Days</div>
+                </div>
+                <div class="stat-card stat-tipsy">
+                    <div class="stat-value">${counts.tipsy}</div>
+                    <div class="stat-label">Tipsy Days</div>
+                </div>
+                <div class="stat-card stat-drunk">
+                    <div class="stat-value">${counts.drunk}</div>
+                    <div class="stat-label">Drunk Days</div>
+                </div>
+            `;
+
+            // Update subtitle
+            const start = getStartDate();
+            const startLabel = `${getMonthName(start.month)} ${start.year}`;
+            document.getElementById('subtitle').textContent =
+                total > 0 ? `Tracking since ${startLabel} — ${total} days logged` : `Start tracking today — click a day to log it`;
+        }
+
+        function updateCharts(days) {
+            const counts = { sober: 0, tipsy: 0, drunk: 0 };
+            days.forEach(d => { if (counts[d.status] !== undefined) counts[d.status]++; });
+
+            // Destroy old charts
+            if (pieChart) pieChart.destroy();
+            if (trendChart) trendChart.destroy();
+
+            // Pie chart
+            const ctxPie = document.getElementById('statusPieChart').getContext('2d');
+            pieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Sober', 'Tipsy', 'Drunk'],
+                    datasets: [{
+                        data: [counts.sober, counts.tipsy, counts.drunk],
+                        backgroundColor: [
+                            getComputedStyle(document.documentElement).getPropertyValue('--sober').trim(),
+                            getComputedStyle(document.documentElement).getPropertyValue('--tipsy').trim(),
+                            getComputedStyle(document.documentElement).getPropertyValue('--drunk').trim()
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#8b8fa3', font: { family: 'DM Sans', size: 12 }, padding: 16 }
+                        }
+                    }
+                }
+            });
+
+            // Monthly trend
+            const monthlyData = {};
+            days.forEach(d => {
+                const mKey = `${d.year}-${String(d.month + 1).padStart(2, '0')}`;
+                if (!monthlyData[mKey]) monthlyData[mKey] = { sober: 0, tipsy: 0, drunk: 0, total: 0 };
+                monthlyData[mKey][d.status]++;
+                monthlyData[mKey].total++;
+            });
+
+            const monthKeys = Object.keys(monthlyData).sort();
+            const monthLabels = monthKeys.map(k => {
+                const [y, m] = k.split('-');
+                return `${getMonthName(parseInt(m) - 1).slice(0, 3)} '${y.slice(2)}`;
+            });
+
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            trendChart = new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: monthLabels,
+                    datasets: [
+                        {
+                            label: 'Sober %',
+                            data: monthKeys.map(k => ((monthlyData[k].sober / monthlyData[k].total) * 100).toFixed(1)),
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 3,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: 'Drinking %',
+                            data: monthKeys.map(k => (((monthlyData[k].tipsy + monthlyData[k].drunk) / monthlyData[k].total) * 100).toFixed(1)),
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 3,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    interaction: { intersect: false, mode: 'index' },
+                    scales: {
+                        y: {
+                            min: 0, max: 100,
+                            ticks: { color: '#8b8fa3', callback: v => v + '%' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#8b8fa3', maxRotation: 45 },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#8b8fa3', font: { family: 'DM Sans', size: 12 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}%`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateDOWHeatmap(days) {
+            const dowData = Array.from({length: 7}, () => ({ sober: 0, tipsy: 0, drunk: 0, total: 0 }));
+            days.forEach(d => {
+                dowData[d.dow][d.status]++;
+                dowData[d.dow].total++;
+            });
+
+            const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+            const heatmap = document.getElementById('dowHeatmap');
+
+            let html = '<div></div><div class="header">Sober</div><div class="header">Tipsy</div><div class="header">Drunk</div>';
+
+            dayNames.forEach((name, i) => {
+                const d = dowData[i];
+                const soberPct = d.total ? (d.sober / d.total * 100).toFixed(0) : 0;
+                const tipsyPct = d.total ? (d.tipsy / d.total * 100).toFixed(0) : 0;
+                const drunkPct = d.total ? (d.drunk / d.total * 100).toFixed(0) : 0;
+
+                const soberOpacity = d.total ? (d.sober / d.total) : 0;
+                const tipsyOpacity = d.total ? (d.tipsy / d.total) : 0;
+                const drunkOpacity = d.total ? (d.drunk / d.total) : 0;
+
+                html += `<div class="day-label">${name}</div>`;
+                html += `<div class="cell" style="background: rgba(34,197,94,${soberOpacity * 0.4}); color: var(--sober)">${soberPct}%</div>`;
+                html += `<div class="cell" style="background: rgba(245,158,11,${tipsyOpacity * 0.5}); color: var(--tipsy)">${tipsyPct}%</div>`;
+                html += `<div class="cell" style="background: rgba(239,68,68,${drunkOpacity * 0.5}); color: var(--drunk)">${drunkPct}%</div>`;
+            });
+
+            heatmap.innerHTML = html;
+        }
+
+        function exportToCSV() {
+            const days = getAllDayData();
+            let csv = "Date,Status\n";
+            days.forEach(d => { csv += `${d.key},${d.status}\n`; });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'alcohol_calendar.csv';
             link.click();
-            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
 
         function importFromCSV(event) {
@@ -301,103 +819,18 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function (e) {
-                const text = e.target.result;
-                const rows = text.split('\n').slice(1); // Skip header row
-
+            reader.onload = function(e) {
+                const rows = e.target.result.split('\n').slice(1);
                 rows.forEach(row => {
                     const [date, status] = row.split(',');
-                    if (date && status) {
-                        saveColor(date.trim(), status.trim());
-                    }
+                    if (date && status) saveColor(date.trim(), status.trim());
                 });
-
-                // Clear the calendar and regenerate it with the imported data
-                document.getElementById('calendar').innerHTML = '';
                 generateCalendar();
-                generateCharts(); // Update charts after import
+                updateAll();
             };
-
             reader.readAsText(file);
-        }
-
-        function generateCharts() {
-            const counts = { sober: 0, tipsy: 0, drunk: 0 };
-            const today = new Date();
-            let year = 2023;
-            let month = 11; // December
-            let totalDays = 0;
-
-            while (year < today.getFullYear() || (year === today.getFullYear() && month <= today.getMonth())) {
-                let date = new Date(year, month, 1);
-
-                while (date.getMonth() === month) {
-                    const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-                    const status = loadColor(dayKey) || 'sober';
-                    if (counts[status] !== undefined) {
-                        counts[status]++;
-                    }
-                    totalDays++;
-                    date.setDate(date.getDate() + 1);
-                }
-
-                month++;
-                if (month > 11) {
-                    month = 0;
-                    year++;
-                }
-            }
-
-            // Calculate Probability of Getting Drunk
-            const probabilityDrunk = (counts.drunk / totalDays * 100).toFixed(2);
-
-            // Display Probability
-            document.getElementById('drunkProbability').textContent = `Probability of Getting Drunk Today: ${probabilityDrunk}%`;
-
-            // Create Pie Chart
-            const ctxPie = document.getElementById('statusPieChart').getContext('2d');
-            new Chart(ctxPie, {
-                type: 'pie',
-                data: {
-                    labels: ['Sober', 'Tipsy', 'Drunk'],
-                    datasets: [{
-                        data: [counts.sober, counts.tipsy, counts.drunk],
-                        backgroundColor: ['green', 'blue', 'red']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
-                    }
-                }
-            });
-
-            // Create Bar Chart
-            const ctxBar = document.getElementById('statusBarChart').getContext('2d');
-            new Chart(ctxBar, {
-                type: 'bar',
-                data: {
-                    labels: ['Sober', 'Tipsy', 'Drunk'],
-                    datasets: [{
-                        label: 'Days Count',
-                        data: [counts.sober, counts.tipsy, counts.drunk],
-                        backgroundColor: ['green', 'blue', 'red']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
-                    }
-                }
-            });
+            event.target.value = '';
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>
