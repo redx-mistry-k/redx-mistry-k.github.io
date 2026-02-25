@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JSON Superviewer</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: #f5f3ef;
+  --bg-card: #ffffff;
+  --bg-input: #fafaf8;
+  --bg-hover: #f0eee9;
+  --bg-header: #1a1a1a;
+  --text: #1a1a1a;
+  --text-muted: #6b6560;
+  --text-header: #ffffff;
+  --border: #e0ddd7;
+  --border-focus: #b8a990;
+  --accent: #c45d3e;
+  --accent-hover: #a84e34;
+  --accent-light: rgba(196,93,62,0.08);
+  --success: #3a7d5c;
+  --success-light: rgba(58,125,92,0.08);
+  --warning: #c49a3e;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --json-string: #c45d3e;
+  --json-number: #3a7d5c;
+  --json-bool: #7c5cbf;
+  --json-null: #888;
+  --json-key: #2a6496;
+  --json-bracket: #666;
+  --row-stripe: rgba(0,0,0,0.015);
+  --scrollbar-thumb: #ccc;
+  --scrollbar-track: transparent;
+}
+
+[data-theme="dark"] {
+  --bg: #131316;
+  --bg-card: #1c1c21;
+  --bg-input: #22222a;
+  --bg-hover: #28282f;
+  --bg-header: #0f0f12;
+  --text: #e4e2de;
+  --text-muted: #8a8780;
+  --text-header: #e4e2de;
+  --border: #2e2e35;
+  --border-focus: #5a5a65;
+  --accent: #e07050;
+  --accent-hover: #c45d3e;
+  --accent-light: rgba(224,112,80,0.1);
+  --success: #5cb88a;
+  --success-light: rgba(92,184,138,0.1);
+  --warning: #e0b84e;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+  --json-string: #e07050;
+  --json-number: #5cb88a;
+  --json-bool: #a98ade;
+  --json-null: #666;
+  --json-key: #6aafe6;
+  --json-bracket: #888;
+  --row-stripe: rgba(255,255,255,0.015);
+  --scrollbar-thumb: #444;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+
+/* HEADER */
+.header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+}
+
+.logo span { color: var(--text-muted); font-weight: 400; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-family: var(--mono);
+}
+
+/* BUTTONS */
+.btn {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn:hover { background: var(--bg-hover); border-color: var(--border-focus); }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+.btn-success {
+  background: var(--success);
+  color: #fff;
+  border-color: var(--success);
+}
+.btn-success:hover { opacity: 0.9; }
+
+.btn-icon {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.btn-icon i { font-size: 0.9rem; }
+
+/* LAYOUT */
+.main {
+  display: flex;
+  height: calc(100vh - 56px);
+}
+
+.panel-left {
+  width: 420px;
+  min-width: 320px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  transition: width 0.2s;
+}
+
+.panel-left.collapsed {
+  width: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-right: none;
+}
+
+.panel-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.resizer {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.resizer:hover, .resizer.active { background: var(--accent); }
+
+/* INPUT AREA */
+.input-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.input-toolbar {
+  padding: 10px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.input-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+#jsonInput {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  background: var(--bg-input);
+  color: var(--text);
+  tab-size: 2;
+}
+
+#jsonInput::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.drop-zone {
+  position: absolute;
+  inset: 0;
+  background: var(--accent-light);
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.drop-zone.active { display: flex; }
+
+.drop-zone-text {
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+
+/* STATUS BAR */
+.status-bar {
+  padding: 6px 14px;
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  background: var(--bg);
+}
+
+.status-valid { color: var(--success); }
+.status-invalid { color: var(--accent); }
+
+/* TABLE TOOLBAR */
+.table-toolbar {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
+
+.search-box {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  padding: 7px 12px 7px 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  outline: none;
+  width: 220px;
+  transition: border-color 0.2s;
+}
+
+.search-box:focus { border-color: var(--accent); }
+
+.search-wrapper {
+  position: relative;
+}
+
+.search-wrapper i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.table-info {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  margin-left: auto;
+}
+
+/* COLUMN PICKER */
+.col-picker-wrap {
+  position: relative;
+}
+
+.col-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 280px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  display: none;
+  padding: 8px;
+}
+
+.col-picker-dropdown.open { display: block; }
+
+.col-picker-dropdown label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--mono);
+  transition: background 0.15s;
+}
+
+.col-picker-dropdown label:hover { background: var(--bg-hover); }
+
+.col-picker-actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+/* TABLE */
+.table-scroll {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+thead th {
+  background: var(--bg-header);
+  color: var(--text-header);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  font-family: var(--mono);
+}
+
+thead th:hover { background: #2a2a2a; }
+[data-theme="dark"] thead th:hover { background: #1a1a22; }
+
+thead th .sort-icon {
+  margin-left: 6px;
+  opacity: 0.3;
+  font-size: 0.65rem;
+}
+
+thead th.sorted-asc .sort-icon,
+thead th.sorted-desc .sort-icon { opacity: 1; color: var(--accent); }
+
+th .col-filter {
+  display: block;
+  margin-top: 6px;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  padding: 3px 6px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  color: var(--text-header);
+  outline: none;
+}
+
+th .col-filter::placeholder { color: rgba(255,255,255,0.3); }
+th .col-filter:focus { border-color: var(--accent); background: rgba(255,255,255,0.12); }
+
+tbody tr {
+  transition: background 0.1s;
+}
+
+tbody tr:nth-child(even) { background: var(--row-stripe); }
+tbody tr:hover { background: var(--bg-hover); }
+
+tbody td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  max-width: 350px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: default;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+tbody td:hover { white-space: normal; word-break: break-all; }
+
+td.cell-string { color: var(--json-string); }
+td.cell-number { color: var(--json-number); font-variant-numeric: tabular-nums; }
+td.cell-bool { color: var(--json-bool); }
+td.cell-null { color: var(--json-null); font-style: italic; }
+td.cell-object { color: var(--text-muted); font-size: 0.72rem; }
+
+.nested-toggle {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.72rem;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.nested-preview {
+  display: none;
+  margin-top: 6px;
+  padding: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.nested-preview.open { display: block; }
+
+/* ROW NUMBER */
+td.row-num {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  text-align: right;
+  padding-right: 10px;
+  width: 40px;
+  min-width: 40px;
+  user-select: none;
+  border-right: 2px solid var(--border);
+}
+
+th.row-num-header {
+  width: 40px;
+  min-width: 40px;
+  text-align: center;
+  cursor: default !important;
+}
+
+/* PAGINATION */
+.pagination-bar {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--mono);
+}
+
+.pagination-bar select {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text);
+  outline: none;
+}
+
+.page-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.page-btns button {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: all 0.15s;
+}
+
+.page-btns button:hover { background: var(--bg-hover); }
+.page-btns button:disabled { opacity: 0.3; cursor: default; }
+
+/* TOAST */
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast-success { background: var(--success); color: #fff; }
+.toast-error { background: var(--accent); color: #fff; }
+.toast-info { background: var(--bg-header); color: #fff; }
+
+@keyframes toastIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* EMPTY STATE */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  gap: 12px;
+  padding: 40px;
+}
+
+.empty-state i { font-size: 2rem; opacity: 0.3; }
+.empty-state p { font-size: 0.85rem; text-align: center; line-height: 1.6; }
+
+.kbd {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 500px;
+  padding: 24px;
+}
+
+.modal h3 {
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.modal pre {
+  background: var(--bg-input);
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  max-height: 400px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* JSON TREE SYNTAX */
+.jt-key { color: var(--json-key); }
+.jt-string { color: var(--json-string); }
+.jt-number { color: var(--json-number); }
+.jt-bool { color: var(--json-bool); }
+.jt-null { color: var(--json-null); font-style: italic; }
+.jt-bracket { color: var(--json-bracket); }
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+  .panel-left { width: 100%; min-width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 40vh; }
+  .main { flex-direction: column; }
+  .resizer { display: none; }
+  .search-box { width: 140px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo">{json}<span>.superviewer</span></div>
+    <span class="badge">v2.0</span>
+  </div>
+  <div class="header-right">
+    <a href="https://krishnaanalytics.tech/jsonAdder/v2" target="_blank" class="btn" style="font-size:0.75rem;">
+      <i class="fas fa-plus"></i> JSON Adder
+    </a>
+    <button class="btn btn-icon" onclick="toggleTheme()" title="Toggle theme">
+      <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+    <button class="btn btn-icon" onclick="showShortcuts()" title="Keyboard shortcuts">
+      <i class="fas fa-keyboard"></i>
+    </button>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main">
+  <!-- LEFT PANEL: JSON Input -->
+  <div class="panel-left" id="panelLeft">
+    <div class="input-toolbar">
+      <button class="btn btn-primary" onclick="loadAndRender()" title="Parse & render (Ctrl+Enter)">
+        <i class="fas fa-play"></i> Render
+      </button>
+      <button class="btn" onclick="formatJSON()" title="Beautify JSON">
+        <i class="fas fa-magic"></i> Format
+      </button>
+      <button class="btn" onclick="minifyJSON()">
+        <i class="fas fa-compress-alt"></i> Minify
+      </button>
+      <button class="btn" onclick="clearInput()">
+        <i class="fas fa-trash-alt"></i> Clear
+      </button>
+      <label class="btn" style="margin:0;">
+        <i class="fas fa-file-upload"></i> Upload
+        <input type="file" accept=".json,.txt,.csv" style="display:none" onchange="handleFileUpload(event)">
+      </label>
+    </div>
+
+    <div class="input-area" id="inputArea">
+      <textarea id="jsonInput" spellcheck="false" placeholder='Paste your JSON here, drag & drop a file, or click Upload.
+
+Example:
+[
+  { "id": 1, "name": "Alice", "role": "Engineer" },
+  { "id": 2, "name": "Bob", "role": "Designer" }
+]
+
+Shortcuts: Ctrl+Enter to render, Ctrl+Shift+F to format'></textarea>
+      <div class="drop-zone" id="dropZone">
+        <span class="drop-zone-text"><i class="fas fa-file-import"></i>&nbsp; Drop JSON file here</span>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span id="jsonStatus">Ready</span>
+      <span id="jsonSize"></span>
+    </div>
+  </div>
+
+  <!-- RESIZER -->
+  <div class="resizer" id="resizer"></div>
+
+  <!-- RIGHT PANEL: Table -->
+  <div class="panel-right">
+    <div class="table-toolbar" id="tableToolbar" style="display:none;">
+      <button class="btn btn-icon" onclick="togglePanel()" title="Toggle JSON panel">
+        <i class="fas fa-columns"></i>
+      </button>
+
+      <div class="search-wrapper">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-box" id="globalSearch" placeholder="Search all data..." oninput="applyFilters()">
+      </div>
+
+      <div class="col-picker-wrap">
+        <button class="btn" onclick="toggleColPicker()">
+          <i class="fas fa-th-list"></i> Columns
+        </button>
+        <div class="col-picker-dropdown" id="colPicker"></div>
+      </div>
+
+      <button class="btn" onclick="toggleColFilters()" title="Toggle column filters">
+        <i class="fas fa-filter"></i> Filters
+      </button>
+
+      <div style="display:flex;gap:4px;margin-left:auto;">
+        <button class="btn" onclick="exportCSV()" title="Export CSV">
+          <i class="fas fa-file-csv"></i> CSV
+        </button>
+        <button class="btn" onclick="exportJSON()" title="Export filtered JSON">
+          <i class="fas fa-file-code"></i> JSON
+        </button>
+        <button class="btn" onclick="copyTable()" title="Copy table to clipboard">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
+
+      <div class="table-info" id="tableInfo"></div>
+    </div>
+
+    <div class="table-scroll" id="tableScroll">
+      <div class="empty-state" id="emptyState">
+        <i class="fas fa-table"></i>
+        <p>Paste a JSON array in the left panel and click <strong>Render</strong> to see your data as a table.<br>
+        <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span> to render &nbsp;|&nbsp; <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">F</span> to format</p>
+      </div>
+      <div id="tableContainer"></div>
+    </div>
+
+    <div class="pagination-bar" id="paginationBar" style="display:none;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span>Rows per page:</span>
+        <select id="pageSize" onchange="changePageSize()">
+          <option value="25">25</option>
+          <option value="50" selected>50</option>
+          <option value="100">100</option>
+          <option value="250">250</option>
+          <option value="0">All</option>
+        </select>
+      </div>
+      <span id="pageInfo"></span>
+      <div class="page-btns">
+        <button onclick="goPage('first')" title="First"><i class="fas fa-angle-double-left"></i></button>
+        <button onclick="goPage('prev')" title="Previous"><i class="fas fa-angle-left"></i></button>
+        <button onclick="goPage('next')" title="Next"><i class="fas fa-angle-right"></i></button>
+        <button onclick="goPage('last')" title="Last"><i class="fas fa-angle-double-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SHORTCUTS MODAL -->
+<div class="modal-overlay" id="shortcutsModal">
+  <div class="modal">
+    <h3><i class="fas fa-keyboard"></i>&nbsp; Keyboard Shortcuts</h3>
+    <div style="display:grid; grid-template-columns: auto 1fr; gap: 8px 20px; font-size: 0.85rem;">
+      <span class="kbd">Ctrl + Enter</span><span>Render table</span>
+      <span class="kbd">Ctrl + Shift + F</span><span>Format / beautify JSON</span>
+      <span class="kbd">Ctrl + Shift + M</span><span>Minify JSON</span>
+      <span class="kbd">Ctrl + Shift + K</span><span>Clear input</span>
+      <span class="kbd">Ctrl + Shift + D</span><span>Toggle dark mode</span>
+      <span class="kbd">Escape</span><span>Close modal / dropdown</span>
+    </div>
+    <div style="margin-top: 16px; text-align: right;">
+      <button class="btn" onclick="closeShortcuts()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- CELL DETAIL MODAL -->
+<div class="modal-overlay" id="cellModal">
+  <div class="modal">
+    <h3 id="cellModalTitle">Cell Value</h3>
+    <pre id="cellModalContent"></pre>
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn" onclick="copyCellValue()"><i class="fas fa-copy"></i> Copy</button>
+      <button class="btn" onclick="closeCellModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==================== STATE ====================
+let jsonData = [];
+let allColumns = [];
+let selectedColumns = [];
+let filteredData = [];
+let sortCol = null;
+let sortDir = 'asc';
+let currentPage = 1;
+let showColFilters = false;
+
+// ==================== THEME ====================
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('json-sv-theme', next);
+  document.getElementById('themeIcon').className = next === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('json-sv-theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeIcon').className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }
+})();
+
+// ==================== TOAST ====================
+function toast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${msg}`;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2500);
+}
+
+// ==================== JSON INPUT ====================
+function getInput() { return document.getElementById('jsonInput').value.trim(); }
+
+function updateStatus() {
+  const input = getInput();
+  const statusEl = document.getElementById('jsonStatus');
+  const sizeEl = document.getElementById('jsonSize');
+
+  if (!input) {
+    statusEl.textContent = 'Ready';
+    statusEl.className = '';
+    sizeEl.textContent = '';
+    return;
+  }
+
+  sizeEl.textContent = formatBytes(new Blob([input]).size);
+
+  try {
+    const parsed = JSON.parse(input);
+    if (Array.isArray(parsed)) {
+      statusEl.textContent = `✓ Valid · ${parsed.length} items`;
+      statusEl.className = 'status-valid';
+    } else {
+      statusEl.textContent = '✓ Valid JSON (not an array)';
+      statusEl.className = 'status-valid';
+    }
+  } catch (e) {
+    statusEl.textContent = `✗ ${e.message.substring(0, 60)}`;
+    statusEl.className = 'status-invalid';
+  }
+}
+
+document.getElementById('jsonInput').addEventListener('input', debounce(updateStatus, 300));
+
+function formatJSON() {
+  try {
+    const parsed = JSON.parse(getInput());
+    document.getElementById('jsonInput').value = JSON.stringify(parsed, null, 2);
+    updateStatus();
+    toast('JSON formatted', 'success');
+  } catch (e) {
+    toast('Invalid JSON', 'error');
+  }
+}
+
+function minifyJSON() {
+  try {
+    const parsed = JSON.parse(getInput());
+    document.getElementById('jsonInput').value = JSON.stringify(parsed);
+    updateStatus();
+    toast('JSON minified', 'success');
+  } catch (e) {
+    toast('Invalid JSON', 'error');
+  }
+}
+
+function clearInput() {
+  document.getElementById('jsonInput').value = '';
+  jsonData = [];
+  filteredData = [];
+  allColumns = [];
+  selectedColumns = [];
+  document.getElementById('tableContainer').innerHTML = '';
+  document.getElementById('tableToolbar').style.display = 'none';
+  document.getElementById('paginationBar').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'flex';
+  updateStatus();
+}
+
+// ==================== FILE HANDLING ====================
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  readFile(file);
+  e.target.value = '';
+}
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('jsonInput').value = e.target.result;
+    updateStatus();
+    toast(`Loaded: ${file.name}`, 'success');
+  };
+  reader.readAsText(file);
+}
+
+// Drag & drop
+const inputArea = document.getElementById('inputArea');
+const dropZone = document.getElementById('dropZone');
+
+inputArea.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('active'); });
+inputArea.addEventListener('dragleave', () => { dropZone.classList.remove('active'); });
+inputArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('active');
+  const file = e.dataTransfer.files[0];
+  if (file) readFile(file);
+});
+
+// ==================== LOAD & RENDER ====================
+function loadAndRender() {
+  const input = getInput();
+  if (!input) { toast('Paste some JSON first', 'error'); return; }
+
+  try {
+    let parsed = JSON.parse(input);
+
+    // Handle single object by wrapping in array
+    if (!Array.isArray(parsed)) {
+      if (typeof parsed === 'object' && parsed !== null) {
+        parsed = [parsed];
+      } else {
+        throw new Error('JSON must be an array or object');
+      }
+    }
+
+    if (parsed.length === 0) throw new Error('Array is empty');
+
+    jsonData = parsed;
+    allColumns = Array.from(new Set(parsed.flatMap(obj => Object.keys(obj))));
+
+    // Restore saved columns or use all
+    const savedKey = getStorageKey();
+    const saved = JSON.parse(localStorage.getItem(savedKey) || 'null');
+    selectedColumns = saved && saved.length ? saved.filter(c => allColumns.includes(c)) : [...allColumns];
+
+    sortCol = null;
+    sortDir = 'asc';
+    currentPage = 1;
+
+    buildColPicker();
+    applyFilters();
+
+    document.getElementById('tableToolbar').style.display = 'flex';
+    document.getElementById('emptyState').style.display = 'none';
+
+    toast(`Loaded ${parsed.length} rows · ${allColumns.length} columns`, 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function getStorageKey() {
+  return 'jsv_cols_' + btoa(JSON.stringify(allColumns)).slice(0, 40);
+}
+
+// ==================== COLUMN PICKER ====================
+function buildColPicker() {
+  const container = document.getElementById('colPicker');
+  container.innerHTML = `
+    <div class="col-picker-actions">
+      <button class="btn" style="font-size:0.72rem;padding:4px 10px;" onclick="pickAll()">All</button>
+      <button class="btn" style="font-size:0.72rem;padding:4px 10px;" onclick="pickNone()">None</button>
+    </div>
+  `;
+
+  allColumns.forEach(col => {
+    const label = document.createElement('label');
+    const checked = selectedColumns.includes(col);
+    label.innerHTML = `<input type="checkbox" value="${escapeHTML(col)}" ${checked ? 'checked' : ''} onchange="updateSelectedColumns()"> ${escapeHTML(col)}`;
+    container.appendChild(label);
+  });
+}
+
+function toggleColPicker() {
+  document.getElementById('colPicker').classList.toggle('open');
+}
+
+function pickAll() {
+  selectedColumns = [...allColumns];
+  buildColPicker();
+  applyFilters();
+}
+
+function pickNone() {
+  selectedColumns = [];
+  buildColPicker();
+  applyFilters();
+}
+
+function updateSelectedColumns() {
+  selectedColumns = Array.from(document.querySelectorAll('#colPicker input:checked')).map(cb => cb.value);
+  localStorage.setItem(getStorageKey(), JSON.stringify(selectedColumns));
+  applyFilters();
+}
+
+// ==================== FILTERING & SORTING ====================
+function applyFilters() {
+  const globalQuery = document.getElementById('globalSearch').value.toLowerCase();
+
+  // Column filters
+  const colFilters = {};
+  document.querySelectorAll('.col-filter').forEach(input => {
+    const v = input.value.toLowerCase().trim();
+    if (v) colFilters[input.dataset.col] = v;
+  });
+
+  filteredData = jsonData.filter(row => {
+    // Global search
+    if (globalQuery) {
+      const match = selectedColumns.some(col => {
+        const val = row[col];
+        return String(val ?? '').toLowerCase().includes(globalQuery);
+      });
+      if (!match) return false;
+    }
+
+    // Per-column filters
+    for (const [col, query] of Object.entries(colFilters)) {
+      const val = String(row[col] ?? '').toLowerCase();
+      if (!val.includes(query)) return false;
+    }
+
+    return true;
+  });
+
+  // Sorting
+  if (sortCol) {
+    filteredData.sort((a, b) => {
+      let va = a[sortCol], vb = b[sortCol];
+      if (va == null) va = '';
+      if (vb == null) vb = '';
+
+      // Try numeric comparison
+      const na = Number(va), nb = Number(vb);
+      if (!isNaN(na) && !isNaN(nb)) {
+        return sortDir === 'asc' ? na - nb : nb - na;
+      }
+
+      // String comparison
+      const sa = String(va).toLowerCase(), sb = String(vb).toLowerCase();
+      if (sa < sb) return sortDir === 'asc' ? -1 : 1;
+      if (sa > sb) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  currentPage = 1;
+  renderTable();
+}
+
+function toggleSort(col) {
+  if (sortCol === col) {
+    sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortCol = col;
+    sortDir = 'asc';
+  }
+  applyFilters();
+}
+
+// ==================== RENDER TABLE ====================
+function renderTable() {
+  if (selectedColumns.length === 0) {
+    document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><p>Select at least one column to display.</p></div>';
+    document.getElementById('paginationBar').style.display = 'none';
+    return;
+  }
+
+  const pageSize = parseInt(document.getElementById('pageSize').value);
+  const totalRows = filteredData.length;
+  const totalPages = pageSize === 0 ? 1 : Math.max(1, Math.ceil(totalRows / pageSize));
+
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const startIdx = pageSize === 0 ? 0 : (currentPage - 1) * pageSize;
+  const endIdx = pageSize === 0 ? totalRows : Math.min(startIdx + pageSize, totalRows);
+  const pageData = filteredData.slice(startIdx, endIdx);
+
+  // Build header
+  let html = '<table><thead><tr><th class="row-num-header">#</th>';
+  selectedColumns.forEach(col => {
+    const sortClass = sortCol === col ? (sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc') : '';
+    const arrow = sortCol === col ? (sortDir === 'asc' ? '▲' : '▼') : '▲';
+    html += `<th class="${sortClass}" onclick="toggleSort('${escapeAttr(col)}')">
+      ${escapeHTML(col)}<span class="sort-icon">${arrow}</span>
+      ${showColFilters ? `<input class="col-filter" data-col="${escapeAttr(col)}" placeholder="Filter..." onclick="event.stopPropagation()" oninput="applyFilters()">` : ''}
+    </th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  // Build rows
+  pageData.forEach((row, i) => {
+    html += `<tr><td class="row-num">${startIdx + i + 1}</td>`;
+    selectedColumns.forEach(col => {
+      const val = row[col];
+      const { cellHtml, cellClass } = formatCell(val, col, startIdx + i);
+      html += `<td class="${cellClass}" ondblclick="showCellDetail('${escapeAttr(col)}', ${startIdx + i})">${cellHtml}</td>`;
+    });
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('tableContainer').innerHTML = html;
+
+  // Restore column filter values
+  if (showColFilters) {
+    document.querySelectorAll('.col-filter').forEach(input => {
+      const prev = document.querySelector(`.col-filter[data-col="${input.dataset.col}"]`);
+    });
+  }
+
+  // Update info
+  const showing = totalRows === jsonData.length ? `${totalRows} rows` : `${totalRows} of ${jsonData.length} rows`;
+  document.getElementById('tableInfo').textContent = `${showing} · ${selectedColumns.length} cols`;
+
+  // Pagination
+  if (pageSize > 0 && totalRows > pageSize) {
+    document.getElementById('paginationBar').style.display = 'flex';
+    document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+
+    const btns = document.querySelectorAll('.page-btns button');
+    btns[0].disabled = currentPage === 1;
+    btns[1].disabled = currentPage === 1;
+    btns[2].disabled = currentPage === totalPages;
+    btns[3].disabled = currentPage === totalPages;
+  } else {
+    document.getElementById('paginationBar').style.display = 'none';
+  }
+}
+
+function formatCell(val, col, rowIdx) {
+  if (val === null || val === undefined) {
+    return { cellHtml: '<span style="opacity:0.4">null</span>', cellClass: 'cell-null' };
+  }
+
+  if (typeof val === 'boolean') {
+    return { cellHtml: `<span>${val}</span>`, cellClass: 'cell-bool' };
+  }
+
+  if (typeof val === 'number') {
+    return { cellHtml: String(val), cellClass: 'cell-number' };
+  }
+
+  if (typeof val === 'object') {
+    const preview = JSON.stringify(val).substring(0, 60);
+    const isArr = Array.isArray(val);
+    return {
+      cellHtml: `<span class="nested-toggle" onclick="event.stopPropagation();showCellDetail('${escapeAttr(col)}', ${rowIdx})">${isArr ? `[${val.length} items]` : `{${Object.keys(val).length} keys}`}</span>`,
+      cellClass: 'cell-object'
+    };
+  }
+
+  // String
+  const str = String(val);
+  // Check for URLs
+  if (/^https?:\/\//i.test(str)) {
+    return { cellHtml: `<a href="${escapeAttr(str)}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;">${escapeHTML(str.length > 50 ? str.substring(0, 50) + '...' : str)}</a>`, cellClass: 'cell-string' };
+  }
+
+  return { cellHtml: escapeHTML(str), cellClass: 'cell-string' };
+}
+
+// ==================== CELL DETAIL ====================
+function showCellDetail(col, rowIdx) {
+  const val = jsonData[rowIdx]?.[col];
+  document.getElementById('cellModalTitle').textContent = `${col} [Row ${rowIdx + 1}]`;
+  document.getElementById('cellModalContent').textContent = typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val ?? 'null');
+  document.getElementById('cellModal').classList.add('open');
+}
+
+function closeCellModal() {
+  document.getElementById('cellModal').classList.remove('open');
+}
+
+function copyCellValue() {
+  const text = document.getElementById('cellModalContent').textContent;
+  navigator.clipboard.writeText(text);
+  toast('Copied to clipboard', 'success');
+}
+
+// ==================== COL FILTERS ====================
+function toggleColFilters() {
+  showColFilters = !showColFilters;
+  renderTable();
+}
+
+// ==================== PAGINATION ====================
+function goPage(dir) {
+  const pageSize = parseInt(document.getElementById('pageSize').value);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
+
+  switch (dir) {
+    case 'first': currentPage = 1; break;
+    case 'prev': currentPage = Math.max(1, currentPage - 1); break;
+    case 'next': currentPage = Math.min(totalPages, currentPage + 1); break;
+    case 'last': currentPage = totalPages; break;
+  }
+  renderTable();
+}
+
+function changePageSize() {
+  currentPage = 1;
+  renderTable();
+}
+
+// ==================== EXPORT ====================
+function exportCSV() {
+  if (!filteredData.length) { toast('No data to export', 'error'); return; }
+
+  const headers = selectedColumns;
+  const rows = filteredData.map(row =>
+    headers.map(h => {
+      let val = row[h];
+      if (val === null || val === undefined) val = '';
+      if (typeof val === 'object') val = JSON.stringify(val);
+      val = String(val).replace(/"/g, '""');
+      return `"${val}"`;
+    }).join(',')
+  );
+
+  const csv = [headers.map(h => `"${h}"`).join(','), ...rows].join('\n');
+  downloadFile(csv, 'data.csv', 'text/csv');
+  toast('CSV exported', 'success');
+}
+
+function exportJSON() {
+  if (!filteredData.length) { toast('No data to export', 'error'); return; }
+
+  // Export only selected columns
+  const exported = filteredData.map(row => {
+    const obj = {};
+    selectedColumns.forEach(col => { obj[col] = row[col]; });
+    return obj;
+  });
+
+  downloadFile(JSON.stringify(exported, null, 2), 'data.json', 'application/json');
+  toast('JSON exported', 'success');
+}
+
+function copyTable() {
+  const table = document.querySelector('#tableContainer table');
+  if (!table) { toast('No table to copy', 'error'); return; }
+
+  const rows = Array.from(table.querySelectorAll('tr')).map(tr =>
+    Array.from(tr.querySelectorAll('th, td'))
+      .slice(1) // skip row num
+      .map(cell => cell.innerText.replace(/\s+/g, ' ').trim())
+      .join('\t')
+  );
+
+  navigator.clipboard.writeText(rows.join('\n'));
+  toast('Table copied to clipboard', 'success');
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ==================== PANEL / RESIZER ====================
+function togglePanel() {
+  document.getElementById('panelLeft').classList.toggle('collapsed');
+}
+
+// Resizer
+const resizer = document.getElementById('resizer');
+const panelLeft = document.getElementById('panelLeft');
+let isResizing = false;
+
+resizer.addEventListener('mousedown', (e) => {
+  isResizing = true;
+  resizer.classList.add('active');
+  document.addEventListener('mousemove', onResize);
+  document.addEventListener('mouseup', stopResize);
+});
+
+function onResize(e) {
+  if (!isResizing) return;
+  const newWidth = Math.max(200, Math.min(800, e.clientX));
+  panelLeft.style.width = newWidth + 'px';
+}
+
+function stopResize() {
+  isResizing = false;
+  resizer.classList.remove('active');
+  document.removeEventListener('mousemove', onResize);
+  document.removeEventListener('mouseup', stopResize);
+}
+
+// ==================== SHORTCUTS ====================
+function showShortcuts() {
+  document.getElementById('shortcutsModal').classList.add('open');
+}
+
+function closeShortcuts() {
+  document.getElementById('shortcutsModal').classList.remove('open');
+}
+
+document.addEventListener('keydown', (e) => {
+  // Ctrl+Enter: render
+  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); loadAndRender(); }
+  // Ctrl+Shift+F: format
+  if (e.ctrlKey && e.shiftKey && e.key === 'F') { e.preventDefault(); formatJSON(); }
+  // Ctrl+Shift+M: minify
+  if (e.ctrlKey && e.shiftKey && e.key === 'M') { e.preventDefault(); minifyJSON(); }
+  // Ctrl+Shift+K: clear
+  if (e.ctrlKey && e.shiftKey && e.key === 'K') { e.preventDefault(); clearInput(); }
+  // Ctrl+Shift+D: theme
+  if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); toggleTheme(); }
+  // Escape: close modals
+  if (e.key === 'Escape') {
+    closeShortcuts();
+    closeCellModal();
+    document.getElementById('colPicker').classList.remove('open');
+  }
+});
+
+// Close dropdown on outside click
+document.addEventListener('click', (e) => {
+  const picker = document.getElementById('colPicker');
+  const wrap = e.target.closest('.col-picker-wrap');
+  if (!wrap && picker.classList.contains('open')) {
+    picker.classList.remove('open');
+  }
+});
+
+// ==================== UTILITIES ====================
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function escapeAttr(str) {
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
+}
+
+// Init
+updateStatus();
+</script>
+</body>
+</html>
