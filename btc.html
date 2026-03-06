@@ -1,418 +1,887 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Calorie Calculator | BMR & TDEE Tracker for Fitness Goals</title>
-<meta name="description" content="Calculate your daily calorie needs to lose, maintain, or gain weight using the BMR and TDEE formula. Simple, accurate, and responsive calorie calculator for fitness tracking." />
-<meta name="keywords" content="calorie calculator, BMR calculator, TDEE calculator, fitness, weight loss, gain weight, nutrition, fitness tool, health tracker" />
-<meta name="author" content="Krishnaanand" />
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calorie Calculator | BMR & TDEE Tracker for Fitness Goals</title>
+  <meta name="description" content="Calculate your daily calorie needs to lose, maintain, or gain weight using the BMR and TDEE formula. Simple, accurate, and responsive calorie calculator for fitness tracking." />
+  <meta name="keywords" content="calorie calculator, BMR calculator, TDEE calculator, fitness, weight loss, gain weight, nutrition, fitness tool, health tracker" />
+  <meta name="author" content="Krishnaanand" />
+  <meta property="og:title" content="Calorie Calculator | BMR & TDEE Tracker for Fitness Goals" />
+  <meta property="og:description" content="Find out how many calories you need each day to lose, maintain, or gain weight. Includes activity level adjustment and visual calorie chart." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://krishnaanalytics.tech/btc.html" />
+  <meta property="og:image" content="https://krishnaanalytics.tech/preview.png" />
 
-<!-- Open Graph / Social Sharing -->
-<meta property="og:title" content="Calorie Calculator | BMR & TDEE Tracker for Fitness Goals" />
-<meta property="og:description" content="Find out how many calories you need each day to lose, maintain, or gain weight. Includes activity level adjustment and visual calorie chart." />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://krishnaanalytics.tech/btc.html" />
-<meta property="og:image" content="https://krishnaanalytics.tech/preview.png" /> <!-- Optional: add your preview image -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- Bootstrap 5 CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
+    :root {
+      --bg: #FAF7F2;
+      --bg-card: #FFFFFF;
+      --bg-input: #F5F1EB;
+      --bg-result: #FFF8F0;
+      --text-primary: #1A1612;
+      --text-secondary: #6B6157;
+      --text-muted: #9B9185;
+      --accent: #D4622B;
+      --accent-light: #F0DDD0;
+      --accent-hover: #B8511F;
+      --border: #E8E2DA;
+      --border-active: #D4622B;
+      --success: #3D8B5E;
+      --info: #3A7CC2;
+      --shadow-sm: 0 1px 3px rgba(26,22,18,0.04);
+      --shadow-md: 0 4px 20px rgba(26,22,18,0.07);
+      --shadow-lg: 0 12px 40px rgba(26,22,18,0.10);
+      --radius: 12px;
+      --radius-lg: 18px;
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    [data-theme="dark"] {
+      --bg: #151210;
+      --bg-card: #1E1B18;
+      --bg-input: #272320;
+      --bg-result: #21201D;
+      --text-primary: #F0EBE4;
+      --text-secondary: #A09889;
+      --text-muted: #706860;
+      --accent: #E8803F;
+      --accent-light: #3A2A1E;
+      --accent-hover: #F09050;
+      --border: #302C28;
+      --border-active: #E8803F;
+      --success: #5CB87A;
+      --info: #5A9CDE;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.3);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.35);
+    }
 
-    <style>
-      body {
-        font-family: "Poppins", sans-serif;
-        background-color: #f8f9fa;
-        color: #222;
-        transition: background-color 0.2s, color 0.2s;
-      }
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+    }
 
-      .card {
-        border-radius: 1rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        transition: 0.25s ease;
-      }
+    /* Subtle background texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 0%, rgba(212,98,43,0.04) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 100%, rgba(61,139,94,0.03) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-      .card:hover {
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-      }
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
 
-      .form-label {
-        font-weight: 600;
-      }
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
 
-      .gender-group {
-        display: flex;
-        gap: 15px;
-      }
+    .header-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
 
-      .activity-group {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 8px;
-      }
+    .header-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
 
-      .result-box {
-        margin-top: 20px;
-        padding: 15px;
-        border-radius: 10px;
-        background: rgba(0, 0, 0, 0.03);
-      }
+    /* Theme toggle */
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover {
+      border-color: var(--accent);
+      transform: scale(1.05);
+    }
+    .theme-toggle svg { width: 18px; height: 18px; color: var(--text-secondary); transition: color var(--transition); }
+    [data-theme="dark"] .sun-icon { display: none; }
+    [data-theme="dark"] .moon-icon { display: block; }
+    :not([data-theme="dark"]) .moon-icon { display: none; }
 
-      canvas {
-        margin-top: 18px;
-      }
+    /* Card */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+      transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
 
-      @media (max-width: 576px) {
-        .gender-group {
-          flex-direction: column;
-        }
-      }
-    </style>
-  </head>
+    /* Section labels */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
 
-  <body>
-    <div class="container py-4">
-      <div class="card p-4 mx-auto" style="max-width: 900px">
-        <h2 class="text-center mb-4">Calorie Calculator</h2>
+    /* Input row */
+    .input-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
 
-        <form id="calorieForm" class="mb-3">
-          <div class="row g-3 mb-3">
-            <div class="col-md-4">
-              <label class="form-label" for="age">Age</label>
-              <input type="number" id="age" class="form-control" required />
-            </div>
+    @media (max-width: 520px) {
+      .input-row { grid-template-columns: 1fr; }
+    }
 
-            <div class="col-md-4">
-              <label class="form-label" for="height">Height (cm)</label>
-              <input type="number" id="height" class="form-control" required />
-            </div>
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
 
-            <div class="col-md-4">
-              <label class="form-label" for="weight">Weight (kg)</label>
-              <input type="number" id="weight" class="form-control" required />
-            </div>
+    .input-group label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .input-group input {
+      height: 46px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+      padding: 0 14px;
+      outline: none;
+      transition: all var(--transition);
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(212,98,43,0.1);
+    }
+
+    .input-group input::placeholder { color: var(--text-muted); }
+
+    /* Option cards (for gender, activity, goal) */
+    .option-section { margin-bottom: 26px; }
+
+    .option-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .option-card {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .option-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .option-card .option-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      background: var(--bg-input);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .option-card .option-label .option-icon {
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .option-card input:checked + .option-label {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 600;
+      box-shadow: 0 0 0 3px rgba(212,98,43,0.08);
+    }
+
+    .option-card .option-label:hover {
+      border-color: var(--text-muted);
+    }
+
+    .option-card input:checked + .option-label:hover {
+      border-color: var(--accent);
+    }
+
+    /* Activity options wrap nicely */
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
+    }
+
+    .activity-grid .option-label {
+      border-radius: var(--radius);
+      white-space: normal;
+      font-size: 0.82rem;
+      padding: 10px 14px;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      height: 50px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      letter-spacing: 0.01em;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(212,98,43,0.25);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-reset {
+      height: 50px;
+      padding: 0 22px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .btn-reset:hover {
+      border-color: var(--text-muted);
+      background: var(--bg-input);
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 28px 0;
+    }
+
+    /* Results */
+    .results-container {
+      display: none;
+      animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .results-container.visible { display: block; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 520px) {
+      .result-grid { grid-template-columns: 1fr; }
+    }
+
+    .result-tile {
+      background: var(--bg-result);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      text-align: center;
+      transition: all var(--transition);
+    }
+
+    .result-tile.highlight {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .result-tile .tile-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .result-tile .tile-value {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .result-tile.highlight .tile-value { color: var(--accent); }
+
+    .result-tile .tile-unit {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Macro bar */
+    .macro-section { margin-bottom: 24px; }
+
+    .macro-bar-container {
+      display: flex;
+      height: 10px;
+      border-radius: 99px;
+      overflow: hidden;
+      background: var(--bg-input);
+      margin-bottom: 10px;
+    }
+
+    .macro-bar-segment {
+      height: 100%;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .macro-bar-segment.protein { background: #D4622B; }
+    .macro-bar-segment.carbs { background: #3D8B5E; }
+    .macro-bar-segment.fat { background: #3A7CC2; }
+
+    .macro-legend {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .macro-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .macro-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .macro-dot.protein { background: #D4622B; }
+    .macro-dot.carbs { background: #3D8B5E; }
+    .macro-dot.fat { background: #3A7CC2; }
+
+    .macro-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Chart */
+    .chart-container {
+      position: relative;
+      height: 220px;
+    }
+
+    /* Tip section */
+    .tip-box {
+      margin-top: 20px;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      background: var(--bg-input);
+      border-left: 3px solid var(--accent);
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .tip-box strong { color: var(--text-primary); }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 36px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Error */
+    .error-msg {
+      color: #C0392B;
+      font-size: 0.88rem;
+      font-weight: 500;
+      text-align: center;
+      padding: 12px;
+      background: rgba(192,57,43,0.06);
+      border-radius: var(--radius);
+    }
+
+    /* Smooth transitions on theme change */
+    .result-tile, .macro-bar-container, .tip-box, .chart-container {
+      transition: all var(--transition);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <div class="header-title">Calorie Calculator</div>
+        <div class="header-subtitle">BMR & TDEE based on the Mifflin-St Jeor equation</div>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+      <form id="calorieForm" novalidate>
+        <!-- Measurements -->
+        <div class="section-label">Your Measurements</div>
+        <div class="input-row">
+          <div class="input-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" placeholder="25" min="10" max="120" required />
           </div>
-
-          <!-- Gender -->
-          <div class="mb-3">
-            <label class="form-label">Gender</label>
-            <div class="gender-group">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="gender"
-                  id="male"
-                  value="male"
-                  required
-                />
-                <label class="form-check-label" for="male">Male</label>
-              </div>
-
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="gender"
-                  id="female"
-                  value="female"
-                />
-                <label class="form-check-label" for="female">Female</label>
-              </div>
-            </div>
+          <div class="input-group">
+            <label for="height">Height (cm)</label>
+            <input type="number" id="height" placeholder="175" min="50" max="300" required />
           </div>
-
-          <!-- Activity Level -->
-          <div class="mb-3">
-            <label class="form-label">Activity Level</label>
-            <div class="activity-group">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="activity"
-                  id="sedentary"
-                  value="1.2"
-                  required
-                />
-                <label class="form-check-label" for="sedentary"
-                  >Sedentary (little/no exercise)</label
-                >
-              </div>
-
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="activity"
-                  id="light"
-                  value="1.375"
-                />
-                <label class="form-check-label" for="light"
-                  >Lightly active (1-3 days/week)</label
-                >
-              </div>
-
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="activity"
-                  id="moderate"
-                  value="1.55"
-                />
-                <label class="form-check-label" for="moderate"
-                  >Moderately active (3-5 days/week)</label
-                >
-              </div>
-
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="activity"
-                  id="very"
-                  value="1.725"
-                />
-                <label class="form-check-label" for="very"
-                  >Very active (6-7 days/week)</label
-                >
-              </div>
-
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="activity"
-                  id="super"
-                  value="1.9"
-                />
-                <label class="form-check-label" for="super"
-                  >Super active (twice/day training/manual labor)</label
-                >
-              </div>
-            </div>
+          <div class="input-group">
+            <label for="weight">Weight (kg)</label>
+            <input type="number" id="weight" placeholder="70" min="20" max="500" required />
           </div>
-
-          <!-- Goal -->
-          <div class="mb-3">
-            <label class="form-label">Goal</label>
-            <div class="activity-group">
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="goal"
-                  id="maintain"
-                  value="maintain"
-                  required
-                />
-                <label class="form-check-label" for="maintain">Maintain</label>
-              </div>
-
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="goal"
-                  id="lose"
-                  value="lose"
-                />
-                <label class="form-check-label" for="lose">Lose Weight</label>
-              </div>
-
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="goal"
-                  id="gain"
-                  value="gain"
-                />
-                <label class="form-check-label" for="gain">Gain Weight</label>
-              </div>
-            </div>
-          </div>
-
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary px-4">
-              Calculate
-            </button>
-            <button
-              type="button"
-              id="resetBtn"
-              class="btn btn-outline-secondary ms-2"
-            >
-              Reset
-            </button>
-          </div>
-        </form>
-
-        <!-- Results -->
-        <div id="result" class="result-box text-center fw-bold"></div>
-
-        <!-- Chart (responsive) -->
-        <div class="mt-3">
-          <canvas id="calorieChart" height="120"></canvas>
         </div>
+
+        <!-- Gender -->
+        <div class="option-section">
+          <div class="section-label">Gender</div>
+          <div class="option-grid">
+            <label class="option-card">
+              <input type="radio" name="gender" value="male" required />
+              <span class="option-label"><span class="option-icon">♂</span> Male</span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="gender" value="female" />
+              <span class="option-label"><span class="option-icon">♀</span> Female</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Activity Level -->
+        <div class="option-section">
+          <div class="section-label">Activity Level</div>
+          <div class="activity-grid">
+            <label class="option-card">
+              <input type="radio" name="activity" value="1.2" required />
+              <span class="option-label">🪑 Sedentary (little/no exercise)</span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="activity" value="1.375" />
+              <span class="option-label">🚶 Lightly active (1-3 days/wk)</span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="activity" value="1.55" />
+              <span class="option-label">🏃 Moderate (3-5 days/wk)</span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="activity" value="1.725" />
+              <span class="option-label">💪 Very active (6-7 days/wk)</span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="activity" value="1.9" />
+              <span class="option-label">🔥 Super active (2x/day)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Goal -->
+        <div class="option-section">
+          <div class="section-label">Your Goal</div>
+          <div class="option-grid">
+            <label class="option-card">
+              <input type="radio" name="goal" value="maintain" required />
+              <span class="option-label">⚖️ Maintain</span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="goal" value="lose" />
+              <span class="option-label">📉 Lose Weight</span>
+            </label>
+            <label class="option-card">
+              <input type="radio" name="goal" value="gain" />
+              <span class="option-label">📈 Gain Weight</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-row">
+          <button type="submit" class="btn-primary">Calculate</button>
+          <button type="button" id="resetBtn" class="btn-reset">Reset</button>
+        </div>
+      </form>
+
+      <!-- Error Message -->
+      <div id="errorMsg" style="display:none; margin-top:16px;"></div>
+
+      <!-- Results -->
+      <div id="resultsContainer" class="results-container">
+        <div class="divider"></div>
+
+        <div class="section-label">Your Results</div>
+        <div class="result-grid">
+          <div class="result-tile">
+            <div class="tile-label">BMR</div>
+            <div class="tile-value" id="bmrValue">—</div>
+            <div class="tile-unit">kcal/day</div>
+          </div>
+          <div class="result-tile">
+            <div class="tile-label">TDEE</div>
+            <div class="tile-value" id="tdeeValue">—</div>
+            <div class="tile-unit">kcal/day</div>
+          </div>
+          <div class="result-tile highlight">
+            <div class="tile-label" id="goalLabel">Goal</div>
+            <div class="tile-value" id="goalValue">—</div>
+            <div class="tile-unit">kcal/day</div>
+          </div>
+        </div>
+
+        <!-- Macro Breakdown -->
+        <div class="macro-section">
+          <div class="section-label">Suggested Macro Split</div>
+          <div class="macro-bar-container">
+            <div class="macro-bar-segment protein" id="proteinBar" style="width:0%"></div>
+            <div class="macro-bar-segment carbs" id="carbsBar" style="width:0%"></div>
+            <div class="macro-bar-segment fat" id="fatBar" style="width:0%"></div>
+          </div>
+          <div class="macro-legend">
+            <div class="macro-item"><span class="macro-dot protein"></span>Protein <span class="macro-value" id="proteinVal">—</span></div>
+            <div class="macro-item"><span class="macro-dot carbs"></span>Carbs <span class="macro-value" id="carbsVal">—</span></div>
+            <div class="macro-item"><span class="macro-dot fat"></span>Fat <span class="macro-value" id="fatVal">—</span></div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container">
+          <canvas id="calorieChart"></canvas>
+        </div>
+
+        <!-- Tip -->
+        <div class="tip-box" id="tipBox"></div>
       </div>
     </div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-      crossorigin="anonymous"
-    ></script>
+    <div class="footer">
+      Built by <a href="https://krishnaanalytics.tech" target="_blank" rel="noopener">Krishnaanand</a> · Uses Mifflin-St Jeor Equation
+    </div>
+  </div>
 
-    <script>
-      // Keep chart instance accessible
-      let chartInstance = null;
+  <script>
+    // Theme
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('calorie-theme');
+    if (savedTheme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
-      // Helper: safe number parse
-      function toNum(v) {
-        const n = parseFloat(v);
-        return Number.isFinite(n) ? n : NaN;
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('calorie-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('calorie-theme', 'dark');
+      }
+      // Redraw chart with new colors if it exists
+      if (chartInstance) redrawChart();
+    });
+
+    let chartInstance = null;
+    let lastResults = null;
+
+    function toNum(v) {
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : NaN;
+    }
+
+    function animateValue(el, target, duration = 600) {
+      const start = parseInt(el.textContent) || 0;
+      const diff = target - start;
+      const startTime = performance.now();
+
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(start + diff * eased).toLocaleString();
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    function getChartColors() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      return {
+        bmr: isDark ? '#5A9CDE' : '#3A7CC2',
+        tdee: isDark ? '#5CB87A' : '#3D8B5E',
+        goal: isDark ? '#E8803F' : '#D4622B',
+        grid: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+        text: isDark ? '#A09889' : '#6B6157',
+      };
+    }
+
+    function redrawChart() {
+      if (!lastResults) return;
+      drawChart(lastResults.bmr, lastResults.tdee, lastResults.goal);
+    }
+
+    function drawChart(bmr, tdee, goal) {
+      const ctx = document.getElementById('calorieChart').getContext('2d');
+      const colors = getChartColors();
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['BMR', 'TDEE', 'Goal'],
+          datasets: [{
+            label: 'kcal/day',
+            data: [bmr, tdee, goal],
+            backgroundColor: [colors.bmr, colors.tdee, colors.goal],
+            borderRadius: 8,
+            borderSkipped: false,
+            barPercentage: 0.55,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(26,22,18,0.9)',
+              titleFont: { family: "'DM Sans'", weight: '600' },
+              bodyFont: { family: "'DM Sans'" },
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: ctx => ctx.formattedValue + ' kcal/day'
+              }
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: colors.grid },
+              border: { display: false },
+              ticks: {
+                color: colors.text,
+                font: { family: "'DM Sans'", size: 11 },
+                callback: v => v.toLocaleString()
+              }
+            },
+            x: {
+              grid: { display: false },
+              border: { display: false },
+              ticks: {
+                color: colors.text,
+                font: { family: "'DM Sans'", size: 12, weight: '600' }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function getTip(goal, calorieGoal) {
+      if (goal === 'lose') {
+        return `<strong>Tip:</strong> A 400 kcal daily deficit is a safe pace, roughly 0.35 kg/week. Prioritize protein to preserve muscle, and don't go below 1,200 kcal/day without professional guidance.`;
+      } else if (goal === 'gain') {
+        return `<strong>Tip:</strong> A 400 kcal surplus supports steady lean mass gain. Pair this with resistance training and aim for 1.6-2.2 g protein per kg of bodyweight for best results.`;
+      } else {
+        return `<strong>Tip:</strong> Eating at maintenance keeps your weight stable. If you're recomping (losing fat while gaining muscle), keep protein high and focus on progressive overload in training.`;
+      }
+    }
+
+    document.getElementById('calorieForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const errorDiv = document.getElementById('errorMsg');
+      const resultsDiv = document.getElementById('resultsContainer');
+
+      const age = toNum(document.getElementById('age').value);
+      const height = toNum(document.getElementById('height').value);
+      const weight = toNum(document.getElementById('weight').value);
+      const genderEl = document.querySelector('input[name="gender"]:checked');
+      const activityEl = document.querySelector('input[name="activity"]:checked');
+      const goalEl = document.querySelector('input[name="goal"]:checked');
+
+      if (!age || !height || !weight || !genderEl || !activityEl || !goalEl) {
+        errorDiv.style.display = 'block';
+        errorDiv.innerHTML = '<div class="error-msg">Please fill in all fields and select all options.</div>';
+        resultsDiv.classList.remove('visible');
+        return;
       }
 
-      document
-        .getElementById("calorieForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
+      errorDiv.style.display = 'none';
 
-          const age = toNum(document.getElementById("age").value);
-          const height = toNum(document.getElementById("height").value);
-          const weight = toNum(document.getElementById("weight").value);
-          const genderEl = document.querySelector(
-            'input[name="gender"]:checked'
-          );
-          const activityEl = document.querySelector(
-            'input[name="activity"]:checked'
-          );
-          const goalEl = document.querySelector('input[name="goal"]:checked');
-          const resultDiv = document.getElementById("result");
+      const gender = genderEl.value;
+      const activity = toNum(activityEl.value);
+      const goal = goalEl.value;
 
-          if (
-            !age ||
-            !height ||
-            !weight ||
-            !genderEl ||
-            !activityEl ||
-            !goalEl
-          ) {
-            resultDiv.innerHTML =
-              "<p class='text-danger'>⚠️ Please fill all fields and select options.</p>";
-            return;
-          }
+      // Mifflin-St Jeor BMR
+      let bmr = gender === 'male'
+        ? 10 * weight + 6.25 * height - 5 * age + 5
+        : 10 * weight + 6.25 * height - 5 * age - 161;
 
-          const gender = genderEl.value;
-          const activity = toNum(activityEl.value);
-          const goal = goalEl.value;
+      let tdee = bmr * activity;
 
-          // Calculate BMR (Mifflin-St Jeor)
-          let bmr =
-            gender === "male"
-              ? 10 * weight + 6.25 * height - 5 * age + 5
-              : 10 * weight + 6.25 * height - 5 * age - 161;
+      let calorieGoal;
+      if (goal === 'maintain') calorieGoal = tdee;
+      else if (goal === 'lose') calorieGoal = Math.max(1200, tdee - 400);
+      else calorieGoal = tdee + 400;
 
-          // TDEE
-          let tdee = bmr * activity;
+      bmr = Math.round(bmr);
+      tdee = Math.round(tdee);
+      calorieGoal = Math.round(calorieGoal);
 
-          // Goal calories (safe deficit/surplus)
-          let calorieGoal;
-          if (goal === "maintain") calorieGoal = tdee;
-          else if (goal === "lose")
-            calorieGoal = Math.max(1200, tdee - 400); // avoid extreme low
-          else calorieGoal = tdee + 400;
+      lastResults = { bmr, tdee, goal: calorieGoal };
 
-          resultDiv.innerHTML = `
-          <p class="mb-1">Your <strong>BMR</strong>: ${bmr.toFixed(
-            0
-          )} kcal/day</p>
-          <p class="mb-1">Your <strong>TDEE</strong>: ${tdee.toFixed(
-            0
-          )} kcal/day</p>
-          <p class="mb-0">To <strong>${goal}</strong> weight, target around <strong>${calorieGoal.toFixed(
-            0
-          )}</strong> kcal/day.</p>
-        `;
+      // Show results
+      resultsDiv.classList.remove('visible');
+      void resultsDiv.offsetWidth; // force reflow for re-animation
+      resultsDiv.classList.add('visible');
 
-          // Draw chart
-          const ctx = document.getElementById("calorieChart").getContext("2d");
-          if (chartInstance) chartInstance.destroy();
+      // Animate numbers
+      animateValue(document.getElementById('bmrValue'), bmr);
+      animateValue(document.getElementById('tdeeValue'), tdee);
+      animateValue(document.getElementById('goalValue'), calorieGoal);
 
-          chartInstance = new Chart(ctx, {
-            type: "bar",
-            data: {
-              labels: ["BMR", "TDEE", "Goal"],
-              datasets: [
-                {
-                  label: "Calories (kcal/day)",
-                  data: [
-                    bmr.toFixed(0),
-                    tdee.toFixed(0),
-                    calorieGoal.toFixed(0),
-                  ],
-                  backgroundColor: ["#0d6efd", "#198754", "#fd7e14"],
-                  borderRadius: 6,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  callbacks: {
-                    label: function (ctx) {
-                      return ctx.formattedValue + " kcal/day";
-                    },
-                  },
-                },
-                title: {
-                  display: true,
-                  text: "Caloric Profile",
-                  padding: { top: 6, bottom: 6 },
-                  font: { weight: "600" },
-                },
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: {
-                    callback: function (v) {
-                      return v + " kcal";
-                    },
-                  },
-                },
-              },
-            },
-          });
-        });
+      // Goal label
+      const goalLabels = { maintain: 'Maintain', lose: 'Lose Weight', gain: 'Gain Weight' };
+      document.getElementById('goalLabel').textContent = goalLabels[goal] || 'Goal';
 
-      // Reset button
-      document
-        .getElementById("resetBtn")
-        .addEventListener("click", function () {
-          document.getElementById("calorieForm").reset();
-          document.getElementById("result").innerHTML = "";
-          if (chartInstance) {
-            chartInstance.destroy();
-            chartInstance = null;
-          }
-        });
-    </script>
-  </body>
+      // Macro breakdown (balanced: 30% protein, 40% carbs, 30% fat)
+      let proteinPct = 30, carbsPct = 40, fatPct = 30;
+      if (goal === 'lose') { proteinPct = 35; carbsPct = 35; fatPct = 30; }
+      if (goal === 'gain') { proteinPct = 30; carbsPct = 45; fatPct = 25; }
+
+      const proteinG = Math.round((calorieGoal * proteinPct / 100) / 4);
+      const carbsG = Math.round((calorieGoal * carbsPct / 100) / 4);
+      const fatG = Math.round((calorieGoal * fatPct / 100) / 9);
+
+      // Animate macro bars
+      setTimeout(() => {
+        document.getElementById('proteinBar').style.width = proteinPct + '%';
+        document.getElementById('carbsBar').style.width = carbsPct + '%';
+        document.getElementById('fatBar').style.width = fatPct + '%';
+      }, 100);
+
+      document.getElementById('proteinVal').textContent = proteinG + 'g (' + proteinPct + '%)';
+      document.getElementById('carbsVal').textContent = carbsG + 'g (' + carbsPct + '%)';
+      document.getElementById('fatVal').textContent = fatG + 'g (' + fatPct + '%)';
+
+      // Chart
+      drawChart(bmr, tdee, calorieGoal);
+
+      // Tip
+      document.getElementById('tipBox').innerHTML = getTip(goal, calorieGoal);
+
+      // Smooth scroll to results
+      setTimeout(() => {
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 200);
+    });
+
+    // Reset
+    document.getElementById('resetBtn').addEventListener('click', function() {
+      document.getElementById('calorieForm').reset();
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('resultsContainer').classList.remove('visible');
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+      lastResults = null;
+
+      // Reset macro bars
+      document.getElementById('proteinBar').style.width = '0%';
+      document.getElementById('carbsBar').style.width = '0%';
+      document.getElementById('fatBar').style.width = '0%';
+    });
+  </script>
+</body>
 </html>
-
