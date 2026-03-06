@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chai Counter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1612;
+      --surface: #241f1a;
+      --surface-2: #2e2821;
+      --border: #3d3529;
+      --accent: #e8944c;
+      --accent-dim: rgba(232, 148, 76, 0.15);
+      --accent-hover: #d4803c;
+      --text: #f0e6d9;
+      --text-dim: #9a8d7f;
+      --green: #7ab87e;
+      --red: #cf6b5e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .wrap {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 16px 16px 60px;
+    }
+
+    /* ---- Lock Screen ---- */
+    #lockScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      min-height: 80dvh;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .lock-icon {
+      width: 64px;
+      height: 64px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+      background: var(--surface);
+    }
+
+    .lock-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    .lock-sub {
+      color: var(--text-dim);
+      font-size: 14px;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .pin-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .pin-field {
+      flex: 1;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 18px;
+      letter-spacing: 3px;
+      text-align: center;
+    }
+
+    .pin-field:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .pin-field::placeholder {
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    .pin-go {
+      padding: 12px 22px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .pin-go:hover { background: var(--accent-hover); }
+
+    .pin-err {
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 10px;
+      min-height: 20px;
+    }
+
+    /* ---- Main App ---- */
+    #mainApp { display: none; animation: fadeIn 0.4s ease; }
+    #mainApp.show { display: block; }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 20px 0 16px;
+    }
+
+    .header-left h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .round-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 6px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 6px;
+    }
+
+    .logout-btn {
+      margin-top: 6px;
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* Name bar */
+    .name-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .name-bar label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .name-input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      min-width: 0;
+    }
+
+    .name-input:focus { outline: none; }
+    .name-input::placeholder { color: var(--text-dim); font-weight: 400; }
+
+    .name-save {
+      padding: 4px 12px;
+      background: var(--accent-dim);
+      border: none;
+      border-radius: 6px;
+      color: var(--accent);
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: none;
+    }
+
+    .name-save.show { display: block; }
+    .name-save:hover { background: rgba(232, 148, 76, 0.25); }
+
+    .name-saved-tick {
+      color: var(--green);
+      font-size: 16px;
+      display: none;
+    }
+
+    .name-saved-tick.show { display: block; }
+
+    /* Drink grid */
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .drink-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .drink-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .drink-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .drink-card:active { transform: translateY(0); }
+
+    .drink-card.picked {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .drink-card .icon { font-size: 36px; display: block; margin-bottom: 8px; }
+    .drink-card .label { font-weight: 700; font-size: 15px; }
+
+    .drink-card .tick {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 22px;
+      height: 22px;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 50%;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .drink-card.picked .tick { display: flex; }
+
+    .order-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+
+    .order-btn:hover { background: var(--accent-hover); }
+    .order-btn:disabled {
+      background: var(--surface-2);
+      color: var(--text-dim);
+      cursor: not-allowed;
+    }
+
+    /* Counts panel */
+    .counts-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .counts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .counts-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+    }
+
+    .counts-total {
+      background: var(--accent);
+      color: var(--bg);
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .count-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .count-row:last-of-type { border-bottom: none; }
+
+    .count-left { display: flex; align-items: center; gap: 10px; }
+    .count-icon { font-size: 22px; }
+    .count-name { font-weight: 600; font-size: 14px; }
+
+    .count-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .orders-detail {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+    }
+
+    .orders-detail summary {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .orders-detail summary::-webkit-details-marker { display: none; }
+    .orders-detail[open] summary .arrow { transform: rotate(90deg); }
+
+    .arrow {
+      display: inline-block;
+      transition: transform 0.2s;
+      font-size: 10px;
+    }
+
+    .order-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+    }
+
+    .order-entry .who { font-weight: 600; }
+    .order-entry .what { color: var(--text-dim); }
+
+    .refresh-row { display: flex; gap: 8px; margin-top: 14px; }
+
+    .refresh-btn, .clear-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .refresh-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .refresh-btn:hover { border-color: var(--accent); }
+
+    .clear-btn {
+      background: none;
+      border: 1px solid var(--red);
+      color: var(--red);
+    }
+
+    .clear-btn:hover { background: rgba(207, 107, 94, 0.1); }
+
+    /* Success overlay */
+    .success-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 22, 18, 0.92);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .success-overlay.show { display: flex; }
+
+    .success-box {
+      text-align: center;
+      padding: 40px 32px;
+      animation: popIn 0.3s ease;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .success-box .big-icon { font-size: 56px; margin-bottom: 16px; }
+
+    .success-box h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .success-box p { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+
+    .success-close {
+      padding: 10px 28px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .no-orders { color: var(--text-dim); font-size: 13px; padding: 8px 0; }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- LOCK SCREEN -->
+  <div id="lockScreen">
+    <div class="lock-icon">☕</div>
+    <div class="lock-title">Chai Counter</div>
+    <p class="lock-sub">Enter the office PIN to<br>place your drink order</p>
+    <div class="pin-row">
+      <input type="password" class="pin-field" id="pinInput" placeholder="PIN" maxlength="10" inputmode="numeric">
+      <button class="pin-go" onclick="unlock()">Enter</button>
+    </div>
+    <div class="pin-err" id="pinErr"></div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="mainApp">
+
+    <div class="header">
+      <div class="header-left">
+        <h1>☕ Chai Counter</h1>
+        <div class="round-badge" id="roundBadge">...</div>
+      </div>
+      <button class="logout-btn" onclick="lockApp()">Lock</button>
+    </div>
+
+    <!-- Saved name -->
+    <div class="name-bar">
+      <label>Name</label>
+      <input type="text" class="name-input" id="nameInput" placeholder="Type your name" maxlength="30">
+      <button class="name-save" id="nameSaveBtn" onclick="saveName()">Save</button>
+      <span class="name-saved-tick" id="nameTick">✓</span>
+    </div>
+
+    <!-- Drink pick -->
+    <div class="section-label">What are you having?</div>
+    <div class="drink-grid">
+      <div class="drink-card" data-drink="coffee" onclick="pickDrink(this)">
+        <span class="tick">✓</span>
+        <span class="icon">☕</span>
+        <span class="label">Coffee</span>
+      </div>
+      <div class="drink-card" data-drink="tea" onclick="pickDrink(this)">
+        <span class="tick">✓</span>
+        <span class="icon">🍵</span>
+        <span class="label">Tea</span>
+      </div>
+      <div class="drink-card" data-drink="horlicks" onclick="pickDrink(this)">
+        <span class="tick">✓</span>
+        <span class="icon">🥛</span>
+        <span class="label">Horlicks</span>
+      </div>
+      <div class="drink-card" data-drink="boost" onclick="pickDrink(this)">
+        <span class="tick">✓</span>
+        <span class="icon">🧃</span>
+        <span class="label">Boost</span>
+      </div>
+    </div>
+
+    <button class="order-btn" id="orderBtn" disabled onclick="placeOrder()">Pick a drink</button>
+
+    <!-- Live counts -->
+    <div class="counts-panel">
+      <div class="counts-header">
+        <h3>This Round</h3>
+        <span class="counts-total" id="countsTotal">0 total</span>
+      </div>
+      <div class="count-row">
+        <div class="count-left"><span class="count-icon">☕</span><span class="count-name">Coffee</span></div>
+        <span class="count-num" id="cCoffee">0</span>
+      </div>
+      <div class="count-row">
+        <div class="count-left"><span class="count-icon">🍵</span><span class="count-name">Tea</span></div>
+        <span class="count-num" id="cTea">0</span>
+      </div>
+      <div class="count-row">
+        <div class="count-left"><span class="count-icon">🥛</span><span class="count-name">Horlicks</span></div>
+        <span class="count-num" id="cHorlicks">0</span>
+      </div>
+      <div class="count-row">
+        <div class="count-left"><span class="count-icon">🧃</span><span class="count-name">Boost</span></div>
+        <span class="count-num" id="cBoost">0</span>
+      </div>
+
+      <details class="orders-detail">
+        <summary><span class="arrow">▶</span> Who ordered what</summary>
+        <div id="ordersListInner"></div>
+      </details>
+
+      <div class="refresh-row">
+        <button class="refresh-btn" onclick="loadCounts()">↻ Refresh</button>
+        <button class="clear-btn" onclick="clearRound()">Clear round</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Success -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="big-icon">✅</div>
+    <h2>Order placed!</h2>
+    <p id="successText"></p>
+    <button class="success-close" onclick="closeSuccess()">Got it</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // =============================================
+  // CONFIG: your deployed Worker URL
+  // =============================================
+  const API = ''; // e.g. 'https://chai-counter.you.workers.dev'
+
+  let currentPin = '';
+  let pickedDrink = null;
+
+  // ---- Init ----
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('chai-name');
+    if (saved) {
+      document.getElementById('nameInput').value = saved;
+      document.getElementById('nameTick').classList.add('show');
+    }
+
+    document.getElementById('pinInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') unlock();
+    });
+
+    document.getElementById('nameInput').addEventListener('input', () => {
+      document.getElementById('nameSaveBtn').classList.add('show');
+      document.getElementById('nameTick').classList.remove('show');
+    });
+  });
+
+  // ---- Unlock ----
+  async function unlock() {
+    const pin = document.getElementById('pinInput').value.trim();
+    if (!pin) return;
+    document.getElementById('pinErr').textContent = '';
+
+    try {
+      const res = await fetch(`${API}/api/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin })
+      });
+      if (!res.ok) {
+        document.getElementById('pinErr').textContent = 'Wrong PIN. Try again.';
+        return;
+      }
+      currentPin = pin;
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('mainApp').classList.add('show');
+      loadCounts();
+    } catch (err) {
+      document.getElementById('pinErr').textContent = 'Can\'t reach server. Is the Worker running?';
+    }
+  }
+
+  function lockApp() {
+    currentPin = '';
+    pickedDrink = null;
+    document.getElementById('mainApp').classList.remove('show');
+    document.getElementById('lockScreen').style.display = 'flex';
+    document.getElementById('pinInput').value = '';
+    document.getElementById('pinErr').textContent = '';
+    document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('picked'));
+    document.getElementById('orderBtn').disabled = true;
+    document.getElementById('orderBtn').textContent = 'Pick a drink';
+  }
+
+  // ---- Name ----
+  function saveName() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) return;
+    localStorage.setItem('chai-name', name);
+    document.getElementById('nameSaveBtn').classList.remove('show');
+    document.getElementById('nameTick').classList.add('show');
+    toast('Name saved!');
+  }
+
+  // ---- Drink pick ----
+  function pickDrink(el) {
+    document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('picked'));
+    el.classList.add('picked');
+    pickedDrink = el.dataset.drink;
+    const btn = document.getElementById('orderBtn');
+    btn.disabled = false;
+    btn.textContent = `Order ${cap(pickedDrink)}`;
+  }
+
+  // ---- Place order ----
+  async function placeOrder() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) { toast('Enter your name first'); return; }
+    if (!pickedDrink) return;
+
+    const btn = document.getElementById('orderBtn');
+    btn.disabled = true;
+    btn.textContent = 'Placing...';
+
+    try {
+      const res = await fetch(`${API}/api/order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: currentPin, name, drink: pickedDrink })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast(data.error || 'Something went wrong');
+        btn.disabled = false;
+        btn.textContent = `Order ${cap(pickedDrink)}`;
+        return;
+      }
+
+      // Auto-save name
+      localStorage.setItem('chai-name', name);
+      document.getElementById('nameSaveBtn').classList.remove('show');
+      document.getElementById('nameTick').classList.add('show');
+
+      document.getElementById('successText').textContent = `${name}, your ${pickedDrink} is on the list.`;
+      document.getElementById('successOverlay').classList.add('show');
+
+      pickedDrink = null;
+      document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('picked'));
+      btn.disabled = true;
+      btn.textContent = 'Pick a drink';
+      loadCounts();
+    } catch (err) {
+      toast('Can\'t reach server');
+      btn.disabled = false;
+      btn.textContent = `Order ${cap(pickedDrink)}`;
+    }
+  }
+
+  function closeSuccess() {
+    document.getElementById('successOverlay').classList.remove('show');
+  }
+
+  // ---- Load counts ----
+  async function loadCounts() {
+    try {
+      const res = await fetch(`${API}/api/counts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: currentPin })
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      document.getElementById('roundBadge').textContent = data.round || 'Current Round';
+
+      const c = data.counts || {};
+      document.getElementById('cCoffee').textContent = c.coffee || 0;
+      document.getElementById('cTea').textContent = c.tea || 0;
+      document.getElementById('cHorlicks').textContent = c.horlicks || 0;
+      document.getElementById('cBoost').textContent = c.boost || 0;
+
+      const total = (c.coffee || 0) + (c.tea || 0) + (c.horlicks || 0) + (c.boost || 0);
+      document.getElementById('countsTotal').textContent = `${total} total`;
+
+      const inner = document.getElementById('ordersListInner');
+      inner.innerHTML = '';
+      if (data.orders && data.orders.length > 0) {
+        data.orders.forEach(o => {
+          const div = document.createElement('div');
+          div.className = 'order-entry';
+          div.innerHTML = `<span class="who">${esc(o.name)}</span><span class="what">${cap(o.drink)}</span>`;
+          inner.appendChild(div);
+        });
+      } else {
+        inner.innerHTML = '<p class="no-orders">No orders yet this round.</p>';
+      }
+    } catch (err) { /* silent */ }
+  }
+
+  // ---- Clear round ----
+  async function clearRound() {
+    if (!confirm('Clear all orders for this round?')) return;
+    try {
+      const res = await fetch(`${API}/api/clear`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: currentPin })
+      });
+      if (res.ok) { toast('Round cleared'); loadCounts(); }
+    } catch (err) { toast('Failed to clear'); }
+  }
+
+  // ---- Helpers ----
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+</script>
+
+</body>
+</html>
