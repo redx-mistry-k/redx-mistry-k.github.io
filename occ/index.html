@@ -306,7 +306,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .drink-card {
@@ -354,6 +354,37 @@
     }
 
     .drink-card.picked .tick { display: flex; }
+
+    /* ---- Other drink input ---- */
+    .other-input-wrap {
+      display: none;
+      margin-bottom: 10px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .other-input-wrap.show { display: block; }
+
+    .other-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .other-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .other-input::placeholder {
+      color: var(--text-dim);
+      font-weight: 400;
+    }
 
     .order-btn {
       width: 100%;
@@ -414,7 +445,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .count-row:last-of-type { border-bottom: none; }
+    .count-row:last-child { border-bottom: none; }
 
     .count-left { display: flex; align-items: center; gap: 10px; }
     .count-icon { font-size: 22px; }
@@ -493,7 +524,6 @@
 
     .clear-btn:hover { background: rgba(207, 107, 94, 0.1); }
 
-    /* ---- Vendor-only refresh (no clear) ---- */
     .vendor-refresh-row { margin-top: 14px; }
 
     .vendor-refresh-btn {
@@ -511,6 +541,8 @@
     }
 
     .vendor-refresh-btn:hover { border-color: var(--accent); }
+
+    .no-counts { color: var(--text-dim); font-size: 14px; padding: 10px 0; }
 
     /* ---- Success overlay ---- */
     .success-overlay {
@@ -651,32 +683,27 @@
         <span class="icon">🧃</span>
         <span class="label">Boost</span>
       </div>
+      <div class="drink-card" data-drink="other" onclick="pickDrink(this)" style="grid-column: 1 / -1;">
+        <span class="tick">✓</span>
+        <span class="icon">🥤</span>
+        <span class="label">Other</span>
+      </div>
+    </div>
+
+    <!-- Custom drink name input (shows when "Other" is picked) -->
+    <div class="other-input-wrap" id="otherWrap">
+      <input type="text" class="other-input" id="otherInput" placeholder="Type drink name (e.g. Badam Milk)" maxlength="30">
     </div>
 
     <button class="order-btn" id="orderBtn" disabled onclick="placeOrder()">Pick a drink</button>
 
-    <!-- Counts (staff view with clear button) -->
+    <!-- Counts (staff view) -->
     <div class="counts-panel">
       <div class="counts-header">
         <h3>This Round</h3>
         <span class="counts-total" id="countsTotal">0 total</span>
       </div>
-      <div class="count-row">
-        <div class="count-left"><span class="count-icon">☕</span><span class="count-name">Coffee</span></div>
-        <span class="count-num" id="cCoffee">0</span>
-      </div>
-      <div class="count-row">
-        <div class="count-left"><span class="count-icon">🍵</span><span class="count-name">Tea</span></div>
-        <span class="count-num" id="cTea">0</span>
-      </div>
-      <div class="count-row">
-        <div class="count-left"><span class="count-icon">🥛</span><span class="count-name">Horlicks</span></div>
-        <span class="count-num" id="cHorlicks">0</span>
-      </div>
-      <div class="count-row">
-        <div class="count-left"><span class="count-icon">🧃</span><span class="count-name">Boost</span></div>
-        <span class="count-num" id="cBoost">0</span>
-      </div>
+      <div id="countsRows"></div>
 
       <details class="orders-detail">
         <summary><span class="arrow">▶</span> Who ordered what</summary>
@@ -706,22 +733,7 @@
         <h3>Drink Count</h3>
         <span class="counts-total" id="vCountsTotal">0 total</span>
       </div>
-      <div class="count-row">
-        <div class="count-left"><span class="count-icon">☕</span><span class="count-name">Coffee</span></div>
-        <span class="count-num" id="vCoffee">0</span>
-      </div>
-      <div class="count-row">
-        <div class="count-left"><span class="count-icon">🍵</span><span class="count-name">Tea</span></div>
-        <span class="count-num" id="vTea">0</span>
-      </div>
-      <div class="count-row">
-        <div class="count-left"><span class="count-icon">🥛</span><span class="count-name">Horlicks</span></div>
-        <span class="count-num" id="vHorlicks">0</span>
-      </div>
-      <div class="count-row">
-        <div class="count-left"><span class="count-icon">🧃</span><span class="count-name">Boost</span></div>
-        <span class="count-num" id="vBoost">0</span>
-      </div>
+      <div id="vCountsRows"></div>
 
       <div class="vendor-refresh-row">
         <button class="vendor-refresh-btn" onclick="loadVendorCounts()">↻ Refresh</button>
@@ -745,9 +757,18 @@
 
 <script>
   // =============================================
-  // CONFIG: your deployed Worker URL
+  // CONFIG
   // =============================================
   const API = 'https://occ.vkrishnaanand.workers.dev';
+
+  // Emoji map for known drinks, fallback for custom ones
+  const DRINK_EMOJI = {
+    coffee: '☕',
+    tea: '🍵',
+    horlicks: '🥛',
+    boost: '🧃',
+  };
+  const DEFAULT_EMOJI = '🥤';
 
   let currentPin = '';
   let pickedDrink = null;
@@ -768,10 +789,23 @@
       document.getElementById('nameSaveBtn').classList.add('show');
       document.getElementById('nameTick').classList.remove('show');
     });
+
+    // Update order button text when typing custom drink name
+    document.getElementById('otherInput').addEventListener('input', () => {
+      const val = document.getElementById('otherInput').value.trim();
+      const btn = document.getElementById('orderBtn');
+      if (val) {
+        btn.disabled = false;
+        btn.textContent = `Order ${cap(val)}`;
+      } else {
+        btn.disabled = true;
+        btn.textContent = 'Type a drink name';
+      }
+    });
   });
 
   // =============================================
-  // SCREEN: Lock → Staff App
+  // Lock / Unlock
   // =============================================
   async function unlock() {
     const pin = document.getElementById('pinInput').value.trim();
@@ -804,13 +838,15 @@
     document.getElementById('lockScreen').style.display = 'flex';
     document.getElementById('pinInput').value = '';
     document.getElementById('pinErr').textContent = '';
+    document.getElementById('otherWrap').classList.remove('show');
+    document.getElementById('otherInput').value = '';
     document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('picked'));
     document.getElementById('orderBtn').disabled = true;
     document.getElementById('orderBtn').textContent = 'Pick a drink';
   }
 
   // =============================================
-  // SCREEN: Lock → Vendor View
+  // Vendor View
   // =============================================
   function openVendorView() {
     document.getElementById('lockScreen').style.display = 'none';
@@ -830,15 +866,7 @@
       const data = await res.json();
 
       document.getElementById('vRoundBadge').textContent = data.round || 'Current Round';
-
-      const c = data.counts || {};
-      document.getElementById('vCoffee').textContent = c.coffee || 0;
-      document.getElementById('vTea').textContent = c.tea || 0;
-      document.getElementById('vHorlicks').textContent = c.horlicks || 0;
-      document.getElementById('vBoost').textContent = c.boost || 0;
-
-      const total = (c.coffee || 0) + (c.tea || 0) + (c.horlicks || 0) + (c.boost || 0);
-      document.getElementById('vCountsTotal').textContent = `${total} total`;
+      renderCounts(data.counts || {}, 'vCountsRows', 'vCountsTotal');
     } catch (err) {
       toast('Can\'t reach server');
     }
@@ -863,9 +891,28 @@
     document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('picked'));
     el.classList.add('picked');
     pickedDrink = el.dataset.drink;
+
     const btn = document.getElementById('orderBtn');
-    btn.disabled = false;
-    btn.textContent = `Order ${cap(pickedDrink)}`;
+    const otherWrap = document.getElementById('otherWrap');
+    const otherInput = document.getElementById('otherInput');
+
+    if (pickedDrink === 'other') {
+      otherWrap.classList.add('show');
+      otherInput.focus();
+      const val = otherInput.value.trim();
+      if (val) {
+        btn.disabled = false;
+        btn.textContent = `Order ${cap(val)}`;
+      } else {
+        btn.disabled = true;
+        btn.textContent = 'Type a drink name';
+      }
+    } else {
+      otherWrap.classList.remove('show');
+      otherInput.value = '';
+      btn.disabled = false;
+      btn.textContent = `Order ${cap(pickedDrink)}`;
+    }
   }
 
   // =============================================
@@ -874,7 +921,14 @@
   async function placeOrder() {
     const name = document.getElementById('nameInput').value.trim();
     if (!name) { toast('Enter your name first'); return; }
-    if (!pickedDrink) return;
+
+    // Determine the actual drink name
+    let drink = pickedDrink;
+    if (drink === 'other') {
+      drink = document.getElementById('otherInput').value.trim().toLowerCase();
+      if (!drink) { toast('Type a drink name'); return; }
+    }
+    if (!drink) return;
 
     const btn = document.getElementById('orderBtn');
     btn.disabled = true;
@@ -884,13 +938,13 @@
       const res = await fetch(`${API}/api/order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: currentPin, name, drink: pickedDrink })
+        body: JSON.stringify({ pin: currentPin, name, drink })
       });
       const data = await res.json();
       if (!res.ok) {
         toast(data.error || 'Something went wrong');
         btn.disabled = false;
-        btn.textContent = `Order ${cap(pickedDrink)}`;
+        btn.textContent = `Order ${cap(drink)}`;
         return;
       }
 
@@ -898,18 +952,21 @@
       document.getElementById('nameSaveBtn').classList.remove('show');
       document.getElementById('nameTick').classList.add('show');
 
-      document.getElementById('successText').textContent = `${name}, your ${pickedDrink} is on the list.`;
+      document.getElementById('successText').textContent = `${name}, your ${drink} is on the list.`;
       document.getElementById('successOverlay').classList.add('show');
 
+      // Reset
       pickedDrink = null;
       document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('picked'));
+      document.getElementById('otherWrap').classList.remove('show');
+      document.getElementById('otherInput').value = '';
       btn.disabled = true;
       btn.textContent = 'Pick a drink';
       loadCounts();
     } catch (err) {
       toast('Can\'t reach server');
       btn.disabled = false;
-      btn.textContent = `Order ${cap(pickedDrink)}`;
+      btn.textContent = `Order ${cap(drink)}`;
     }
   }
 
@@ -918,7 +975,7 @@
   }
 
   // =============================================
-  // Staff counts (PIN protected)
+  // Staff counts
   // =============================================
   async function loadCounts() {
     try {
@@ -931,16 +988,9 @@
       const data = await res.json();
 
       document.getElementById('roundBadge').textContent = data.round || 'Current Round';
+      renderCounts(data.counts || {}, 'countsRows', 'countsTotal');
 
-      const c = data.counts || {};
-      document.getElementById('cCoffee').textContent = c.coffee || 0;
-      document.getElementById('cTea').textContent = c.tea || 0;
-      document.getElementById('cHorlicks').textContent = c.horlicks || 0;
-      document.getElementById('cBoost').textContent = c.boost || 0;
-
-      const total = (c.coffee || 0) + (c.tea || 0) + (c.horlicks || 0) + (c.boost || 0);
-      document.getElementById('countsTotal').textContent = `${total} total`;
-
+      // Render individual orders
       const inner = document.getElementById('ordersListInner');
       inner.innerHTML = '';
       if (data.orders && data.orders.length > 0) {
@@ -957,7 +1007,52 @@
   }
 
   // =============================================
-  // Clear round (staff only)
+  // Render counts dynamically (works for any drinks)
+  // =============================================
+  function renderCounts(counts, containerId, totalId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+
+    const entries = Object.entries(counts);
+    let total = 0;
+
+    if (entries.length === 0) {
+      container.innerHTML = '<p class="no-counts">No orders yet this round.</p>';
+      document.getElementById(totalId).textContent = '0 total';
+      return;
+    }
+
+    // Sort: known drinks first in order, then custom ones alphabetically
+    const knownOrder = ['coffee', 'tea', 'horlicks', 'boost'];
+    entries.sort((a, b) => {
+      const ai = knownOrder.indexOf(a[0]);
+      const bi = knownOrder.indexOf(b[0]);
+      if (ai !== -1 && bi !== -1) return ai - bi;
+      if (ai !== -1) return -1;
+      if (bi !== -1) return 1;
+      return a[0].localeCompare(b[0]);
+    });
+
+    entries.forEach(([drink, count]) => {
+      total += count;
+      const emoji = DRINK_EMOJI[drink] || DEFAULT_EMOJI;
+      const row = document.createElement('div');
+      row.className = 'count-row';
+      row.innerHTML = `
+        <div class="count-left">
+          <span class="count-icon">${emoji}</span>
+          <span class="count-name">${esc(cap(drink))}</span>
+        </div>
+        <span class="count-num">${count}</span>
+      `;
+      container.appendChild(row);
+    });
+
+    document.getElementById(totalId).textContent = `${total} total`;
+  }
+
+  // =============================================
+  // Clear round
   // =============================================
   async function clearRound() {
     if (!confirm('Clear all orders for this round?')) return;
