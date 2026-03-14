@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Payment Tracker</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f3f3f3;
+text-align:center;
+margin-top:100px;
+}
+
+.box{
+background:white;
+padding:30px;
+width:300px;
+margin:auto;
+border-radius:10px;
+}
+
+input{
+width:90%;
+padding:10px;
+margin:10px;
+}
+
+button{
+padding:10px 20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Create Payment Session</h2>
+
+<input id="amount" placeholder="Total Amount">
+
+<input id="password" placeholder="Secret Password">
+
+<input id="pin" placeholder="4 Digit PIN">
+
+<button onclick="createSession()">Create</button>
+
+</div>
+
+<script>
+
+async function createSession(){
+
+let amount=document.getElementById("amount").value
+let password=document.getElementById("password").value
+let pin=document.getElementById("pin").value
+
+let res=await fetch("/api/create",{
+method:"POST",
+body:JSON.stringify({amount,password,pin})
+})
+
+let data=await res.json()
+
+alert("Session Created. ID: "+data.session)
+
+localStorage.session=data.session
+
+window.location="tracker.html"
+
+}
+
+</script>
+
+</body>
+</html>
