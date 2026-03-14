@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
-<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Payment Tracker</title>
@@ -13,7 +11,6 @@
 body{
 font-family:system-ui;
 background:#f4f6f9;
-margin:0;
 padding:30px;
 }
 
@@ -22,12 +19,8 @@ max-width:520px;
 margin:auto;
 background:white;
 padding:25px;
-border-radius:12px;
-box-shadow:0 4px 20px rgba(0,0,0,0.05);
-}
-
-h1{
-margin-top:0;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,0.05);
 }
 
 input,button,select{
@@ -35,7 +28,6 @@ width:100%;
 padding:12px;
 margin:8px 0;
 font-size:15px;
-box-sizing:border-box;
 }
 
 button{
@@ -46,51 +38,24 @@ border-radius:6px;
 cursor:pointer;
 }
 
-button:hover{
-opacity:0.9;
-}
-
-.summary{
-font-size:15px;
-margin-bottom:10px;
-}
-
 .progress{
 height:10px;
 background:#eee;
 border-radius:10px;
-margin:10px 0 20px 0;
+margin:10px 0;
 }
 
 .bar{
 height:10px;
 background:#2563eb;
 border-radius:10px;
-width:0%;
 }
 
 .payment{
 display:flex;
 justify-content:space-between;
-padding:10px 0;
+padding:8px 0;
 border-bottom:1px solid #eee;
-font-size:14px;
-}
-
-.pending{
-color:orange;
-}
-
-.confirmed{
-color:green;
-}
-
-.linkbox{
-font-size:13px;
-background:#f1f1f1;
-padding:10px;
-border-radius:6px;
-word-break:break-all;
 }
 
 </style>
@@ -101,7 +66,7 @@ word-break:break-all;
 
 <div class="container">
 
-<h1>Payment Tracker</h1>
+<h2>Payment Tracker</h2>
 
 <div id="create">
 
@@ -113,25 +78,40 @@ word-break:break-all;
 
 <input id="receiverPin" placeholder="Receiver PIN">
 
-<select id="role">
-<option value="payer">I am the Payer</option>
-<option value="receiver">I am the Receiver</option>
-</select>
-
 <button onclick="createSession()">Create Session</button>
+
+</div>
+
+
+<div id="login" style="display:none">
+
+<h3>Enter Session Password</h3>
+
+<input id="loginPassword">
+
+<button onclick="unlock()">Unlock</button>
+
+</div>
+
+
+<div id="roleSelect" style="display:none">
+
+<h3>I am the</h3>
+
+<button onclick="setRole('payer')">Payer</button>
+
+<button onclick="setRole('receiver')">Receiver</button>
 
 </div>
 
 
 <div id="tracker" style="display:none">
 
-<div class="summary" id="summary"></div>
+<div id="summary"></div>
 
 <div class="progress">
 <div id="bar" class="bar"></div>
 </div>
-
-<div class="linkbox" id="sharelink"></div>
 
 <div id="payerUI">
 
@@ -139,7 +119,7 @@ word-break:break-all;
 
 <input type="date" id="date">
 
-<input placeholder="Amount Paid" id="amount">
+<input placeholder="Amount" id="amount">
 
 <input placeholder="Payer PIN" id="pin">
 
@@ -147,7 +127,7 @@ word-break:break-all;
 
 </div>
 
-<h3>Payment History</h3>
+<h3>Payments</h3>
 
 <div id="list"></div>
 
@@ -164,17 +144,16 @@ const params=new URLSearchParams(location.search)
 
 let session=params.get("s")
 
-if(session){
-localStorage.setItem("session",session)
-}else{
-session=localStorage.getItem("session")
-}
+let role=null
 
 if(session){
+
 document.getElementById("create").style.display="none"
-document.getElementById("tracker").style.display="block"
-load()
+document.getElementById("login").style.display="block"
+
 }
+
+
 
 async function createSession(){
 
@@ -182,13 +161,12 @@ let total=document.getElementById("total").value
 let password=document.getElementById("password").value
 let payerPin=document.getElementById("payerPin").value
 let receiverPin=document.getElementById("receiverPin").value
-let role=document.getElementById("role").value
 
 let r=await fetch(API+"/api/create",{
 method:"POST",
 headers:{ "Content-Type":"application/json" },
 body:JSON.stringify({
-total,password,payerPin,receiverPin,role
+total,password,payerPin,receiverPin
 })
 })
 
@@ -200,9 +178,59 @@ location="?s="+data.session
 
 
 
+async function unlock(){
+
+let password=document.getElementById("loginPassword").value
+
+let r=await fetch(API+"/api/login",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+session,password
+})
+})
+
+let data=await r.json()
+
+if(data.error){
+alert(data.error)
+return
+}
+
+document.getElementById("login").style.display="none"
+document.getElementById("roleSelect").style.display="block"
+
+}
+
+
+
+function setRole(r){
+
+role=r
+
+document.getElementById("roleSelect").style.display="none"
+document.getElementById("tracker").style.display="block"
+
+if(role==="receiver"){
+document.getElementById("payerUI").style.display="none"
+}
+
+load()
+
+}
+
+
+
 async function load(){
 
-let r=await fetch(API+"/api/get?s="+session)
+let r=await fetch(API+"/api/login",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({
+session,
+password:document.getElementById("loginPassword").value
+})
+})
 
 let data=await r.json()
 
@@ -213,40 +241,29 @@ document.getElementById("summary").innerHTML=
 
 document.getElementById("bar").style.width=percent+"%"
 
-document.getElementById("sharelink").innerHTML=
-`Session Link: ${location.origin}?s=${session}`
-
-if(data.role==="receiver"){
-document.getElementById("payerUI").style.display="none"
-}
-
 let html=""
 
 data.payments.forEach((p,i)=>{
 
 let actions=""
 
-if(p.status==="pending" && data.role==="receiver"){
-
+if(p.status==="pending" && role==="receiver"){
 actions=`<button onclick="confirmPayment(${i})">Confirm</button>`
-
 }
 
 html+=`
 <div class="payment">
 <div>${p.date} ₹${p.amount}</div>
-<div class="${p.status}">
-${p.status}
-</div>
+<div>${p.status}</div>
 ${actions}
 </div>
 `
-
 })
 
 document.getElementById("list").innerHTML=html
 
 }
+
 
 
 async function addPayment(){
@@ -258,7 +275,9 @@ let pin=document.getElementById("pin").value
 await fetch(API+"/api/add",{
 method:"POST",
 headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({session,date,amount,pin})
+body:JSON.stringify({
+session,date,amount,pin
+})
 })
 
 load()
@@ -266,14 +285,17 @@ load()
 }
 
 
+
 async function confirmPayment(index){
 
-let pin=prompt("Enter Receiver PIN")
+let pin=prompt("Receiver PIN")
 
 await fetch(API+"/api/confirm",{
 method:"POST",
 headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({session,index,pin})
+body:JSON.stringify({
+session,index,pin
+})
 })
 
 load()
