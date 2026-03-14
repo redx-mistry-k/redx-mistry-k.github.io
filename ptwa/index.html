@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <meta charset="UTF-8">
@@ -17,7 +18,7 @@ padding:30px;
 }
 
 .container{
-max-width:500px;
+max-width:520px;
 margin:auto;
 background:white;
 padding:25px;
@@ -29,7 +30,7 @@ h1{
 margin-top:0;
 }
 
-input,button{
+input,button,select{
 width:100%;
 padding:12px;
 margin:8px 0;
@@ -76,8 +77,20 @@ border-bottom:1px solid #eee;
 font-size:14px;
 }
 
-.remaining{
-font-weight:bold;
+.pending{
+color:orange;
+}
+
+.confirmed{
+color:green;
+}
+
+.linkbox{
+font-size:13px;
+background:#f1f1f1;
+padding:10px;
+border-radius:6px;
+word-break:break-all;
 }
 
 </style>
@@ -96,7 +109,14 @@ font-weight:bold;
 
 <input id="password" placeholder="Session Password">
 
-<input id="pin" placeholder="4 Digit PIN">
+<input id="payerPin" placeholder="Payer PIN">
+
+<input id="receiverPin" placeholder="Receiver PIN">
+
+<select id="role">
+<option value="payer">I am the Payer</option>
+<option value="receiver">I am the Receiver</option>
+</select>
 
 <button onclick="createSession()">Create Session</button>
 
@@ -111,15 +131,21 @@ font-weight:bold;
 <div id="bar" class="bar"></div>
 </div>
 
+<div class="linkbox" id="sharelink"></div>
+
+<div id="payerUI">
+
 <h3>Add Payment</h3>
 
 <input type="date" id="date">
 
 <input placeholder="Amount Paid" id="amount">
 
-<input placeholder="PIN" id="pin2">
+<input placeholder="Payer PIN" id="pin">
 
-<button onclick="addPayment()">Add Payment</button>
+<button onclick="addPayment()">Submit Payment</button>
+
+</div>
 
 <h3>Payment History</h3>
 
@@ -129,12 +155,20 @@ font-weight:bold;
 
 </div>
 
+
 <script>
 
 const API="https://ptwa.vkrishnaanand.workers.dev"
 
 const params=new URLSearchParams(location.search)
+
 let session=params.get("s")
+
+if(session){
+localStorage.setItem("session",session)
+}else{
+session=localStorage.getItem("session")
+}
 
 if(session){
 document.getElementById("create").style.display="none"
@@ -146,12 +180,16 @@ async function createSession(){
 
 let total=document.getElementById("total").value
 let password=document.getElementById("password").value
-let pin=document.getElementById("pin").value
+let payerPin=document.getElementById("payerPin").value
+let receiverPin=document.getElementById("receiverPin").value
+let role=document.getElementById("role").value
 
 let r=await fetch(API+"/api/create",{
 method:"POST",
 headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({total,password,pin})
+body:JSON.stringify({
+total,password,payerPin,receiverPin,role
+})
 })
 
 let data=await r.json()
@@ -161,31 +199,46 @@ location="?s="+data.session
 }
 
 
+
 async function load(){
 
 let r=await fetch(API+"/api/get?s="+session)
 
 let data=await r.json()
 
-let percent=0
-
-if(data.total>0){
-percent=(data.paid/data.total)*100
-}
+let percent=(data.paid/data.total)*100
 
 document.getElementById("summary").innerHTML=
 `Total ₹${data.total} | Paid ₹${data.paid} | Remaining ₹${data.total-data.paid}`
 
 document.getElementById("bar").style.width=percent+"%"
 
+document.getElementById("sharelink").innerHTML=
+`Session Link: ${location.origin}?s=${session}`
+
+if(data.role==="receiver"){
+document.getElementById("payerUI").style.display="none"
+}
+
 let html=""
 
-data.payments.forEach(p=>{
+data.payments.forEach((p,i)=>{
+
+let actions=""
+
+if(p.status==="pending" && data.role==="receiver"){
+
+actions=`<button onclick="confirmPayment(${i})">Confirm</button>`
+
+}
 
 html+=`
 <div class="payment">
-<div>${p.date}</div>
-<div>₹${p.amount}</div>
+<div>${p.date} ₹${p.amount}</div>
+<div class="${p.status}">
+${p.status}
+</div>
+${actions}
 </div>
 `
 
@@ -200,7 +253,7 @@ async function addPayment(){
 
 let date=document.getElementById("date").value
 let amount=document.getElementById("amount").value
-let pin=document.getElementById("pin2").value
+let pin=document.getElementById("pin").value
 
 await fetch(API+"/api/add",{
 method:"POST",
@@ -208,7 +261,20 @@ headers:{ "Content-Type":"application/json" },
 body:JSON.stringify({session,date,amount,pin})
 })
 
-document.getElementById("amount").value=""
+load()
+
+}
+
+
+async function confirmPayment(index){
+
+let pin=prompt("Enter Receiver PIN")
+
+await fetch(API+"/api/confirm",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({session,index,pin})
+})
 
 load()
 
@@ -217,5 +283,5 @@ load()
 </script>
 
 </body>
-
 </html>
+
