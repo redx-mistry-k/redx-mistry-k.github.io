@@ -117,6 +117,9 @@ body{
 .hint{text-align:center;font-size:12px;color:var(--pearl-muted);margin-top:12px;font-style:italic}
 .divider{border:none;border-top:1px solid rgba(247,215,148,0.08);margin:18px 0}
 
+.notice{background:var(--champ-soft);border:1px solid rgba(247,215,148,0.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--champ);line-height:1.5}
+.notice strong{font-weight:600}
+
 @media(max-width:380px){.stats{flex-direction:column}.stat{border-right:none;border-bottom:1px solid rgba(247,215,148,0.06)}.stat:last-child{border-bottom:none}.row{grid-template-columns:1fr}}
 </style>
 </head>
@@ -134,9 +137,10 @@ body{
       <div class="field"><label>Total Amount</label><input id="inTotal" type="number" placeholder="50000" inputmode="numeric"></div>
       <div class="field"><label>Session Password</label><input id="inPassword" type="password" placeholder="Min 4 characters"></div>
       <div class="row">
-        <div class="field"><label>Payer PIN</label><input id="inPayerPin" type="password" placeholder="e.g. 1234" inputmode="numeric"></div>
-        <div class="field"><label>Receiver PIN</label><input id="inReceiverPin" type="password" placeholder="e.g. 5678" inputmode="numeric"></div>
+        <div class="field"><label>Temp Payer PIN</label><input id="inPayerPin" type="password" placeholder="e.g. 1234" inputmode="numeric"></div>
+        <div class="field"><label>Temp Receiver PIN</label><input id="inReceiverPin" type="password" placeholder="e.g. 5678" inputmode="numeric"></div>
       </div>
+      <p class="hint" style="margin-top:0;margin-bottom:10px">Both users must change their PIN on first login.</p>
       <button class="btn btn-accent" onclick="createSession()">Create Session</button>
     </div>
     <p class="hint">Have a session link already? Just open it.</p>
@@ -157,6 +161,18 @@ body{
         <div class="role-opt" onclick="setRole('payer')"><div class="glyph">P</div><div class="rname">Payer</div><div class="rdesc">Sending money</div></div>
         <div class="role-opt" onclick="setRole('receiver')"><div class="glyph">R</div><div class="rname">Receiver</div><div class="rdesc">Receiving money</div></div>
       </div>
+    </div>
+  </div>
+
+  <!-- CHANGE PIN (forced on first use) -->
+  <div id="screenChangePin" class="hidden">
+    <div class="card">
+      <div class="card-label">Set Your PIN</div>
+      <div class="notice"><strong>First time here?</strong> The session creator set a temporary PIN for you. Change it now so only you know it.</div>
+      <div class="field"><label>Temporary PIN (given to you)</label><input type="password" id="inOldPin" placeholder="Enter the PIN you were given" inputmode="numeric"></div>
+      <div class="field"><label>New PIN (choose your own)</label><input type="password" id="inNewPin" placeholder="Min 4 characters" inputmode="numeric"></div>
+      <div class="field"><label>Confirm New PIN</label><input type="password" id="inNewPinConfirm" placeholder="Re-enter new PIN" inputmode="numeric"></div>
+      <button class="btn btn-accent" onclick="changePin()">Set My PIN</button>
     </div>
   </div>
 
@@ -199,6 +215,11 @@ body{
       <div class="field"><label>Total Amount</label><input type="number" id="settingsTotal"></div>
       <div class="field"><label>Password (to confirm)</label><input type="password" id="settingsPassword" placeholder="Enter password"></div>
       <button class="btn btn-ghost" onclick="saveSettings()">Save Changes</button>
+      <hr class="divider">
+      <div class="card-label" style="margin-top:4px">Change Your PIN</div>
+      <div class="field"><label>Current PIN</label><input type="password" id="settingsOldPin" placeholder="Your current PIN" inputmode="numeric"></div>
+      <div class="field"><label>New PIN</label><input type="password" id="settingsNewPin" placeholder="Min 4 characters" inputmode="numeric"></div>
+      <button class="btn btn-ghost" onclick="changePinFromSettings()">Update PIN</button>
     </div>
   </div>
 </div>
@@ -227,6 +248,7 @@ body{
 const API="https://ptwa.vkrishnaanand.workers.dev"
 const params=new URLSearchParams(location.search)
 let session=params.get("s"),role=null,token=null,currentPaymentId=null
+let pinStatus={payer:true,receiver:true}
 
 if(session){show("screenLogin");hide("screenCreate")}
 document.getElementById("inDate").valueAsDate=new Date()
@@ -275,18 +297,70 @@ async function login(){
   const d=await api("/api/login",{session,password})
   if(!d)return
   token=d.token
+  pinStatus.payer=d.payerPinChanged!==false
+  pinStatus.receiver=d.receiverPinChanged!==false
   hide("screenLogin");show("screenRole")
 }
 
 function setRole(r){
-  role=r;hide("screenRole");show("screenTracker")
+  role=r
+  hide("screenRole")
+
+  // Check if this role's PIN needs changing
+  const needsChange=(role==="payer"&&!pinStatus.payer)||(role==="receiver"&&!pinStatus.receiver)
+
+  if(needsChange){
+    show("screenChangePin")
+  }else{
+    show("screenTracker")
+    if(role==="receiver")hide("tabAdd")
+    loadData()
+  }
+}
+
+async function changePin(){
+  const oldPin=document.getElementById("inOldPin").value
+  const newPin=document.getElementById("inNewPin").value
+  const confirmPin=document.getElementById("inNewPinConfirm").value
+
+  if(!oldPin||!newPin||!confirmPin){toast("Fill in all fields",true);return}
+  if(newPin!==confirmPin){toast("New PINs don't match",true);return}
+  if(newPin.length<4){toast("PIN must be at least 4 characters",true);return}
+
+  const d=await api("/api/change-pin",{session,currentPin:oldPin,newPin:newPin,role:role})
+  if(!d)return
+
+  toast("PIN set successfully!")
+
+  if(role==="payer")pinStatus.payer=true
+  if(role==="receiver")pinStatus.receiver=true
+
+  hide("screenChangePin")
+  show("screenTracker")
   if(role==="receiver")hide("tabAdd")
   loadData()
+}
+
+async function changePinFromSettings(){
+  const oldPin=document.getElementById("settingsOldPin").value
+  const newPin=document.getElementById("settingsNewPin").value
+
+  if(!oldPin||!newPin){toast("Fill in both fields",true);return}
+  if(newPin.length<4){toast("PIN must be at least 4 characters",true);return}
+
+  const d=await api("/api/change-pin",{session,currentPin:oldPin,newPin:newPin,role:role})
+  if(!d)return
+
+  toast("PIN updated!")
+  document.getElementById("settingsOldPin").value=""
+  document.getElementById("settingsNewPin").value=""
 }
 
 async function loadData(){
   const d=await api("/api/data",{session})
   if(!d)return
+  if(d.payerPinChanged!==undefined)pinStatus.payer=d.payerPinChanged!==false
+  if(d.receiverPinChanged!==undefined)pinStatus.receiver=d.receiverPinChanged!==false
   const pct=d.total>0?Math.min((d.paid/d.total)*100,100):0
   const rem=d.total-d.paid
   document.getElementById("statTotal").textContent="\u20B9"+fmt(d.total)
