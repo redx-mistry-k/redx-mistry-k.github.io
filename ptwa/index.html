@@ -1,309 +1,362 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>Payment Tracker</title>
-
+<title>PayTrack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --navy:#192A56;
+  --navy-light:#1e3268;
+  --navy-dark:#111d3a;
+  --champ:#F7D794;
+  --champ-dim:#e8c97e;
+  --champ-soft:rgba(247,215,148,0.12);
+  --champ-text:#4a3c1a;
+  --rose:#EDA6A3;
+  --rose-hover:#e4908c;
+  --rose-soft:rgba(237,166,163,0.12);
+  --rose-text:#5c2d2b;
+  --pearl:#FCFBFB;
+  --pearl-dim:rgba(252,251,251,0.65);
+  --pearl-muted:rgba(252,251,251,0.4);
+  --green:#7ec89b;
+  --green-soft:rgba(126,200,155,0.12);
+  --radius:8px;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'Libre Franklin',sans-serif;
+}
 
 body{
-font-family:system-ui;
-background:#f4f6f9;
-padding:30px;
+  font-family:var(--sans);
+  background:var(--navy);
+  color:var(--pearl);
+  min-height:100vh;
+  min-height:100dvh;
+  padding:16px;
+  -webkit-font-smoothing:antialiased;
 }
 
-.container{
-max-width:520px;
-margin:auto;
-background:white;
-padding:25px;
-border-radius:10px;
-box-shadow:0 5px 20px rgba(0,0,0,0.05);
-}
+.app{max-width:460px;margin:0 auto;position:relative}
 
-input,button,select{
-width:100%;
-padding:12px;
-margin:8px 0;
-font-size:15px;
-}
+.header{display:flex;align-items:baseline;gap:12px;padding:28px 0 24px;border-bottom:1px solid rgba(247,215,148,0.15);margin-bottom:28px}
+.header h1{font-family:var(--serif);font-size:32px;font-weight:600;color:var(--champ);letter-spacing:0.5px;line-height:1}
+.header .ver{font-family:var(--mono);font-size:10px;color:var(--pearl-muted);border:1px solid rgba(247,215,148,0.15);padding:2px 8px;border-radius:3px;letter-spacing:0.5px}
 
-button{
-background:#2563eb;
-color:white;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
+.card{background:var(--navy-light);border:1px solid rgba(247,215,148,0.1);border-radius:var(--radius);padding:24px;margin-bottom:16px;animation:enter 0.35s ease both}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card-label{font-family:var(--mono);font-size:10px;font-weight:500;color:var(--champ);text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(247,215,148,0.1)}
 
-.progress{
-height:10px;
-background:#eee;
-border-radius:10px;
-margin:10px 0;
-}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:var(--mono);font-size:10px;font-weight:500;color:var(--pearl-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+.field input{width:100%;padding:11px 14px;background:var(--navy-dark);border:1px solid rgba(247,215,148,0.12);border-radius:5px;color:var(--pearl);font-family:var(--sans);font-size:14px;outline:none;transition:border-color 0.2s}
+.field input:focus{border-color:var(--champ)}
+.field input::placeholder{color:var(--pearl-muted)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-.bar{
-height:10px;
-background:#2563eb;
-border-radius:10px;
-}
+.btn{display:inline-flex;align-items:center;justify-content:center;width:100%;padding:12px 16px;border:none;border-radius:5px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;margin-top:6px;letter-spacing:0.3px}
+.btn-accent{background:var(--rose);color:var(--rose-text)}.btn-accent:hover{background:var(--rose-hover)}.btn-accent:active{transform:scale(0.98)}
+.btn-champ{background:var(--champ);color:var(--champ-text)}.btn-champ:hover{background:var(--champ-dim)}.btn-champ:active{transform:scale(0.98)}
+.btn-ghost{background:transparent;color:var(--pearl-dim);border:1px solid rgba(247,215,148,0.15)}.btn-ghost:hover{background:rgba(247,215,148,0.06);color:var(--pearl);border-color:rgba(247,215,148,0.25)}
+.btn-sm{width:auto;padding:5px 13px;font-size:11px;margin-top:0}
+.btn-del{background:var(--rose-soft);color:var(--rose);border:1px solid rgba(237,166,163,0.2)}.btn-del:hover{background:rgba(237,166,163,0.2)}
 
-.payment{
-display:flex;
-justify-content:space-between;
-padding:8px 0;
-border-bottom:1px solid #eee;
-}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.role-opt{background:var(--navy-dark);border:2px solid rgba(247,215,148,0.12);border-radius:var(--radius);padding:28px 16px 22px;text-align:center;cursor:pointer;transition:all 0.2s}
+.role-opt:hover{border-color:var(--rose);background:var(--rose-soft)}
+.role-opt .glyph{font-family:var(--serif);font-size:36px;font-weight:700;color:var(--champ);margin-bottom:6px;line-height:1}
+.role-opt .rname{font-size:14px;font-weight:600;color:var(--pearl)}
+.role-opt .rdesc{font-size:11px;color:var(--pearl-muted);margin-top:4px}
 
+.stats{display:flex;border:1px solid rgba(247,215,148,0.1);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;background:var(--navy-light)}
+.stat{flex:1;padding:18px 12px;text-align:center;border-right:1px solid rgba(247,215,148,0.08)}.stat:last-child{border-right:none}
+.stat-val{font-family:var(--mono);font-size:15px;font-weight:500}
+.stat-lbl{font-family:var(--mono);font-size:9px;color:var(--pearl-muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:5px}
+
+.progress-wrap{margin-bottom:22px}
+.progress-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.progress-head .name{font-family:var(--serif);font-size:20px;font-weight:500;color:var(--champ)}
+.progress-head .pct{font-family:var(--mono);font-size:12px;color:var(--pearl-dim)}
+.progress-track{height:5px;background:var(--navy-dark);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--champ),var(--rose));border-radius:3px;transition:width 0.5s ease}
+
+.tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid rgba(247,215,148,0.1)}
+.tab{padding:11px 18px;font-family:var(--mono);font-size:11px;font-weight:500;color:var(--pearl-muted);cursor:pointer;border:none;background:none;letter-spacing:0.3px;position:relative;transition:color 0.15s}
+.tab:hover{color:var(--pearl-dim)}.tab.active{color:var(--champ)}
+.tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--rose)}
+
+.pay-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(247,215,148,0.06);animation:enter 0.25s ease both}.pay-row:last-child{border-bottom:none}
+.pay-marker{width:7px;height:7px;border-radius:50%;flex-shrink:0}.pay-marker.pending{background:var(--champ)}.pay-marker.confirmed{background:var(--green)}
+.pay-body{flex:1;min-width:0}
+.pay-amt{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--pearl)}
+.pay-sub{font-size:11px;color:var(--pearl-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pay-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tag{font-family:var(--mono);font-size:9px;font-weight:500;padding:3px 9px;border-radius:3px;text-transform:uppercase;letter-spacing:0.8px}
+.tag-pending{background:var(--champ-soft);color:var(--champ)}.tag-confirmed{background:var(--green-soft);color:var(--green)}
+
+.empty{text-align:center;padding:40px 16px;color:var(--pearl-muted)}.empty p{font-size:13px;font-style:italic}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--champ);color:var(--champ-text);padding:10px 22px;border-radius:5px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.25s ease;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}.toast.err{background:var(--rose);color:var(--rose-text)}
+
+.overlay{position:fixed;inset:0;background:rgba(17,29,58,0.7);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}.overlay.show{display:flex}
+.modal{background:var(--navy-light);border:1px solid rgba(247,215,148,0.12);border-radius:var(--radius);padding:24px;width:100%;max-width:360px;animation:enter 0.25s ease}
+.modal h3{font-family:var(--serif);font-size:22px;font-weight:500;color:var(--champ);margin-bottom:4px}
+.modal .modal-sub{font-size:13px;color:var(--pearl-dim);margin-bottom:18px}
+.modal-btns{display:flex;gap:8px;margin-top:4px}.modal-btns .btn{flex:1}
+
+.share-row{display:flex;gap:8px;margin-top:6px}
+.share-row input{flex:1;padding:9px 10px;background:var(--navy-dark);border:1px solid rgba(247,215,148,0.1);border-radius:4px;color:var(--pearl-dim);font-family:var(--mono);font-size:11px;outline:none}
+
+.hidden{display:none!important}
+.hint{text-align:center;font-size:12px;color:var(--pearl-muted);margin-top:12px;font-style:italic}
+.divider{border:none;border-top:1px solid rgba(247,215,148,0.08);margin:18px 0}
+
+@media(max-width:380px){.stats{flex-direction:column}.stat{border-right:none;border-bottom:1px solid rgba(247,215,148,0.06)}.stat:last-child{border-bottom:none}.row{grid-template-columns:1fr}}
 </style>
-
 </head>
-
 <body>
+<div class="app">
+  <div class="header">
+    <h1>PayTrack</h1>
+    <span class="ver">v2</span>
+  </div>
 
-<div class="container">
+  <div id="screenCreate">
+    <div class="card">
+      <div class="card-label">New Session</div>
+      <div class="field"><label>Session Name</label><input id="inName" placeholder="Rent 2026, Freelance Project..."></div>
+      <div class="field"><label>Total Amount</label><input id="inTotal" type="number" placeholder="50000" inputmode="numeric"></div>
+      <div class="field"><label>Session Password</label><input id="inPassword" type="password" placeholder="Min 4 characters"></div>
+      <div class="row">
+        <div class="field"><label>Payer PIN</label><input id="inPayerPin" type="password" placeholder="e.g. 1234" inputmode="numeric"></div>
+        <div class="field"><label>Receiver PIN</label><input id="inReceiverPin" type="password" placeholder="e.g. 5678" inputmode="numeric"></div>
+      </div>
+      <button class="btn btn-accent" onclick="createSession()">Create Session</button>
+    </div>
+    <p class="hint">Have a session link already? Just open it.</p>
+  </div>
 
-<h2>Payment Tracker</h2>
+  <div id="screenLogin" class="hidden">
+    <div class="card">
+      <div class="card-label">Unlock Session</div>
+      <div class="field"><label>Password</label><input id="inLoginPassword" type="password" placeholder="Enter session password"></div>
+      <button class="btn btn-accent" onclick="login()">Unlock</button>
+    </div>
+  </div>
 
-<div id="create">
+  <div id="screenRole" class="hidden">
+    <div class="card">
+      <div class="card-label">Who are you?</div>
+      <div class="role-grid">
+        <div class="role-opt" onclick="setRole('payer')"><div class="glyph">P</div><div class="rname">Payer</div><div class="rdesc">Sending money</div></div>
+        <div class="role-opt" onclick="setRole('receiver')"><div class="glyph">R</div><div class="rname">Receiver</div><div class="rdesc">Receiving money</div></div>
+      </div>
+    </div>
+  </div>
 
-<input id="total" placeholder="Total Amount">
+  <div id="screenTracker" class="hidden">
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="statTotal" style="color:var(--pearl)">--</div><div class="stat-lbl">Total</div></div>
+      <div class="stat"><div class="stat-val" id="statPaid" style="color:var(--green)">--</div><div class="stat-lbl">Paid</div></div>
+      <div class="stat"><div class="stat-val" id="statRemaining" style="color:var(--rose)">--</div><div class="stat-lbl">Remaining</div></div>
+    </div>
 
-<input id="password" placeholder="Session Password">
+    <div class="progress-wrap">
+      <div class="progress-head"><span class="name" id="sessionNameDisplay">Session</span><span class="pct" id="progressPercent">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+    </div>
 
-<input id="payerPin" placeholder="Payer PIN">
+    <div class="tabs" id="trackerTabs">
+      <button class="tab active" data-tab="payments" onclick="switchTab('payments')">Ledger</button>
+      <button class="tab" data-tab="add" onclick="switchTab('add')" id="tabAdd">+ Payment</button>
+      <button class="tab" data-tab="settings" onclick="switchTab('settings')">Settings</button>
+    </div>
 
-<input id="receiverPin" placeholder="Receiver PIN">
+    <div id="tabPayments" class="card"><div id="paymentList"></div></div>
 
-<button onclick="createSession()">Create Session</button>
+    <div id="tabAddPayment" class="card hidden">
+      <div class="card-label">Record Payment</div>
+      <div class="row">
+        <div class="field"><label>Date</label><input type="date" id="inDate"></div>
+        <div class="field"><label>Amount</label><input type="number" id="inAmount" placeholder="5000" inputmode="numeric"></div>
+      </div>
+      <div class="field"><label>Note (optional)</label><input id="inNote" placeholder="March rent, milestone 2..."></div>
+      <div class="field"><label>Payer PIN</label><input type="password" id="inPayerPinConfirm" placeholder="Your payer PIN" inputmode="numeric"></div>
+      <button class="btn btn-accent" onclick="addPayment()">Submit</button>
+    </div>
 
+    <div id="tabSettings" class="card hidden">
+      <div class="card-label">Settings</div>
+      <div class="field"><label>Share Link</label><div class="share-row"><input id="shareLink" readonly><button class="btn btn-ghost btn-sm" onclick="copyLink()">Copy</button></div></div>
+      <hr class="divider">
+      <div class="field"><label>Session Name</label><input id="settingsName"></div>
+      <div class="field"><label>Total Amount</label><input type="number" id="settingsTotal"></div>
+      <div class="field"><label>Password (to confirm)</label><input type="password" id="settingsPassword" placeholder="Enter password"></div>
+      <button class="btn btn-ghost" onclick="saveSettings()">Save Changes</button>
+    </div>
+  </div>
 </div>
 
+<div class="toast" id="toast"></div>
 
-<div id="login" style="display:none">
-
-<h3>Enter Session Password</h3>
-
-<input id="loginPassword">
-
-<button onclick="unlock()">Unlock</button>
-
+<div class="overlay" id="confirmModal">
+  <div class="modal">
+    <h3>Confirm Payment</h3>
+    <p class="modal-sub" id="confirmText"></p>
+    <div class="field"><label>Receiver PIN</label><input type="password" id="inReceiverPinConfirm" placeholder="Enter receiver PIN" inputmode="numeric"></div>
+    <div class="modal-btns"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-accent" onclick="confirmPayment()">Confirm</button></div>
+  </div>
 </div>
 
-
-<div id="roleSelect" style="display:none">
-
-<h3>I am the</h3>
-
-<button onclick="setRole('payer')">Payer</button>
-
-<button onclick="setRole('receiver')">Receiver</button>
-
+<div class="overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Delete Payment</h3>
+    <p class="modal-sub" id="deleteText"></p>
+    <div class="field"><label>Payer PIN</label><input type="password" id="inDeletePin" placeholder="Enter payer PIN" inputmode="numeric"></div>
+    <div class="modal-btns"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-del" onclick="deletePayment()">Delete</button></div>
+  </div>
 </div>
-
-
-<div id="tracker" style="display:none">
-
-<div id="summary"></div>
-
-<div class="progress">
-<div id="bar" class="bar"></div>
-</div>
-
-<div id="payerUI">
-
-<h3>Add Payment</h3>
-
-<input type="date" id="date">
-
-<input placeholder="Amount" id="amount">
-
-<input placeholder="Payer PIN" id="pin">
-
-<button onclick="addPayment()">Submit Payment</button>
-
-</div>
-
-<h3>Payments</h3>
-
-<div id="list"></div>
-
-</div>
-
-</div>
-
 
 <script>
-
 const API="https://ptwa.vkrishnaanand.workers.dev"
-
 const params=new URLSearchParams(location.search)
+let session=params.get("s"),role=null,token=null,currentPaymentId=null
 
-let session=params.get("s")
+if(session){show("screenLogin");hide("screenCreate")}
+document.getElementById("inDate").valueAsDate=new Date()
 
-let role=null
+function show(id){document.getElementById(id).classList.remove("hidden")}
+function hide(id){document.getElementById(id).classList.add("hidden")}
+function toast(msg,isErr){const t=document.getElementById("toast");t.textContent=msg;t.className="toast show"+(isErr?" err":"");setTimeout(()=>t.className="toast",3000)}
+function fmt(n){return Number(n).toLocaleString("en-IN")}
 
-if(session){
-
-document.getElementById("create").style.display="none"
-document.getElementById("login").style.display="block"
-
+function switchTab(tab){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
+  document.querySelector('[data-tab="'+tab+'"]').classList.add("active")
+  hide("tabPayments");hide("tabAddPayment");hide("tabSettings")
+  if(tab==="payments")show("tabPayments")
+  if(tab==="add")show("tabAddPayment")
+  if(tab==="settings")show("tabSettings")
 }
 
+function closeModal(){document.getElementById("confirmModal").classList.remove("show");document.getElementById("deleteModal").classList.remove("show");currentPaymentId=null}
+function copyLink(){const i=document.getElementById("shareLink");i.select();navigator.clipboard.writeText(i.value);toast("Link copied")}
 
+async function api(path,body={}){
+  const h={"Content-Type":"application/json"}
+  if(token)h["Authorization"]="Bearer "+token
+  const r=await fetch(API+path,{method:"POST",headers:h,body:JSON.stringify(body)})
+  const d=await r.json()
+  if(d.error){toast(d.error,true);return null}
+  return d
+}
 
 async function createSession(){
-
-let total=document.getElementById("total").value
-let password=document.getElementById("password").value
-let payerPin=document.getElementById("payerPin").value
-let receiverPin=document.getElementById("receiverPin").value
-
-let r=await fetch(API+"/api/create",{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({
-total,password,payerPin,receiverPin
-})
-})
-
-let data=await r.json()
-
-location="?s="+data.session
-
+  const name=document.getElementById("inName").value.trim()
+  const total=document.getElementById("inTotal").value
+  const password=document.getElementById("inPassword").value
+  const payerPin=document.getElementById("inPayerPin").value
+  const receiverPin=document.getElementById("inReceiverPin").value
+  if(!total||!password||!payerPin||!receiverPin){toast("Fill in all required fields",true);return}
+  const d=await api("/api/create",{name,total,password,payerPin,receiverPin})
+  if(!d)return
+  location.href="?s="+d.session
 }
 
-
-
-async function unlock(){
-
-let password=document.getElementById("loginPassword").value
-
-let r=await fetch(API+"/api/login",{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({
-session,password
-})
-})
-
-let data=await r.json()
-
-if(data.error){
-alert(data.error)
-return
+async function login(){
+  const password=document.getElementById("inLoginPassword").value
+  if(!password){toast("Enter the password",true);return}
+  const d=await api("/api/login",{session,password})
+  if(!d)return
+  token=d.token
+  hide("screenLogin");show("screenRole")
 }
-
-document.getElementById("login").style.display="none"
-document.getElementById("roleSelect").style.display="block"
-
-}
-
-
 
 function setRole(r){
-
-role=r
-
-document.getElementById("roleSelect").style.display="none"
-document.getElementById("tracker").style.display="block"
-
-if(role==="receiver"){
-document.getElementById("payerUI").style.display="none"
+  role=r;hide("screenRole");show("screenTracker")
+  if(role==="receiver")hide("tabAdd")
+  loadData()
 }
 
-load()
+async function loadData(){
+  const d=await api("/api/data",{session})
+  if(!d)return
+  const pct=d.total>0?Math.min((d.paid/d.total)*100,100):0
+  const rem=d.total-d.paid
+  document.getElementById("statTotal").textContent="\u20B9"+fmt(d.total)
+  document.getElementById("statPaid").textContent="\u20B9"+fmt(d.paid)
+  document.getElementById("statRemaining").textContent="\u20B9"+fmt(rem)
+  document.getElementById("progressBar").style.width=pct+"%"
+  document.getElementById("progressPercent").textContent=Math.round(pct)+"%"
+  document.getElementById("sessionNameDisplay").textContent=d.name||"Session"
+  document.getElementById("shareLink").value=location.origin+location.pathname+"?s="+session
+  document.getElementById("settingsName").value=d.name||""
+  document.getElementById("settingsTotal").value=d.total
 
+  const list=document.getElementById("paymentList")
+  if(!d.payments||d.payments.length===0){list.innerHTML='<div class="empty"><p>No entries yet</p></div>';return}
+
+  const sorted=[...d.payments].sort((a,b)=>{
+    if(a.status==="pending"&&b.status!=="pending")return -1
+    if(a.status!=="pending"&&b.status==="pending")return 1
+    return new Date(b.date)-new Date(a.date)
+  })
+
+  list.innerHTML=sorted.map(p=>{
+    let act=""
+    if(p.status==="pending"&&role==="receiver")act='<button class="btn btn-accent btn-sm" onclick="openConfirm(\''+p.id+'\','+p.amount+')">Confirm</button>'
+    if(p.status==="pending"&&role==="payer")act='<button class="btn btn-del btn-sm" onclick="openDelete(\''+p.id+'\','+p.amount+')">Delete</button>'
+    const note=p.note?" \u00B7 "+p.note:""
+    return '<div class="pay-row"><div class="pay-marker '+p.status+'"></div><div class="pay-body"><div class="pay-amt">\u20B9'+fmt(p.amount)+'</div><div class="pay-sub">'+p.date+note+'</div></div><div class="pay-right"><span class="tag tag-'+p.status+'">'+p.status+'</span>'+act+'</div></div>'
+  }).join("")
 }
-
-
-
-async function load(){
-
-let r=await fetch(API+"/api/login",{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({
-session,
-password:document.getElementById("loginPassword").value
-})
-})
-
-let data=await r.json()
-
-let percent=(data.paid/data.total)*100
-
-document.getElementById("summary").innerHTML=
-`Total ₹${data.total} | Paid ₹${data.paid} | Remaining ₹${data.total-data.paid}`
-
-document.getElementById("bar").style.width=percent+"%"
-
-let html=""
-
-data.payments.forEach((p,i)=>{
-
-let actions=""
-
-if(p.status==="pending" && role==="receiver"){
-actions=`<button onclick="confirmPayment(${i})">Confirm</button>`
-}
-
-html+=`
-<div class="payment">
-<div>${p.date} ₹${p.amount}</div>
-<div>${p.status}</div>
-${actions}
-</div>
-`
-})
-
-document.getElementById("list").innerHTML=html
-
-}
-
-
 
 async function addPayment(){
-
-let date=document.getElementById("date").value
-let amount=document.getElementById("amount").value
-let pin=document.getElementById("pin").value
-
-await fetch(API+"/api/add",{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({
-session,date,amount,pin
-})
-})
-
-load()
-
+  const date=document.getElementById("inDate").value,amount=document.getElementById("inAmount").value,note=document.getElementById("inNote").value,pin=document.getElementById("inPayerPinConfirm").value
+  if(!date||!amount||!pin){toast("Date, amount, and PIN required",true);return}
+  const d=await api("/api/add",{session,date,amount,note,pin})
+  if(!d)return
+  toast("Payment recorded")
+  document.getElementById("inAmount").value=""
+  document.getElementById("inNote").value=""
+  document.getElementById("inPayerPinConfirm").value=""
+  document.getElementById("inDate").valueAsDate=new Date()
+  switchTab("payments");loadData()
 }
 
+function openConfirm(id,amount){currentPaymentId=id;document.getElementById("confirmText").textContent="Confirm \u20B9"+fmt(amount)+" received?";document.getElementById("inReceiverPinConfirm").value="";document.getElementById("confirmModal").classList.add("show")}
 
-
-async function confirmPayment(index){
-
-let pin=prompt("Receiver PIN")
-
-await fetch(API+"/api/confirm",{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body:JSON.stringify({
-session,index,pin
-})
-})
-
-load()
-
+async function confirmPayment(){
+  const pin=document.getElementById("inReceiverPinConfirm").value
+  if(!pin){toast("Enter receiver PIN",true);return}
+  const d=await api("/api/confirm",{session,paymentId:currentPaymentId,pin})
+  if(!d)return
+  toast("Payment confirmed");closeModal();loadData()
 }
 
+function openDelete(id,amount){currentPaymentId=id;document.getElementById("deleteText").textContent="Remove pending entry for \u20B9"+fmt(amount)+"?";document.getElementById("inDeletePin").value="";document.getElementById("deleteModal").classList.add("show")}
+
+async function deletePayment(){
+  const pin=document.getElementById("inDeletePin").value
+  if(!pin){toast("Enter payer PIN",true);return}
+  const d=await api("/api/delete",{session,paymentId:currentPaymentId,pin})
+  if(!d)return
+  toast("Payment deleted");closeModal();loadData()
+}
+
+async function saveSettings(){
+  const name=document.getElementById("settingsName").value,total=document.getElementById("settingsTotal").value,password=document.getElementById("settingsPassword").value
+  if(!password){toast("Enter password to save changes",true);return}
+  const d=await api("/api/settings",{session,name,total,password})
+  if(!d)return
+  toast("Settings saved");document.getElementById("settingsPassword").value="";loadData()
+}
 </script>
-
 </body>
 </html>
-
