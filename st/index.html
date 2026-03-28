@@ -96,7 +96,6 @@ textarea{resize:vertical;min-height:72px}
 </head>
 <body>
 
-<!-- Lock Screen -->
 <div class="lock-screen" id="lockScreen">
   <div class="lock-box">
     <div class="lock-icon" id="lockIcon">&#128274;</div>
@@ -110,7 +109,6 @@ textarea{resize:vertical;min-height:72px}
   </div>
 </div>
 
-<!-- Main App -->
 <div class="app" id="app">
   <div class="container">
     <header>
@@ -168,7 +166,6 @@ textarea{resize:vertical;min-height:72px}
   </div>
 </div>
 
-<!-- Change Password Modal -->
 <div class="modal-overlay hidden" id="changePwModal">
   <div class="modal">
     <h3>Change Password</h3>
@@ -183,24 +180,18 @@ textarea{resize:vertical;min-height:72px}
 </div>
 
 <script>
-// =====================================================
-// CHANGE THIS to your deployed Worker URL
-// e.g. 'https://saturday-log.your-name.workers.dev'
-// =====================================================
 const WORKER_URL = 'https://st.vkrishnaanand.workers.dev';
 
 let token = null;
 let entries = [];
 let activeFilter = 'all';
 
-// ---- Helpers ----
 function api(path, opts = {}) {
   const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
   if (token) headers['Authorization'] = 'Bearer ' + token;
   return fetch(WORKER_URL + path, { ...opts, headers });
 }
 
-// ---- Auth ----
 async function checkSetup() {
   try {
     const res = await api('/api/has-password');
@@ -226,7 +217,6 @@ async function handleLogin() {
 
   if (!pw) { errEl.textContent = 'Type a password.'; return; }
 
-  // Setup mode
   if (confirm.style.display !== 'none') {
     if (pw !== confirm.value) {
       errEl.textContent = "Passwords don't match.";
@@ -236,10 +226,7 @@ async function handleLogin() {
     }
     btn.disabled = true; btn.textContent = 'Setting up...';
     try {
-      const res = await api('/api/setup', {
-        method: 'POST',
-        body: JSON.stringify({ password: pw }),
-      });
+      const res = await api('/api/setup', { method: 'POST', body: JSON.stringify({ password: pw }) });
       const data = await res.json();
       btn.disabled = false;
       if (data.ok) { token = data.token; unlock(); }
@@ -248,13 +235,9 @@ async function handleLogin() {
     return;
   }
 
-  // Login mode
   btn.disabled = true; btn.textContent = 'Checking...';
   try {
-    const res = await api('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({ password: pw }),
-    });
+    const res = await api('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) });
     const data = await res.json();
     btn.disabled = false; btn.textContent = 'Unlock';
     if (data.ok) { token = data.token; unlock(); }
@@ -283,7 +266,6 @@ function logout() {
   document.getElementById('lockError').textContent = '';
 }
 
-// ---- Entries ----
 async function loadEntries() {
   const res = await api('/api/entries');
   const data = await res.json();
@@ -323,10 +305,7 @@ async function addEntry() {
 
   const btn = document.getElementById('addBtn');
   btn.disabled = true; btn.textContent = 'Saving...';
-  const res = await api('/api/entries', {
-    method: 'POST',
-    body: JSON.stringify({ entry: { date, hours, task, category, status } }),
-  });
+  const res = await api('/api/entries', { method: 'POST', body: JSON.stringify({ entry: { date, hours, task, category, status } }) });
   const data = await res.json();
   btn.disabled = false; btn.textContent = 'Log It';
 
@@ -394,7 +373,6 @@ function exportData() {
   a.click();
 }
 
-// ---- Change password ----
 function showChangePw() { document.getElementById('changePwModal').classList.remove('hidden'); document.getElementById('cpOld').value = ''; document.getElementById('cpNew').value = ''; document.getElementById('cpError').textContent = ''; }
 function hideChangePw() { document.getElementById('changePwModal').classList.add('hidden'); }
 
@@ -408,7 +386,6 @@ async function changePassword() {
   if (data.ok) { hideChangePw(); alert('Password changed!'); } else { err.textContent = data.error || 'Failed'; }
 }
 
-// ---- Init ----
 checkSetup();
 </script>
 </body>
