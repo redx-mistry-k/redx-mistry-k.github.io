@@ -54,6 +54,9 @@ textarea{resize:vertical;min-height:72px}
 .btn-small{padding:5px 12px;font-size:.78rem;border-radius:6px}
 .btn-delete{background:none;color:var(--ink-light);border:1px solid var(--border)}
 .btn-delete:hover{background:#fef0ed;color:var(--accent);border-color:var(--accent)}
+.btn-edit{background:none;color:var(--ink-light);border:1px solid var(--border)}
+.btn-edit:hover{background:#eef5ff;color:#3b6fad;border-color:#3b6fad}
+.entry-actions{display:flex;gap:6px}
 
 .filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center;animation:slideUp .7s ease}
 .filter-bar span{font-size:.82rem;color:var(--ink-light);font-weight:500}
@@ -175,6 +178,42 @@ textarea{resize:vertical;min-height:72px}
     <div class="modal-actions">
       <button class="btn btn-cancel" onclick="hideChangePw()">Cancel</button>
       <button class="btn btn-primary" style="width:auto" onclick="changePassword()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="editModal">
+  <div class="modal" style="width:420px">
+    <h3>Edit Entry</h3>
+    <input type="hidden" id="editId">
+    <div style="display:flex;gap:12px;margin-bottom:10px">
+      <div style="flex:1;display:flex;flex-direction:column">
+        <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Date</label>
+        <input type="date" id="editDate">
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Hours</label>
+        <input type="number" id="editHours" min="0.25" max="24" step="0.25">
+      </div>
+    </div>
+    <div style="margin-bottom:10px;display:flex;flex-direction:column">
+      <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Task</label>
+      <textarea id="editTask" style="min-height:60px"></textarea>
+    </div>
+    <div style="display:flex;gap:12px;margin-bottom:10px">
+      <div style="flex:1;display:flex;flex-direction:column">
+        <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Category</label>
+        <select id="editCategory"><option value="coding">Coding</option><option value="design">Design</option><option value="writing">Writing</option><option value="learning">Learning</option><option value="admin">Admin</option><option value="other">Other</option></select>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column">
+        <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Status</label>
+        <select id="editStatus"><option value="completed">Completed</option><option value="in progress">In Progress</option></select>
+      </div>
+    </div>
+    <div class="lock-error" id="editError"></div>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="hideEdit()">Cancel</button>
+      <button class="btn btn-primary" style="width:auto" id="editSaveBtn" onclick="saveEdit()">Save</button>
     </div>
   </div>
 </div>
@@ -359,8 +398,46 @@ function render() {
     '</div><div class="entry-hours">' + e.hours + 'h</div></div><div class="entry-task">' + esc(e.task) +
     '</div><div class="entry-footer"><div class="entry-tags"><span class="tag">' + e.category +
     '</span><span class="tag ' + (e.status === 'completed' ? 'completed' : '') + '">' + e.status +
-    '</span></div><button class="btn btn-small btn-delete" onclick="deleteEntry(' + e.id + ')">Delete</button></div></div>'
+    '</span></div><div class="entry-actions"><button class="btn btn-small btn-edit" onclick="showEdit(' + e.id + ')">Edit</button><button class="btn btn-small btn-delete" onclick="deleteEntry(' + e.id + ')">Delete</button></div></div></div>'
   ).join('');
+}
+
+function showEdit(id) {
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('editId').value = id;
+  document.getElementById('editDate').value = e.date;
+  document.getElementById('editHours').value = e.hours;
+  document.getElementById('editTask').value = e.task;
+  document.getElementById('editCategory').value = e.category;
+  document.getElementById('editStatus').value = e.status;
+  document.getElementById('editError').textContent = '';
+  document.getElementById('editModal').classList.remove('hidden');
+}
+
+function hideEdit() { document.getElementById('editModal').classList.add('hidden'); }
+
+async function saveEdit() {
+  const id = parseInt(document.getElementById('editId').value);
+  const date = document.getElementById('editDate').value;
+  const hours = parseFloat(document.getElementById('editHours').value);
+  const task = document.getElementById('editTask').value.trim();
+  const category = document.getElementById('editCategory').value;
+  const status = document.getElementById('editStatus').value;
+  const errEl = document.getElementById('editError');
+
+  if (!date) { errEl.textContent = 'Pick a date.'; return; }
+  if (!hours || hours <= 0) { errEl.textContent = 'How many hours?'; return; }
+  if (!task) { errEl.textContent = 'What did you work on?'; return; }
+
+  const btn = document.getElementById('editSaveBtn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const res = await api('/api/entries/' + id, { method: 'PUT', body: JSON.stringify({ entry: { date, hours, task, category, status } }) });
+  const data = await res.json();
+  btn.disabled = false; btn.textContent = 'Save';
+
+  if (data.ok) { hideEdit(); await loadEntries(); }
+  else { errEl.textContent = data.error || 'Failed to save'; }
 }
 
 function exportData() {
