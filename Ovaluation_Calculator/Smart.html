@@ -3,557 +3,744 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Ovulation Calculator</title>
+    <title>Luna Cycle Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <script src="https://cdn.jsdelivr.net/npm/animejs/lib/anime.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Cormorant Garamond', 'serif'],
+            },
+            colors: {
+              noir: '#151219',
+              plum: '#221726',
+              mauve: '#6F586B',
+              roseDust: '#C58FA4',
+              petal: '#F4D8E2',
+              blossom: '#EAC0CF',
+              cream: '#FFF9F7',
+              iris: '#A78BC7',
+              sageMist: '#A8BFAF',
+              wine: '#8B5C6B',
+            },
+            boxShadow: {
+              luxe: '0 30px 80px rgba(28,18,30,0.28)',
+              soft: '0 12px 32px rgba(255,255,255,0.05)',
+            },
+            backgroundImage: {
+              'hero-radial': 'radial-gradient(circle at 10% 10%, rgba(234,192,207,.25), transparent 28%), radial-gradient(circle at 82% 12%, rgba(167,139,199,.18), transparent 24%), radial-gradient(circle at 50% 85%, rgba(197,143,164,.14), transparent 26%), linear-gradient(135deg, #171118 0%, #221726 46%, #2A1D2B 100%)',
+            },
+          },
+        },
+      };
+    </script>
+
     <style>
-      .gradient-bg {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      :root {
+        color-scheme: dark;
       }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: #171118;
+        overflow-x: hidden;
+      }
+
+      .glass {
+        position: relative;
+        background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255,255,255,.1);
+      }
+
+      .glass::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.03));
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      .hero-orb,
+      .hero-orb-2,
+      .hero-orb-3,
+      .hero-orb-4 {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(70px);
+        opacity: 0.34;
+        pointer-events: none;
+      }
+
+      .hero-orb {
+        width: 280px;
+        height: 280px;
+        background: rgba(234, 192, 207, 0.52);
+        top: -60px;
+        left: -40px;
+        animation: floatA 14s ease-in-out infinite;
+      }
+
+      .hero-orb-2 {
+        width: 240px;
+        height: 240px;
+        background: rgba(167, 139, 199, 0.34);
+        right: 4%;
+        top: 120px;
+        animation: floatB 16s ease-in-out infinite;
+      }
+
+      .hero-orb-3 {
+        width: 190px;
+        height: 190px;
+        background: rgba(197, 143, 164, 0.28);
+        bottom: 10%;
+        left: 44%;
+        animation: floatC 18s ease-in-out infinite;
+      }
+
+      .hero-orb-4 {
+        width: 160px;
+        height: 160px;
+        background: rgba(168, 191, 175, 0.16);
+        bottom: 24%;
+        right: 12%;
+        animation: floatB 19s ease-in-out infinite;
+      }
+
+      .grid-line {
+        background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+        background-size: 42px 42px;
+        mask-image: linear-gradient(to bottom, rgba(255,255,255,.9), transparent 85%);
+      }
+
+      .luxury-ring {
+        box-shadow: 0 0 0 1px rgba(234,192,207,.3), 0 0 0 8px rgba(234,192,207,.05);
+      }
+
       .cycle-day {
-        transition: all 0.3s ease;
+        transition: transform .28s ease, border-color .28s ease, background .28s ease, box-shadow .28s ease;
       }
+
       .cycle-day:hover {
-        transform: scale(1.05);
+        transform: translateY(-5px);
+        border-color: rgba(234,192,207,.34);
+        box-shadow: 0 18px 30px rgba(0,0,0,.18);
       }
-      .stat-value {
-        transition: all 0.5s ease;
+
+      .shimmer {
+        position: relative;
+        overflow: hidden;
       }
-      .pulse {
-        animation: pulse 2s infinite;
+
+      .shimmer::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        transform: translateX(-100%);
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+        animation: shimmer 3.8s infinite;
       }
-      @keyframes pulse {
-        0% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
-        100% {
-          opacity: 1;
-        }
+
+      .floating-card {
+        animation: cardFloat 7s ease-in-out infinite;
+      }
+
+      .ambient-border {
+        border: 1px solid rgba(234,192,207,.16);
+      }
+
+      .text-glow {
+        text-shadow: 0 0 24px rgba(234,192,207,.18);
+      }
+
+      .pill-soft {
+        background: rgba(168,191,175,.14);
+        color: #dce8df;
+        border: 1px solid rgba(168,191,175,.18);
+      }
+
+      .pill-premium {
+        background: rgba(234,192,207,.14);
+        color: #f5dce6;
+        border: 1px solid rgba(234,192,207,.2);
+      }
+
+      .section-blur {
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      }
+
+      @keyframes shimmer {
+        100% { transform: translateX(100%); }
+      }
+
+      @keyframes floatA {
+        0%,100% { transform: translate3d(0,0,0); }
+        50% { transform: translate3d(22px, 26px, 0); }
+      }
+
+      @keyframes floatB {
+        0%,100% { transform: translate3d(0,0,0); }
+        50% { transform: translate3d(-26px, 18px, 0); }
+      }
+
+      @keyframes floatC {
+        0%,100% { transform: translate3d(0,0,0) scale(1); }
+        50% { transform: translate3d(18px, -24px, 0) scale(1.08); }
+      }
+
+      @keyframes cardFloat {
+        0%,100% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
       }
     </style>
   </head>
-  <body class="font-inter gradient-bg min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-      <header class="text-center mb-12">
-        <h1 class="text-4xl font-bold text-indigo-800 mb-2">
-          Smart Ovulation Calculator
-        </h1>
-        <p class="text-lg text-indigo-600">
-          Track your cycle and improve predictions over time
-        </p>
-      </header>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Calculator Section -->
-        <div class="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
-          <h2 class="text-2xl font-semibold text-indigo-700 mb-6">
-            Cycle Calculator
-          </h2>
+  <body class="font-sans text-white min-h-screen bg-hero-radial">
+    <div class="fixed inset-0 grid-line opacity-40"></div>
+    <div class="hero-orb"></div>
+    <div class="hero-orb-2"></div>
+    <div class="hero-orb-3"></div>
+    <div class="hero-orb-4"></div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+      <section class="mb-10">
+        <div class="glass rounded-[34px] shadow-luxe overflow-hidden section-blur">
+          <div class="grid lg:grid-cols-[1.18fr_.82fr] gap-8 p-6 sm:p-8 lg:p-10">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Last Period Start Date</label
-              >
-              <input
-                type="date"
-                id="lastPeriodDate"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Average Cycle Length (days)</label
-              >
-              <input
-                type="number"
-                id="cycleLength"
-                value="28"
-                min="21"
-                max="45"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            </div>
-          </div>
-
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1"
-              >Track Actual Period Start Dates</label
-            >
-            <p class="text-xs text-gray-500 mb-2">
-              Add your actual period start dates to calculate statistics
-            </p>
-            <div class="flex items-center space-x-2">
-              <input
-                type="date"
-                id="trackPeriodDate"
-                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              />
-              <button
-                id="addPeriodBtn"
-                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
-              >
-                <i data-feather="plus"></i> Add Actual
-              </button>
-            </div>
-          </div>
-
-          <div class="flex space-x-4">
-            <button
-              id="calculateBtn"
-              class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition flex-1"
-            >
-              Calculate Ovulation
-            </button>
-            <button
-              id="saveDataBtn"
-              class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition"
-            >
-              <i data-feather="save"></i> Save Prediction
-            </button>
-          </div>
-
-          <div id="results" class="mt-8 hidden">
-            <h3 class="text-xl font-semibold text-indigo-700 mb-4">
-              Your Cycle Overview
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div class="bg-indigo-50 p-4 rounded-lg">
-                <p class="text-sm text-indigo-600">Next Period</p>
-                <p
-                  id="nextPeriod"
-                  class="text-lg font-semibold text-indigo-800"
-                >
-                  --
-                </p>
+              <div class="flex flex-wrap gap-3 mb-6 reveal-up">
+                <span class="pill-premium text-xs uppercase tracking-[0.3em] rounded-full px-4 py-2">Elegant • Personal • Private</span>
+                <span class="pill-soft text-xs uppercase tracking-[0.3em] rounded-full px-4 py-2">Made for her or for both</span>
               </div>
-              <div class="bg-pink-50 p-4 rounded-lg">
-                <p class="text-sm text-pink-600">Fertile Window</p>
-                <p
-                  id="fertileWindow"
-                  class="text-lg font-semibold text-pink-800"
-                >
-                  --
-                </p>
+
+              <p class="text-sm uppercase tracking-[0.35em] text-petal/80 mb-4 reveal-up">Luna Cycle Intelligence</p>
+              <h1 class="font-display text-5xl sm:text-6xl lg:text-7xl leading-none text-cream text-glow reveal-up">
+                Feminine, premium, and beautifully calm.
+              </h1>
+              <p class="mt-6 text-base sm:text-lg text-petal/80 max-w-2xl leading-8 reveal-up">
+                A softer luxury interface for cycle tracking and prediction — refined enough for women, but welcoming and clear enough for a partner helping manage dates, reminders, and fertility windows too.
+              </p>
+
+              <div class="mt-8 flex flex-wrap gap-4 reveal-up">
+                <button id="heroCalculateBtn" class="shimmer rounded-full px-6 py-3 bg-petal text-noir font-semibold hover:scale-[1.02] transition duration-300 luxury-ring">
+                  Run Forecast
+                </button>
+                <button id="scrollInsightsBtn" class="rounded-full px-6 py-3 border border-white/10 text-cream hover:bg-white/5 transition duration-300">
+                  Explore Insights
+                </button>
               </div>
-              <div class="bg-purple-50 p-4 rounded-lg">
-                <p class="text-sm text-purple-600">Ovulation Day</p>
-                <p
-                  id="ovulationDay"
-                  class="text-lg font-semibold text-purple-800"
-                >
-                  --
-                </p>
+
+              <div class="grid sm:grid-cols-3 gap-4 mt-10 reveal-up">
+                <div class="glass rounded-3xl p-5 ambient-border">
+                  <p class="text-xs uppercase tracking-[0.28em] text-mauve">Design Tone</p>
+                  <p class="mt-3 text-2xl font-semibold text-cream">Soft Luxury</p>
+                </div>
+                <div class="glass rounded-3xl p-5 ambient-border">
+                  <p class="text-xs uppercase tracking-[0.28em] text-mauve">Saved History</p>
+                  <p class="mt-3 text-2xl font-semibold text-cream" id="heroHistoryCount">0 entries</p>
+                </div>
+                <div class="glass rounded-3xl p-5 ambient-border">
+                  <p class="text-xs uppercase tracking-[0.28em] text-mauve">Confidence Layer</p>
+                  <p class="mt-3 text-2xl font-semibold text-cream" id="confidenceLabel">Building</p>
+                </div>
               </div>
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg p-4">
-              <canvas id="cycleChart"></canvas>
+            <div class="relative reveal-scale">
+              <div class="glass rounded-[30px] p-6 h-full ambient-border floating-card section-blur">
+                <div class="flex items-center justify-between mb-6">
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.28em] text-mauve">At a glance</p>
+                    <h2 class="text-2xl font-semibold text-cream mt-2">Cycle Snapshot</h2>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <i data-feather="heart" class="w-5 h-5 text-petal"></i>
+                  </div>
+                </div>
+
+                <div class="space-y-4">
+                  <div class="rounded-3xl p-5 bg-white/[0.04] border border-white/10">
+                    <div class="flex items-center justify-between text-sm text-mauve">
+                      <span>Predicted next period</span>
+                      <i data-feather="calendar" class="w-4 h-4"></i>
+                    </div>
+                    <p id="heroNextPeriod" class="mt-3 text-3xl font-semibold text-cream">--</p>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="rounded-3xl p-5 bg-white/[0.04] border border-white/10">
+                      <p class="text-sm text-mauve">Ovulation</p>
+                      <p id="heroOvulation" class="mt-3 text-xl font-semibold text-cream">--</p>
+                    </div>
+                    <div class="rounded-3xl p-5 bg-white/[0.04] border border-white/10">
+                      <p class="text-sm text-mauve">Cycle average</p>
+                      <p id="heroAverage" class="mt-3 text-xl font-semibold text-cream">28d</p>
+                    </div>
+                  </div>
+
+                  <div class="rounded-3xl p-5 bg-gradient-to-br from-white/[0.07] to-white/[0.02] border border-white/10">
+                    <div class="flex items-center justify-between">
+                      <p class="text-sm text-mauve">Refined confidence</p>
+                      <span id="confidencePercent" class="text-petal text-sm font-semibold">0%</span>
+                    </div>
+                    <div class="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
+                      <div id="luxuryConfidenceBar" class="h-full rounded-full bg-gradient-to-r from-roseDust via-petal to-iris w-0 transition-all duration-700"></div>
+                    </div>
+                    <p id="confidenceHelper" class="mt-3 text-sm text-petal/80">Add more actual entries to strengthen confidence.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <!-- History Section -->
-        <div class="bg-white rounded-xl shadow-lg p-6">
-          <h2 class="text-2xl font-semibold text-indigo-700 mb-6">
-            Cycle History
-          </h2>
+      <section class="grid xl:grid-cols-[1.12fr_.88fr] gap-8">
+        <div class="space-y-8">
+          <div class="glass rounded-[30px] p-6 sm:p-8 ambient-border shadow-soft reveal-up section-blur">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em] text-mauve">Forecast Studio</p>
+                <h2 class="text-3xl font-semibold text-cream mt-2">Cycle Calculator</h2>
+              </div>
+              <div class="text-sm text-petal/75 max-w-md">
+                Enter the latest cycle start, adjust the average length, and keep building a more personal prediction profile over time.
+              </div>
+            </div>
 
-          <div class="mb-6">
-            <div class="flex justify-between items-center mb-2">
-              <h3 class="font-medium text-gray-700">Recorded Periods</h3>
-              <button
-                id="clearHistoryBtn"
-                class="text-red-500 text-sm hover:text-red-700"
-              >
-                <i data-feather="trash-2"></i> Clear
+            <div class="grid md:grid-cols-2 gap-5 mb-6">
+              <label class="block">
+                <span class="text-sm text-petal/80 mb-2 block">Last period start date</span>
+                <input id="lastPeriodDate" type="date" class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-cream outline-none focus:border-petal focus:ring-2 focus:ring-petal/20 transition" />
+              </label>
+              <label class="block">
+                <span class="text-sm text-petal/80 mb-2 block">Average cycle length</span>
+                <input id="cycleLength" type="number" value="28" min="21" max="45" class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-cream outline-none focus:border-blossom focus:ring-2 focus:ring-blossom/20 transition" />
+              </label>
+            </div>
+
+            <div class="grid lg:grid-cols-[1fr_auto] gap-4 items-end mb-6">
+              <div>
+                <label class="block">
+                  <span class="text-sm text-petal/80 mb-2 block">Add an actual period start date</span>
+                  <input id="trackPeriodDate" type="date" class="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-cream outline-none focus:border-roseDust focus:ring-2 focus:ring-roseDust/20 transition" />
+                </label>
+                <p class="text-xs text-mauve mt-2">Use actual dates to improve average cycle length, variation, and prediction confidence.</p>
+              </div>
+              <button id="addPeriodBtn" class="rounded-2xl px-5 py-3 bg-white/5 border border-white/10 hover:bg-white/10 transition flex items-center justify-center gap-2 text-cream">
+                <i data-feather="plus" class="w-4 h-4"></i>
+                Add Actual
               </button>
             </div>
-            <div
-              id="periodHistory"
-              class="max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2"
-            >
-              <p class="text-gray-500 text-sm py-4 text-center">
-                No period history recorded yet
-              </p>
+
+            <div class="grid sm:grid-cols-3 gap-4">
+              <button id="calculateBtn" class="rounded-2xl px-5 py-3 bg-petal text-noir font-semibold hover:translate-y-[-1px] transition duration-300">
+                Calculate Forecast
+              </button>
+              <button id="saveDataBtn" class="rounded-2xl px-5 py-3 bg-roseDust text-noir font-semibold hover:translate-y-[-1px] transition duration-300 flex items-center justify-center gap-2">
+                <i data-feather="save" class="w-4 h-4"></i>
+                Save Prediction
+              </button>
+              <button id="todayPresetBtn" class="rounded-2xl px-5 py-3 bg-white/5 border border-white/10 text-cream hover:bg-white/10 transition duration-300">
+                Use Today
+              </button>
             </div>
           </div>
 
-          <div class="mb-6">
-            <h3 class="font-medium text-gray-700 mb-2">Cycle Statistics</h3>
-            <div id="statsInfo" class="text-xs text-gray-500 mb-2">
-              Add at least 2 actual periods to see statistics
+          <div id="results" class="glass rounded-[30px] p-6 sm:p-8 ambient-border shadow-soft hidden reveal-up section-blur">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em] text-mauve">Forecast Results</p>
+                <h3 class="text-3xl font-semibold text-cream mt-2">Your Personalized Overview</h3>
+              </div>
+              <div class="text-sm text-petal/75 max-w-md">Highlights across the next cycle, fertility phase, and ovulation timing — now with a softer and more feminine luxury feel.</div>
             </div>
+
+            <div class="grid md:grid-cols-3 gap-4 mb-6">
+              <div class="rounded-[26px] p-5 bg-white/[0.05] border border-white/10">
+                <p class="text-sm text-mauve">Next period</p>
+                <p id="nextPeriod" class="mt-3 text-2xl font-semibold text-cream">--</p>
+              </div>
+              <div class="rounded-[26px] p-5 bg-white/[0.05] border border-white/10">
+                <p class="text-sm text-mauve">Fertile window</p>
+                <p id="fertileWindow" class="mt-3 text-2xl font-semibold text-cream">--</p>
+              </div>
+              <div class="rounded-[26px] p-5 bg-white/[0.05] border border-white/10">
+                <p class="text-sm text-mauve">Ovulation day</p>
+                <p id="ovulationDay" class="mt-3 text-2xl font-semibold text-cream">--</p>
+              </div>
+            </div>
+
+            <div class="grid lg:grid-cols-[1.2fr_.8fr] gap-6">
+              <div class="rounded-[26px] bg-white/[0.05] border border-white/10 p-5">
+                <div class="flex items-center justify-between mb-5">
+                  <h4 class="text-lg font-semibold text-cream">Prediction Curve</h4>
+                  <span class="text-xs text-mauve uppercase tracking-[0.24em]">Soft View</span>
+                </div>
+                <canvas id="cycleChart" height="135"></canvas>
+              </div>
+
+              <div class="rounded-[26px] bg-white/[0.05] border border-white/10 p-5">
+                <h4 class="text-lg font-semibold text-cream mb-4">Wellness Summary</h4>
+                <div class="space-y-4">
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.24em] text-mauve">Estimated rhythm</p>
+                    <p id="summaryRhythm" class="mt-2 text-xl text-cream font-semibold">--</p>
+                  </div>
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.24em] text-mauve">Fertility focus</p>
+                    <p id="summaryFertility" class="mt-2 text-base text-petal/80 leading-7">--</p>
+                  </div>
+                  <div>
+                    <p class="text-xs uppercase tracking-[0.24em] text-mauve">Confidence note</p>
+                    <p id="summaryConfidence" class="mt-2 text-base text-petal/80 leading-7">--</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="cycleDays" class="glass rounded-[30px] p-6 sm:p-8 ambient-border shadow-soft hidden reveal-up section-blur">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em] text-mauve">Visual Timeline</p>
+                <h2 class="text-3xl font-semibold text-cream mt-2">Cycle Breakdown</h2>
+              </div>
+              <div class="flex flex-wrap gap-2 text-xs">
+                <span class="rounded-full px-3 py-1 bg-white/5 border border-white/10 text-petal/80">Normal</span>
+                <span class="rounded-full px-3 py-1 bg-rose-300/10 border border-rose-200/10 text-petal">Period</span>
+                <span class="rounded-full px-3 py-1 bg-violet-300/10 border border-violet-200/10 text-violet-100">Fertile</span>
+                <span class="rounded-full px-3 py-1 bg-sageMist/10 border border-sageMist/20 text-sageMist">Today</span>
+              </div>
+            </div>
+            <div id="cycleDaysGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 xl:grid-cols-10 gap-3"></div>
+          </div>
+        </div>
+
+        <aside id="insightsPanel" class="space-y-8">
+          <div class="glass rounded-[30px] p-6 ambient-border shadow-soft reveal-up section-blur">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em] text-mauve">History</p>
+                <h2 class="text-2xl font-semibold text-cream mt-2">Cycle Archive</h2>
+              </div>
+              <button id="clearHistoryBtn" class="rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-2 text-petal hover:bg-rose-300/15 transition flex items-center gap-2">
+                <i data-feather="trash-2" class="w-4 h-4"></i>
+                Clear
+              </button>
+            </div>
+
+            <div id="periodHistory" class="space-y-3 max-h-[420px] overflow-y-auto pr-1"></div>
+          </div>
+
+          <div class="glass rounded-[30px] p-6 ambient-border shadow-soft reveal-up section-blur">
+            <p class="text-xs uppercase tracking-[0.3em] text-mauve">Statistics</p>
+            <h2 class="text-2xl font-semibold text-cream mt-2 mb-5">Performance Metrics</h2>
+
+            <div id="statsInfo" class="text-sm text-petal/75 mb-4">Add at least 2 actual periods to unlock metrics.</div>
+
             <div class="grid grid-cols-2 gap-4">
-              <div class="bg-gray-50 p-3 rounded-lg">
-                <p class="text-xs text-gray-500">Average Length</p>
-                <p id="avgCycleLength" class="text-lg font-semibold stat-value">
-                  -- days
-                </p>
+              <div class="rounded-[24px] p-4 bg-white/[0.05] border border-white/10">
+                <p class="text-xs uppercase tracking-[0.22em] text-mauve">Average length</p>
+                <p id="avgCycleLength" class="mt-3 text-2xl font-semibold text-cream">-- days</p>
               </div>
-              <div class="bg-gray-50 p-3 rounded-lg">
-                <p class="text-xs text-gray-500">Cycle Variation</p>
-                <p id="cycleVariation" class="text-lg font-semibold stat-value">
-                  -- days
-                </p>
+              <div class="rounded-[24px] p-4 bg-white/[0.05] border border-white/10">
+                <p class="text-xs uppercase tracking-[0.22em] text-mauve">Variation</p>
+                <p id="cycleVariation" class="mt-3 text-2xl font-semibold text-cream">-- days</p>
+              </div>
+            </div>
+
+            <div class="rounded-[24px] p-4 bg-white/[0.05] border border-white/10 mt-4">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.22em] text-mauve">Prediction accuracy</p>
+                  <p class="mt-3 text-lg font-semibold text-cream" id="predictionAccuracy">--</p>
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                  <i data-feather="sparkles" class="w-5 h-5 text-petal"></i>
+                </div>
+              </div>
+              <div class="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
+                <div id="accuracyBar" class="h-full rounded-full bg-gradient-to-r from-roseDust via-petal to-iris" style="width:0%"></div>
               </div>
             </div>
           </div>
 
-          <div>
-            <h3 class="font-medium text-gray-700 mb-2">Prediction Accuracy</h3>
-            <div class="bg-blue-50 p-4 rounded-lg">
-              <p class="text-sm text-blue-600 mb-2">
-                Last prediction was
-                <span id="predictionAccuracy" class="font-semibold">--</span>
-              </p>
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  id="accuracyBar"
-                  class="bg-blue-600 h-2.5 rounded-full"
-                  style="width: 0%"
-                ></div>
-              </div>
-              
+          <div class="glass rounded-[30px] p-6 ambient-border shadow-soft reveal-up section-blur">
+            <p class="text-xs uppercase tracking-[0.3em] text-mauve">Data tools</p>
+            <h2 class="text-2xl font-semibold text-cream mt-2 mb-5">Import & Export</h2>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <button id="exportCsvBtn" class="rounded-2xl px-4 py-3 bg-iris text-white font-semibold hover:opacity-90 transition">Export CSV</button>
+              <button id="importCsvBtn" class="rounded-2xl px-4 py-3 bg-white/5 border border-white/10 text-cream font-semibold hover:bg-white/10 transition">Import CSV</button>
             </div>
-            <br>
-              <button id="exportCsvBtn"
-  class="bg-blue-600 text-white px-4 py-2 rounded-lg">
-  Export CSV
-</button>
-            <button id="importCsvBtn"
-  class="bg-gray-600 text-white px-4 py-2 rounded-lg ml-2">
-  Import CSV
-</button>
-
-<input
-  type="file"
-  id="importCsvInput"
-  accept=".csv"
-  class="hidden"
-/>
-
+            <input id="importCsvInput" type="file" accept=".csv" class="hidden" />
+            <div class="mt-5 rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
+              <p class="text-sm text-petal/75 leading-7">Your data stays in local storage on this device. Exporting creates a light backup, and importing replaces the saved history.</p>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <!-- Cycle Days Visualization -->
-      <div
-        id="cycleDays"
-        class="mt-12 bg-white rounded-xl shadow-lg p-6 hidden"
-      >
-        <h2 class="text-2xl font-semibold text-indigo-700 mb-6">
-          Your Cycle Breakdown
-        </h2>
-        <div
-          class="grid grid-cols-7 md:grid-cols-14 gap-2"
-          id="cycleDaysGrid"
-        ></div>
-      </div>
-    </div>
+        </aside>
+      </section>
+    </main>
 
     <script>
-      //export CSV
-      document.getElementById("exportCsvBtn").addEventListener("click", () => {
-  const data = JSON.parse(localStorage.getItem("cycleData"));
-  if (!data || data.periods.length === 0) {
-    alert("No data to export");
-    return;
-  }
-
-  const rows = [
-    ["date", "is_actual", "cycle_length", "predicted_next_period"]
-  ];
-
-  data.periods.forEach(p => {
-    rows.push([
-      p.date,
-      p.actual ? 1 : 0,
-      p.cycleLength || "",
-      p.predictedDate || ""
-    ]);
-  });
-
-  const csv = rows.map(r => r.join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `cycle_history_${new Date().toISOString().slice(0,10)}.csv`;
-
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-      // Initialize feather icons
       feather.replace();
 
-      // DOM Elements
-      const lastPeriodDateEl = document.getElementById("lastPeriodDate");
-      const cycleLengthEl = document.getElementById("cycleLength");
-      const trackPeriodDateEl = document.getElementById("trackPeriodDate");
-      const addPeriodBtn = document.getElementById("addPeriodBtn");
-      const calculateBtn = document.getElementById("calculateBtn");
-      const saveDataBtn = document.getElementById("saveDataBtn");
-      const clearHistoryBtn = document.getElementById("clearHistoryBtn");
-      const resultsEl = document.getElementById("results");
-      const periodHistoryEl = document.getElementById("periodHistory");
-      const avgCycleLengthEl = document.getElementById("avgCycleLength");
-      const cycleVariationEl = document.getElementById("cycleVariation");
-      const predictionAccuracyEl =
-        document.getElementById("predictionAccuracy");
-      const accuracyBarEl = document.getElementById("accuracyBar");
-      const cycleDaysEl = document.getElementById("cycleDays");
-      const cycleDaysGridEl = document.getElementById("cycleDaysGrid");
-      const nextPeriodEl = document.getElementById("nextPeriod");
-      const fertileWindowEl = document.getElementById("fertileWindow");
-      const ovulationDayEl = document.getElementById("ovulationDay");
-      const statsInfoEl = document.getElementById("statsInfo");
+      const $ = (id) => document.getElementById(id);
 
-      // Set default date to today
+      const lastPeriodDateEl = $('lastPeriodDate');
+      const cycleLengthEl = $('cycleLength');
+      const trackPeriodDateEl = $('trackPeriodDate');
+      const addPeriodBtn = $('addPeriodBtn');
+      const calculateBtn = $('calculateBtn');
+      const saveDataBtn = $('saveDataBtn');
+      const clearHistoryBtn = $('clearHistoryBtn');
+      const resultsEl = $('results');
+      const periodHistoryEl = $('periodHistory');
+      const avgCycleLengthEl = $('avgCycleLength');
+      const cycleVariationEl = $('cycleVariation');
+      const predictionAccuracyEl = $('predictionAccuracy');
+      const accuracyBarEl = $('accuracyBar');
+      const cycleDaysEl = $('cycleDays');
+      const cycleDaysGridEl = $('cycleDaysGrid');
+      const nextPeriodEl = $('nextPeriod');
+      const fertileWindowEl = $('fertileWindow');
+      const ovulationDayEl = $('ovulationDay');
+      const statsInfoEl = $('statsInfo');
+      const heroNextPeriodEl = $('heroNextPeriod');
+      const heroOvulationEl = $('heroOvulation');
+      const heroAverageEl = $('heroAverage');
+      const heroHistoryCountEl = $('heroHistoryCount');
+      const confidenceLabelEl = $('confidenceLabel');
+      const confidencePercentEl = $('confidencePercent');
+      const luxuryConfidenceBarEl = $('luxuryConfidenceBar');
+      const confidenceHelperEl = $('confidenceHelper');
+      const summaryRhythmEl = $('summaryRhythm');
+      const summaryFertilityEl = $('summaryFertility');
+      const summaryConfidenceEl = $('summaryConfidence');
+
       const today = new Date();
       lastPeriodDateEl.valueAsDate = today;
       trackPeriodDateEl.valueAsDate = today;
 
-      // Load saved data
-      let cycleData = JSON.parse(localStorage.getItem("cycleData")) || {
+      let cycleData = JSON.parse(localStorage.getItem('cycleData')) || {
         periods: [],
         predictions: [],
         calculatedLength: 28,
       };
 
-      // Update history display
+      function formatDate(dateInput, opts = { month: 'short', day: 'numeric', year: 'numeric' }) {
+        return new Date(dateInput).toLocaleDateString('en-US', opts);
+      }
+
+      function showToast(message, tone = 'default') {
+        const toast = document.createElement('div');
+        const theme = {
+          default: 'border-white/10 bg-white/10 text-cream',
+          success: 'border-rose-300/20 bg-rose-300/10 text-petal',
+          error: 'border-red-300/20 bg-red-300/10 text-red-100',
+        };
+
+        toast.className = `fixed top-5 right-5 z-50 px-5 py-3 rounded-2xl border backdrop-blur-xl shadow-luxe ${theme[tone] || theme.default}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        anime({
+          targets: toast,
+          opacity: [0, 1],
+          translateY: [-12, 0],
+          duration: 400,
+          easing: 'easeOutQuad',
+        });
+
+        setTimeout(() => {
+          anime({
+            targets: toast,
+            opacity: [1, 0],
+            translateY: [0, -12],
+            duration: 350,
+            easing: 'easeInQuad',
+            complete: () => toast.remove(),
+          });
+        }, 2600);
+      }
+
+      function updateHeroStats() {
+        const total = cycleData.periods.length;
+        heroHistoryCountEl.textContent = `${total} ${total === 1 ? 'entry' : 'entries'}`;
+
+        const actualCount = cycleData.periods.filter((p) => p.actual).length;
+        const confidence = Math.min(98, actualCount * 18);
+        confidencePercentEl.textContent = `${confidence}%`;
+        luxuryConfidenceBarEl.style.width = `${confidence}%`;
+
+        if (actualCount < 2) {
+          confidenceLabelEl.textContent = 'Building';
+          confidenceHelperEl.textContent = 'Add more actual entries to strengthen confidence.';
+        } else if (actualCount < 4) {
+          confidenceLabelEl.textContent = 'Growing';
+          confidenceHelperEl.textContent = 'Your pattern is becoming more dependable and personal.';
+        } else {
+          confidenceLabelEl.textContent = 'Strong';
+          confidenceHelperEl.textContent = 'Your profile now reflects a more informed and consistent history.';
+        }
+      }
+
       function updateHistory() {
         if (cycleData.periods.length === 0) {
-    periodHistoryEl.innerHTML =
-      '<p class="text-gray-500 text-sm py-4 text-center">No period history recorded yet</p>';
-    return;
-  }
+          periodHistoryEl.innerHTML = `
+            <div class="rounded-[24px] border border-dashed border-white/10 bg-white/[0.03] p-8 text-center">
+              <p class="text-cream font-medium">No cycle history recorded yet</p>
+              <p class="text-sm text-mauve mt-2">Start adding actual dates to build your private archive.</p>
+            </div>
+          `;
+          updateStatistics();
+          updateHeroStats();
+          return;
+        }
 
-  periodHistoryEl.innerHTML = "";
+        periodHistoryEl.innerHTML = '';
 
-  // Sort by newest first
-  cycleData.periods
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .forEach((period, index) => {
-      const date = new Date(period.date);
-      const item = document.createElement("div");
-      item.className =
-        "flex justify-between items-center py-2 border-b border-gray-100 last:border-0";
+        cycleData.periods
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .forEach((period) => {
+            const recordId = `${period.date}-${period.actual}`;
+            const tagClass = period.actual
+              ? 'bg-rose-300/10 text-petal border-rose-200/10'
+              : 'bg-white/5 text-petal/75 border-white/10';
 
-      // Unique ID for deletion
-      const recordId = `${period.date}-${period.actual}`;
+            const item = document.createElement('div');
+            item.className = 'rounded-[24px] border border-white/10 bg-white/[0.05] p-4';
+            item.innerHTML = `
+              <div class="flex items-start justify-between gap-4">
+                <div>
+                  <p class="text-cream font-semibold text-base">${formatDate(period.date)}</p>
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <span class="rounded-full px-3 py-1 text-xs border ${tagClass}">${period.actual ? 'Actual entry' : 'Saved prediction'}</span>
+                    ${period.cycleLength ? `<span class="rounded-full px-3 py-1 text-xs border border-white/10 bg-white/5 text-petal/70">${period.cycleLength} day cycle</span>` : ''}
+                  </div>
+                </div>
+                <button data-id="${recordId}" class="delete-period rounded-xl px-3 py-2 border border-rose-300/20 bg-rose-300/10 text-petal hover:bg-rose-300/15 transition">
+                  <i data-feather="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            `;
+            periodHistoryEl.appendChild(item);
+          });
 
-      item.innerHTML = `
-        <div>
-          <span class="font-medium">${date.toLocaleDateString()}</span>
-          <span class="ml-2 text-sm ${
-            period.actual ? "text-green-600" : "text-gray-500"
-          }">${period.actual ? "Actual" : "Predicted"}</span>
-        </div>
-        <button 
-          data-id="${recordId}"
-          class="delete-period text-red-500 hover:text-red-700 transition text-sm flex items-center"
-        >
-          <i data-feather="trash-2" class="w-4 h-4 mr-1"></i> Delete
-        </button>
-      `;
+        feather.replace();
 
-      periodHistoryEl.appendChild(item);
-    });
+        document.querySelectorAll('.delete-period').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            const recordId = e.currentTarget.getAttribute('data-id');
+            if (confirm('Delete this cycle entry?')) {
+              cycleData.periods = cycleData.periods.filter((p) => `${p.date}-${p.actual}` !== recordId);
+              localStorage.setItem('cycleData', JSON.stringify(cycleData));
+              updateHistory();
+              showToast('Entry removed.', 'success');
+            }
+          });
+        });
 
-  // Re-activate feather icons
-  feather.replace();
-
-  // Add delete button functionality
-  document.querySelectorAll(".delete-period").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const recordId = e.currentTarget.getAttribute("data-id");
-      if (confirm("Are you sure you want to delete this record?")) {
-        // Remove matching record
-        cycleData.periods = cycleData.periods.filter(
-          (p) => `${p.date}-${p.actual}` !== recordId
-        );
-
-        // Save to localStorage and refresh
-        localStorage.setItem("cycleData", JSON.stringify(cycleData));
-        updateHistory();
-      }
-    });
-  });
-
-        // Update statistics
         updateStatistics();
+        updateHeroStats();
       }
 
-      // Update statistics
       function updateStatistics() {
-        // Reset to default values
-        avgCycleLengthEl.textContent = "-- days";
-        cycleVariationEl.textContent = "-- days";
-        avgCycleLengthEl.classList.remove("pulse", "text-green-600");
-        cycleVariationEl.classList.remove("pulse", "text-green-600");
+        avgCycleLengthEl.textContent = '-- days';
+        cycleVariationEl.textContent = '-- days';
+        predictionAccuracyEl.textContent = '--';
+        accuracyBarEl.style.width = '0%';
 
-        // Get all actual periods sorted by date
         const actualPeriods = cycleData.periods
           .filter((p) => p.actual)
           .map((p) => new Date(p.date))
           .sort((a, b) => a - b);
 
-        // Update info text
         if (actualPeriods.length < 2) {
-          statsInfoEl.textContent = `Add ${
-            2 - actualPeriods.length
-          } more actual period${
-            2 - actualPeriods.length !== 1 ? "s" : ""
-          } to see statistics`;
-          statsInfoEl.classList.add("text-gray-500");
-          statsInfoEl.classList.remove("text-green-600");
+          statsInfoEl.textContent = `Add ${2 - actualPeriods.length} more actual period${2 - actualPeriods.length !== 1 ? 's' : ''} to unlock metrics.`;
+          heroAverageEl.textContent = `${cycleData.calculatedLength || 28}d`;
           return;
-        } else {
-          statsInfoEl.textContent = `Calculated from ${actualPeriods.length} actual periods`;
-          statsInfoEl.classList.remove("text-gray-500");
-          statsInfoEl.classList.add("text-green-600");
         }
 
-        // Calculate cycle lengths (differences between consecutive periods)
         const cycleLengths = [];
         for (let i = 1; i < actualPeriods.length; i++) {
           const diffTime = Math.abs(actualPeriods[i] - actualPeriods[i - 1]);
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          cycleLengths.push(diffDays);
+          cycleLengths.push(Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
         }
 
-        // Calculate average cycle length
-        const sum = cycleLengths.reduce((a, b) => a + b, 0);
-        const average = sum / cycleLengths.length;
+        const average = cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length;
+        const variance = cycleLengths.reduce((acc, current) => acc + Math.pow(current - average, 2), 0) / cycleLengths.length;
+        const stdDev = Math.sqrt(variance);
 
-        // Calculate cycle variation (standard deviation)
-        const squareDiffs = cycleLengths.map((length) => {
-          const diff = length - average;
-          return diff * diff;
-        });
-
-        const avgSquareDiff =
-          squareDiffs.reduce((a, b) => a + b, 0) / cycleLengths.length;
-        const variation = Math.sqrt(avgSquareDiff);
-
-        // Update UI with calculated values
         avgCycleLengthEl.textContent = `${average.toFixed(1)} days`;
-        cycleVariationEl.textContent = `${variation.toFixed(1)} days`;
-
-        // Add visual feedback
-        avgCycleLengthEl.classList.add("text-green-600", "pulse");
-        cycleVariationEl.classList.add("text-green-600", "pulse");
-
-        // Remove animation after 3 seconds
-        setTimeout(() => {
-          avgCycleLengthEl.classList.remove("pulse");
-          cycleVariationEl.classList.remove("pulse");
-        }, 3000);
-
-        // Update prediction accuracy if we have predictions
-        updatePredictionAccuracy();
-
-        // Update cycle length input with calculated average
+        cycleVariationEl.textContent = `${stdDev.toFixed(1)} days`;
+        statsInfoEl.textContent = `Calculated from ${actualPeriods.length} actual period entries.`;
+        cycleData.calculatedLength = Math.round(average);
         cycleLengthEl.value = Math.round(average);
+        heroAverageEl.textContent = `${average.toFixed(1)}d`;
+
+        updatePredictionAccuracy();
       }
 
-      // Update prediction accuracy
       function updatePredictionAccuracy() {
-        // Reset to default values
-        predictionAccuracyEl.textContent = "--";
-        accuracyBarEl.style.width = "0%";
-
-        // Get all predictions and actual periods
-        const predictions = cycleData.predictions;
+        const predictions = cycleData.predictions || [];
         const actualPeriods = cycleData.periods.filter((p) => p.actual);
+        if (!predictions.length || !actualPeriods.length) return;
 
-        // Need at least one prediction and one actual period to calculate accuracy
-        if (predictions.length === 0 || actualPeriods.length === 0) {
-          return;
-        }
-
-        // Find the most recent prediction with a matching actual period
         let latestAccuracy = null;
+        const sortedPredictions = [...predictions].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const sortedActualPeriods = [...actualPeriods].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        // Sort predictions by date (newest first)
-        const sortedPredictions = [...predictions].sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
-        );
-
-        // Sort actual periods by date (newest first)
-        const sortedActualPeriods = [...actualPeriods].sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
-        );
-
-        // Try to find a prediction that matches an actual period
         for (const prediction of sortedPredictions) {
           const predictedDate = new Date(prediction.predictedNextPeriod);
-
-          // Find the closest actual period to this prediction
-          for (const actualPeriod of sortedActualPeriods) {
-            const actualDate = new Date(actualPeriod.date);
-
-            // Check if this prediction was for this actual period
-            // We'll consider it a match if the dates are within 10 days of each other
-            const diffTime = Math.abs(actualDate - predictedDate);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+          for (const actual of sortedActualPeriods) {
+            const actualDate = new Date(actual.date);
+            const diffDays = Math.ceil(Math.abs(actualDate - predictedDate) / (1000 * 60 * 60 * 24));
             if (diffDays <= 10) {
-              latestAccuracy = {
-                diffDays,
-                early: actualDate < predictedDate,
-                predictionDate: new Date(prediction.date),
-              };
+              latestAccuracy = { diffDays, early: actualDate < predictedDate };
               break;
             }
           }
-
           if (latestAccuracy) break;
         }
 
-        // Update UI with accuracy data if found
-        if (latestAccuracy) {
-          const accuracyText = `${latestAccuracy.diffDays} day${
-            latestAccuracy.diffDays !== 1 ? "s" : ""
-          } ${latestAccuracy.early ? "early" : "late"}`;
-          predictionAccuracyEl.textContent = accuracyText;
+        if (!latestAccuracy) return;
 
-          // Calculate accuracy percentage (100% if exact, decreasing by 10% per day off)
-          const accuracyPercent = Math.max(
-            0,
-            100 - latestAccuracy.diffDays * 10
-          );
-          accuracyBarEl.style.width = `${accuracyPercent}%`;
-        }
+        predictionAccuracyEl.textContent = `${latestAccuracy.diffDays} day${latestAccuracy.diffDays !== 1 ? 's' : ''} ${latestAccuracy.early ? 'early' : 'late'}`;
+        const accuracyPercent = Math.max(0, 100 - latestAccuracy.diffDays * 10);
+        accuracyBarEl.style.width = `${accuracyPercent}%`;
       }
 
-      // Calculate ovulation and fertile window
       function calculateCycle() {
         const lastPeriodDate = new Date(lastPeriodDateEl.value);
-        const cycleLength = parseInt(cycleLengthEl.value);
+        const cycleLength = parseInt(cycleLengthEl.value, 10);
 
         if (isNaN(lastPeriodDate.getTime()) || isNaN(cycleLength)) {
-          alert("Please enter valid dates and cycle length");
+          showToast('Please enter a valid date and cycle length.', 'error');
           return;
         }
 
-        // Save this prediction
-        const predictionDate = new Date(lastPeriodDate);
-        predictionDate.setDate(predictionDate.getDate() + cycleLength);
-
-        // Calculate dates
         const ovulationDate = new Date(lastPeriodDate);
         ovulationDate.setDate(ovulationDate.getDate() + (cycleLength - 14));
 
@@ -566,39 +753,38 @@
         const nextPeriod = new Date(lastPeriodDate);
         nextPeriod.setDate(nextPeriod.getDate() + cycleLength);
 
-        // Update UI
-        nextPeriodEl.textContent = nextPeriod.toLocaleDateString();
-        fertileWindowEl.textContent = `${fertileStart.toLocaleDateString()} - ${fertileEnd.toLocaleDateString()}`;
-        ovulationDayEl.textContent = ovulationDate.toLocaleDateString();
+        nextPeriodEl.textContent = formatDate(nextPeriod);
+        fertileWindowEl.textContent = `${formatDate(fertileStart, { month: 'short', day: 'numeric' })} – ${formatDate(fertileEnd, { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        ovulationDayEl.textContent = formatDate(ovulationDate);
 
-        // Show results
-        resultsEl.classList.remove("hidden");
+        heroNextPeriodEl.textContent = formatDate(nextPeriod);
+        heroOvulationEl.textContent = formatDate(ovulationDate, { month: 'short', day: 'numeric' });
 
-        // Generate cycle visualization
-        generateCycleVisualization(
-          lastPeriodDate,
-          cycleLength,
-          ovulationDate,
-          fertileStart,
-          fertileEnd,
-          nextPeriod
-        );
+        summaryRhythmEl.textContent = `${cycleLength}-day projection`;
+        summaryFertilityEl.textContent = `Your likely fertile window centers around ${formatDate(ovulationDate, { month: 'long', day: 'numeric' })}, with peak attention starting about five days earlier.`;
+        summaryConfidenceEl.textContent = cycleData.periods.filter((p) => p.actual).length >= 4
+          ? 'This forecast is supported by multiple actual records, so it should feel more tailored and stable.'
+          : 'Keep saving actual dates to make the forecast softer, smarter, and more personalized over time.';
 
-        // Update prediction accuracy
-        updatePredictionAccuracy();
+        resultsEl.classList.remove('hidden');
+        cycleDaysEl.classList.remove('hidden');
+
+        generateCycleVisualization(lastPeriodDate, cycleLength, ovulationDate, fertileStart, fertileEnd);
+
+        anime({
+          targets: '#results .rounded-\\[26px\\], #results canvas, #cycleDays .cycle-day',
+          opacity: [0, 1],
+          translateY: [18, 0],
+          delay: anime.stagger(55),
+          duration: 500,
+          easing: 'easeOutQuad',
+        });
+
+        showToast('Forecast updated.', 'success');
       }
 
-      // Generate cycle visualization
-      function generateCycleVisualization(
-        startDate,
-        length,
-        ovulationDate,
-        fertileStart,
-        fertileEnd,
-        nextPeriod
-      ) {
-        cycleDaysGridEl.innerHTML = "";
-        cycleDaysEl.classList.remove("hidden");
+      function generateCycleVisualization(startDate, length, ovulationDate, fertileStart, fertileEnd) {
+        cycleDaysGridEl.innerHTML = '';
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -606,334 +792,293 @@
         for (let day = 1; day <= length; day++) {
           const currentDate = new Date(startDate);
           currentDate.setDate(currentDate.getDate() + day - 1);
+          currentDate.setHours(0, 0, 0, 0);
 
-          const dayEl = document.createElement("div");
-          dayEl.className =
-            "cycle-day text-center p-2 rounded-lg border border-gray-100";
+          let style = 'bg-white/[0.05] text-petal/70 border-white/10';
+          let badge = 'Cycle';
 
-          // Determine day type
-          let dayType = "normal";
-          let bgColor = "bg-white";
-          let textColor = "text-gray-700";
-
-          if (day === 1 || (day === length && length > 1)) {
-            dayType = "period";
-            bgColor = "bg-red-100";
-            textColor = "text-red-700";
-          } else if (currentDate >= fertileStart && currentDate <= fertileEnd) {
-            dayType = "fertile";
-            bgColor = "bg-pink-100";
-            textColor = "text-pink-700";
+          if (day === 1 || day === length) {
+            style = 'bg-rose-300/10 text-petal border-rose-200/10';
+            badge = 'Period';
           } else if (currentDate.getTime() === ovulationDate.getTime()) {
-            dayType = "ovulation";
-            bgColor = "bg-purple-100";
-            textColor = "text-purple-700";
+            style = 'bg-petal/15 text-petal border-petal/20';
+            badge = 'Ovulation';
+          } else if (currentDate >= fertileStart && currentDate <= fertileEnd) {
+            style = 'bg-violet-300/10 text-violet-100 border-violet-200/10';
+            badge = 'Fertile';
           } else if (currentDate.getTime() === today.getTime()) {
-            dayType = "today";
-            bgColor = "bg-indigo-100";
-            textColor = "text-indigo-700";
+            style = 'bg-sageMist/10 text-sageMist border-sageMist/20';
+            badge = 'Today';
           }
 
-          dayEl.className += ` ${bgColor} ${textColor}`;
-
+          const dayEl = document.createElement('div');
+          dayEl.className = `cycle-day rounded-[22px] border p-4 ${style}`;
           dayEl.innerHTML = `
-                    <div class="text-xs font-medium">Day ${day}</div>
-                    <div class="text-xs">${currentDate.toLocaleDateString(
-                      "en-US",
-                      { month: "short", day: "numeric" }
-                    )}</div>
-                    ${
-                      dayType === "today"
-                        ? '<div class="text-xs font-bold mt-1">TODAY</div>'
-                        : ""
-                    }
-                `;
-
+            <div class="flex items-center justify-between gap-2 mb-4">
+              <span class="text-xs uppercase tracking-[0.2em] opacity-70">Day ${day}</span>
+              <span class="text-[10px] uppercase tracking-[0.18em]">${badge}</span>
+            </div>
+            <p class="text-base font-semibold">${formatDate(currentDate, { month: 'short', day: 'numeric' })}</p>
+          `;
           cycleDaysGridEl.appendChild(dayEl);
         }
 
-        // Create chart
-        createCycleChart(
-          startDate,
-          length,
-          ovulationDate,
-          fertileStart,
-          fertileEnd
-        );
+        createCycleChart(startDate, length, ovulationDate, fertileStart, fertileEnd);
       }
 
-      // Create cycle chart
-      function createCycleChart(
-        startDate,
-        length,
-        ovulationDate,
-        fertileStart,
-        fertileEnd
-      ) {
-        const ctx = document.getElementById("cycleChart").getContext("2d");
+      function createCycleChart(startDate, length, ovulationDate, fertileStart, fertileEnd) {
+        const ctx = $('cycleChart').getContext('2d');
 
-        // Prepare data
         const labels = [];
         const fertilityData = [];
-        const periodData = [];
+        const baselineData = [];
 
         for (let day = 0; day < length; day++) {
           const currentDate = new Date(startDate);
           currentDate.setDate(currentDate.getDate() + day);
 
           labels.push(`Day ${day + 1}`);
+          baselineData.push(0.08);
 
-          // Fertility score (0-1)
-          let fertilityScore = 0;
+          let fertilityScore = 0.12;
           if (currentDate >= fertileStart && currentDate <= fertileEnd) {
-            // Peak fertility around ovulation day
-            const daysFromOvulation = Math.abs(
-              (currentDate - ovulationDate) / (1000 * 60 * 60 * 24)
-            );
-            fertilityScore = Math.max(0, 1 - daysFromOvulation / 3);
+            const daysFromOvulation = Math.abs((currentDate - ovulationDate) / (1000 * 60 * 60 * 24));
+            fertilityScore = Math.max(0.2, 1 - daysFromOvulation / 3.2);
           }
           fertilityData.push(fertilityScore);
-
-          // Period (first day and last day)
-          periodData.push(day === 0 || day === length - 1 ? 1 : 0);
         }
 
-        // Destroy previous chart if exists
-        if (window.cycleChart) {
-          window.cycleChart.destroy();
-        }
+        if (window.cycleChart) window.cycleChart.destroy();
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 240);
+        gradient.addColorStop(0, 'rgba(234,192,207,.48)');
+        gradient.addColorStop(0.55, 'rgba(167,139,199,.24)');
+        gradient.addColorStop(1, 'rgba(197,143,164,0)');
 
         window.cycleChart = new Chart(ctx, {
-          type: "line",
+          type: 'line',
           data: {
-            labels: labels,
+            labels,
             datasets: [
               {
-                label: "Fertility",
+                label: 'Fertility curve',
                 data: fertilityData,
-                borderColor: "rgb(219, 39, 119)",
-                backgroundColor: "rgba(219, 39, 119, 0.1)",
-                borderWidth: 2,
-                tension: 0.3,
+                borderColor: '#F4D8E2',
+                backgroundColor: gradient,
                 fill: true,
-                yAxisID: "y",
+                borderWidth: 2.2,
+                pointRadius: 0,
+                tension: 0.38,
               },
               {
-                label: "Period",
-                data: periodData,
-                borderColor: "rgb(239, 68, 68)",
-                backgroundColor: "rgba(239, 68, 68, 0.1)",
-                borderWidth: 2,
-                type: "bar",
-                yAxisID: "y1",
-              },
+                label: 'Baseline',
+                data: baselineData,
+                borderColor: 'rgba(255,255,255,.16)',
+                borderDash: [4, 6],
+                pointRadius: 0,
+                borderWidth: 1,
+                tension: 0.2,
+              }
             ],
           },
           options: {
             responsive: true,
-            interaction: {
-              mode: "index",
-              intersect: false,
-            },
-            scales: {
-              y: {
-                type: "linear",
-                display: true,
-                position: "left",
-                min: 0,
-                max: 1,
-                title: {
-                  display: true,
-                  text: "Fertility",
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  color: '#EAC0CF',
+                  usePointStyle: true,
                 },
               },
-              y1: {
-                type: "linear",
-                display: true,
-                position: "right",
+            },
+            scales: {
+              x: {
+                ticks: { color: 'rgba(234,192,207,.78)' },
+                grid: { color: 'rgba(255,255,255,.05)' },
+              },
+              y: {
                 min: 0,
                 max: 1,
-                grid: {
-                  drawOnChartArea: false,
-                },
-                title: {
-                  display: true,
-                  text: "Period",
-                },
+                ticks: { color: 'rgba(234,192,207,.78)' },
+                grid: { color: 'rgba(255,255,255,.05)' },
               },
             },
           },
         });
       }
 
-      // Event Listeners
-      addPeriodBtn.addEventListener("click", () => {
+      addPeriodBtn.addEventListener('click', () => {
         const date = new Date(trackPeriodDateEl.value);
         if (isNaN(date.getTime())) {
-          alert("Please select a valid date");
+          showToast('Please select a valid date.', 'error');
           return;
         }
 
-        // Check if this date already exists
-        const exists = cycleData.periods.some((p) => {
-          const pDate = new Date(p.date);
-          return pDate.toDateString() === date.toDateString();
-        });
-
+        const exists = cycleData.periods.some((p) => new Date(p.date).toDateString() === date.toDateString());
         if (exists) {
-          alert("This date is already recorded");
+          showToast('That date is already recorded.', 'error');
           return;
         }
 
-        // Add to history as an ACTUAL period
-        cycleData.periods.push({
-          date: date.toISOString(),
-          actual: true,
-        });
-
-        // Save to localStorage
-        localStorage.setItem("cycleData", JSON.stringify(cycleData));
-
-        // Update UI
-        updateHistory();
+        cycleData.periods.push({ date: date.toISOString(), actual: true });
+        localStorage.setItem('cycleData', JSON.stringify(cycleData));
         trackPeriodDateEl.valueAsDate = new Date();
-
-        // Show confirmation
-        alert("Actual period date added successfully!");
+        updateHistory();
+        showToast('Actual cycle date added.', 'success');
       });
 
-      calculateBtn.addEventListener("click", calculateCycle);
+      calculateBtn.addEventListener('click', calculateCycle);
+      $('heroCalculateBtn').addEventListener('click', calculateCycle);
 
-      saveDataBtn.addEventListener("click", () => {
+      $('scrollInsightsBtn').addEventListener('click', () => {
+        $('insightsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      $('todayPresetBtn').addEventListener('click', () => {
+        lastPeriodDateEl.valueAsDate = new Date();
+        trackPeriodDateEl.valueAsDate = new Date();
+        showToast('Today has been applied.', 'success');
+      });
+
+      saveDataBtn.addEventListener('click', () => {
         const lastPeriodDate = new Date(lastPeriodDateEl.value);
-        const cycleLength = parseInt(cycleLengthEl.value);
+        const cycleLength = parseInt(cycleLengthEl.value, 10);
 
         if (isNaN(lastPeriodDate.getTime()) || isNaN(cycleLength)) {
-          alert("Please calculate first before saving");
+          showToast('Please calculate with valid inputs first.', 'error');
           return;
         }
 
-        // Save the prediction
         const nextPeriodDate = new Date(lastPeriodDate);
         nextPeriodDate.setDate(nextPeriodDate.getDate() + cycleLength);
 
         cycleData.predictions.push({
           date: new Date().toISOString(),
           predictedNextPeriod: nextPeriodDate.toISOString(),
-          cycleLength: cycleLength,
+          cycleLength,
         });
 
-        // Also save as a predicted period (will be marked as actual when user confirms)
         cycleData.periods.push({
           date: nextPeriodDate.toISOString(),
           actual: false,
           predictedDate: nextPeriodDate.toISOString(),
+          cycleLength,
         });
 
-        localStorage.setItem("cycleData", JSON.stringify(cycleData));
+        localStorage.setItem('cycleData', JSON.stringify(cycleData));
         updateHistory();
-
-        alert(
-          "Prediction saved! Update it to an actual period when your period starts for better future predictions."
-        );
+        showToast('Prediction saved to your archive.', 'success');
       });
 
-      clearHistoryBtn.addEventListener("click", () => {
-        if (
-          confirm("Are you sure you want to clear all your period history?")
-        ) {
-          cycleData.periods = [];
-          cycleData.predictions = [];
-          localStorage.setItem("cycleData", JSON.stringify(cycleData));
-          updateHistory();
-        }
+      clearHistoryBtn.addEventListener('click', () => {
+        if (!confirm('Clear all cycle history and predictions?')) return;
+        cycleData = { periods: [], predictions: [], calculatedLength: 28 };
+        localStorage.setItem('cycleData', JSON.stringify(cycleData));
+        updateHistory();
+        resultsEl.classList.add('hidden');
+        cycleDaysEl.classList.add('hidden');
+        heroNextPeriodEl.textContent = '--';
+        heroOvulationEl.textContent = '--';
+        showToast('All history cleared.', 'success');
       });
 
-      // Initialize
-      updateHistory();
-
-      // Try to find the most recent period to pre-fill the form
-      if (cycleData.periods.length > 0) {
-        const lastPeriod = cycleData.periods
-          .filter((p) => p.actual)
-          .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-
-        if (lastPeriod) {
-          lastPeriodDateEl.valueAsDate = new Date(lastPeriod.date);
-
-          // If we have calculated average, use that
-          if (cycleData.calculatedLength) {
-            cycleLengthEl.value = cycleData.calculatedLength;
-          }
+      $('exportCsvBtn').addEventListener('click', () => {
+        if (!cycleData || cycleData.periods.length === 0) {
+          showToast('No data to export yet.', 'error');
+          return;
         }
-      }
-      const importBtn = document.getElementById("importCsvBtn");
-const fileInput = document.getElementById("importCsvInput");
 
-importBtn.addEventListener("click", () => {
-  fileInput.click();
-});
-fileInput.addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    try {
-      const lines = reader.result.trim().split("\n");
-
-      // remove header
-      const rows = lines.slice(1);
-
-      if (rows.length === 0) {
-        alert("CSV file is empty");
-        return;
-      }
-
-      const periods = [];
-
-      rows.forEach(line => {
-        const [date, isActual, cycleLength, predictedDate] =
-          line.split(",");
-
-        if (!date) return;
-
-        periods.push({
-          date: date,
-          actual: isActual === "1",
-          cycleLength: cycleLength ? Number(cycleLength) : undefined,
-          predictedDate: predictedDate || undefined
+        const rows = [['date', 'is_actual', 'cycle_length', 'predicted_next_period']];
+        cycleData.periods.forEach((p) => {
+          rows.push([p.date, p.actual ? 1 : 0, p.cycleLength || '', p.predictedDate || '']);
         });
+
+        const csv = rows.map((r) => r.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `luna_cycle_history_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('CSV exported.', 'success');
       });
 
-      const confirmReplace = confirm(
-        "This will replace your existing cycle data. Continue?"
-      );
-      if (!confirmReplace) return;
+      $('importCsvBtn').addEventListener('click', () => $('importCsvInput').click());
 
-      const newCycleData = {
-        periods,
-        predictions: [],
-        calculatedLength: 28
-      };
+      $('importCsvInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-      localStorage.setItem("cycleData", JSON.stringify(newCycleData));
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const lines = reader.result.trim().split('\n');
+            const rows = lines.slice(1);
+            if (!rows.length) {
+              showToast('CSV file is empty.', 'error');
+              return;
+            }
 
-      alert("CSV imported successfully. Reloading…");
-      location.reload();
+            const periods = [];
+            rows.forEach((line) => {
+              const [date, isActual, cycleLength, predictedDate] = line.split(',');
+              if (!date) return;
+              periods.push({
+                date,
+                actual: isActual === '1',
+                cycleLength: cycleLength ? Number(cycleLength) : undefined,
+                predictedDate: predictedDate || undefined,
+              });
+            });
 
-    } catch (err) {
-      alert("Invalid CSV file");
-    }
-  };
+            if (!confirm('This will replace your current cycle data. Continue?')) return;
 
-  reader.readAsText(file);
-});
+            cycleData = { periods, predictions: [], calculatedLength: 28 };
+            localStorage.setItem('cycleData', JSON.stringify(cycleData));
+            updateHistory();
+            showToast('CSV imported successfully.', 'success');
+          } catch {
+            showToast('Invalid CSV file.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      });
 
+      function runEntranceAnimations() {
+        anime({
+          targets: '.reveal-up',
+          opacity: [0, 1],
+          translateY: [22, 0],
+          delay: anime.stagger(85),
+          duration: 700,
+          easing: 'easeOutExpo',
+        });
+
+        anime({
+          targets: '.reveal-scale',
+          opacity: [0, 1],
+          scale: [0.96, 1],
+          duration: 800,
+          easing: 'easeOutExpo',
+        });
+      }
+
+      updateHistory();
+      updateHeroStats();
+      runEntranceAnimations();
+
+      const lastActual = cycleData.periods
+        .filter((p) => p.actual)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+      if (lastActual) {
+        lastPeriodDateEl.valueAsDate = new Date(lastActual.date);
+      }
+      if (cycleData.calculatedLength) {
+        cycleLengthEl.value = cycleData.calculatedLength;
+      }
     </script>
   </body>
 </html>
-
-
-
