@@ -1,469 +1,1013 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Saturday Log</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#f5f0e8;--card:#fffdf7;--ink:#2c2418;--ink-light:#7a6e5d;--accent:#c45d3e;--accent-hover:#a94e33;--border:#e0d8c8;--tag-bg:#eee7d8;--shadow:rgba(44,36,24,.06);--green:#4a8c5c;--green-light:#e8f2eb}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.6}
-body::before{content:'';position:fixed;inset:0;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none;z-index:999}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saturday Log — Premium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0b11;
+      --bg-soft:#11121b;
+      --panel:rgba(255,255,255,.06);
+      --panel-strong:rgba(255,255,255,.09);
+      --panel-border:rgba(255,255,255,.12);
+      --text:#f6f1ea;
+      --muted:rgba(246,241,234,.62);
+      --accent:#f28c62;
+      --accent-2:#efb36f;
+      --accent-3:#c98bff;
+      --green:#73d6a3;
+      --red:#ff8c8c;
+      --tag:rgba(255,255,255,.08);
+      --shadow:0 20px 80px rgba(0,0,0,.35);
+      --radius:26px;
+      --blur:20px;
+      --container:1240px;
+    }
 
-.lock-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
-.lock-screen.hidden{display:none}
-.lock-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:380px;max-width:90vw;box-shadow:0 8px 40px rgba(44,36,24,.1);text-align:center}
-.lock-icon{font-size:2.6rem;margin-bottom:10px;opacity:.65}
-.lock-box h1{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;margin-bottom:4px}
-.lock-box .subtitle{color:var(--ink-light);font-size:.85rem;margin-bottom:22px}
-.lock-box input{font-family:'DM Sans',sans-serif;width:100%;padding:12px 16px;font-size:.95rem;border:1.5px solid var(--border);border-radius:10px;background:var(--bg);color:var(--ink);text-align:center;letter-spacing:.12em;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:10px}
-.lock-box input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,93,62,.1)}
-.lock-box input.shake{animation:shake .4s ease;border-color:var(--accent)}
-.lock-error{color:var(--accent);font-size:.8rem;min-height:20px;margin-bottom:6px;font-weight:500}
-.lock-box .setup-note{font-size:.78rem;color:var(--ink-light);margin-top:14px;line-height:1.5}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      min-height:100vh;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(242,140,98,.18), transparent 28%),
+        radial-gradient(circle at 78% 18%, rgba(201,139,255,.15), transparent 26%),
+        radial-gradient(circle at 68% 80%, rgba(115,214,163,.10), transparent 22%),
+        linear-gradient(180deg,#08090d 0%,#0b0b11 34%,#11121a 100%);
+      font-family:'Inter',system-ui,sans-serif;
+      overflow-x:hidden;
+      line-height:1.55;
+    }
 
-.app{display:none}.app.visible{display:block}
-.container{max-width:720px;margin:0 auto;padding:40px 24px 80px}
-header{text-align:center;margin-bottom:48px;animation:fadeIn .6s ease}
-header h1{font-family:'Fraunces',serif;font-weight:700;font-size:2.6rem;letter-spacing:-.02em;margin-bottom:6px}
-header p{color:var(--ink-light);font-size:.95rem}
-.header-actions{display:flex;justify-content:center;gap:16px;margin-top:10px}
-.link-btn{font-size:.78rem;color:var(--ink-light);cursor:pointer;transition:color .2s;background:none;border:none;font-family:'DM Sans',sans-serif;font-weight:500}
-.link-btn:hover{color:var(--accent)}
+    body::before,
+    body::after{
+      content:'';
+      position:fixed;
+      inset:auto;
+      width:36rem;
+      height:36rem;
+      border-radius:999px;
+      filter:blur(70px);
+      opacity:.35;
+      pointer-events:none;
+      z-index:0;
+      animation:floatBlob 18s ease-in-out infinite;
+    }
+    body::before{top:-8rem;left:-8rem;background:rgba(242,140,98,.25)}
+    body::after{right:-12rem;top:16rem;background:rgba(201,139,255,.18);animation-delay:-8s}
 
-.stats{display:flex;gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin-bottom:32px;box-shadow:0 2px 12px var(--shadow);animation:slideUp .5s ease}
-.stat{flex:1;background:var(--card);padding:18px 16px;text-align:center}
-.stat-value{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:var(--accent);line-height:1.2}
-.stat-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-light);margin-top:2px}
+    .noise{
+      position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.05' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode:soft-light;
+    }
 
-.add-form{background:var(--card);border-radius:14px;padding:28px;margin-bottom:32px;box-shadow:0 2px 16px var(--shadow);border:1px solid var(--border);animation:slideUp .6s ease}
-.add-form h2{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500;margin-bottom:20px;display:flex;align-items:center;gap:8px}
-.form-row{display:flex;gap:12px;margin-bottom:14px}
-.form-group{flex:1;display:flex;flex-direction:column}
-.form-group label{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600}
-input,textarea,select{font-family:'DM Sans',sans-serif;font-size:.92rem;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--ink);transition:border-color .2s,box-shadow .2s;outline:none}
-input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(196,93,62,.1)}
-textarea{resize:vertical;min-height:72px}
+    .cursor-glow{
+      position:fixed;
+      width:24rem;height:24rem;border-radius:999px;
+      background:radial-gradient(circle, rgba(242,140,98,.13), transparent 60%);
+      pointer-events:none;z-index:0;transform:translate(-50%,-50%);
+      transition:opacity .25s ease;
+      opacity:.9;
+    }
 
-.btn{font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;padding:12px 28px;border:none;border-radius:8px;cursor:pointer;transition:all .2s}
-.btn-primary{background:var(--accent);color:#fff;width:100%;margin-top:4px}
-.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(196,93,62,.25)}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-.btn-small{padding:5px 12px;font-size:.78rem;border-radius:6px}
-.btn-delete{background:none;color:var(--ink-light);border:1px solid var(--border)}
-.btn-delete:hover{background:#fef0ed;color:var(--accent);border-color:var(--accent)}
-.btn-edit{background:none;color:var(--ink-light);border:1px solid var(--border)}
-.btn-edit:hover{background:#eef5ff;color:#3b6fad;border-color:#3b6fad}
-.entry-actions{display:flex;gap:6px}
+    .lock-screen,.modal-overlay{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+      padding:20px;z-index:50;
+      backdrop-filter:blur(22px);
+      background:rgba(5,6,10,.52);
+    }
+    .lock-screen.hidden,.modal-overlay.hidden{display:none}
 
-.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center;animation:slideUp .7s ease}
-.filter-bar span{font-size:.82rem;color:var(--ink-light);font-weight:500}
-.filter-chip{font-family:'DM Sans',sans-serif;font-size:.8rem;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--ink-light);cursor:pointer;transition:all .2s;font-weight:500}
-.filter-chip:hover{border-color:var(--accent);color:var(--accent)}
-.filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .lock-shell{
+      position:relative;
+      width:min(520px,100%);
+      padding:1px;
+      border-radius:32px;
+      background:linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.05), rgba(242,140,98,.22));
+      box-shadow:var(--shadow);
+    }
+    .lock-box,.modal{
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:31px;
+      padding:34px;
+      backdrop-filter:blur(var(--blur));
+      position:relative;
+      overflow:hidden;
+    }
+    .lock-box::before,.modal::before,.panel::before,.entry-card::before,.hero::before{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(130deg, rgba(255,255,255,.10), transparent 26%, transparent 70%, rgba(255,255,255,.05));
+      pointer-events:none;
+    }
 
-.entries-section h2{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:500}
-.entry-card{background:var(--card);border-radius:12px;padding:22px 24px;margin-bottom:12px;border:1px solid var(--border);box-shadow:0 1px 8px var(--shadow);transition:transform .15s,box-shadow .15s;animation:cardIn .4s ease}
-.entry-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px var(--shadow)}
-.entry-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
-.entry-date{font-family:'Fraunces',serif;font-size:1rem;font-weight:500}
-.entry-hours{font-family:'Fraunces',serif;font-weight:700;font-size:1rem;color:var(--accent);white-space:nowrap}
-.entry-task{font-size:.95rem;margin-bottom:10px;line-height:1.55}
-.entry-footer{display:flex;justify-content:space-between;align-items:center}
-.entry-tags{display:flex;gap:6px;flex-wrap:wrap}
-.tag{font-size:.72rem;padding:3px 10px;border-radius:12px;background:var(--tag-bg);color:var(--ink-light);font-weight:500;text-transform:lowercase}
-.tag.completed{background:var(--green-light);color:var(--green)}
-.empty-state{text-align:center;padding:60px 20px;color:var(--ink-light);animation:fadeIn .6s ease}
-.empty-state .icon{font-size:3rem;margin-bottom:12px;opacity:.4}
-.btn-export{background:none;color:var(--ink-light);border:1.5px solid var(--border);font-size:.78rem;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s}
-.btn-export:hover{border-color:var(--accent);color:var(--accent)}
+    .lock-badge{
+      display:inline-flex;align-items:center;gap:10px;
+      font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;
+      color:var(--muted);padding:9px 14px;border-radius:999px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);margin-bottom:18px;
+    }
+    .lock-box h1,.brand-word{
+      font-family:'Instrument Serif',serif;
+      font-size:clamp(2.5rem,6vw,4.4rem);
+      letter-spacing:-.04em;line-height:.95;font-weight:400;
+    }
+    .lock-box p{color:var(--muted);margin-top:12px;margin-bottom:26px}
 
-.modal-overlay{position:fixed;inset:0;background:rgba(44,36,24,.3);display:flex;align-items:center;justify-content:center;z-index:1001;animation:fadeIn .2s ease}
-.modal-overlay.hidden{display:none}
-.modal{background:var(--card);border-radius:14px;padding:32px;width:360px;max-width:90vw;box-shadow:0 8px 40px rgba(44,36,24,.15)}
-.modal h3{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:500;margin-bottom:16px}
-.modal input{width:100%;margin-bottom:10px}
-.modal-actions{display:flex;gap:10px;margin-top:6px}
-.modal-actions .btn{flex:1;padding:10px}
-.btn-cancel{background:var(--bg);color:var(--ink-light);border:1.5px solid var(--border)}
-.btn-cancel:hover{border-color:var(--ink-light)}
+    .app{display:none;position:relative;z-index:2}
+    .app.visible{display:block}
+    .container{max-width:var(--container);margin:0 auto;padding:28px 22px 90px}
 
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-@media(max-width:540px){header h1{font-size:2rem}.form-row{flex-direction:column;gap:10px}.container{padding:28px 16px 60px}.stat{padding:14px 10px}.stat-value{font-size:1.4rem}}
-</style>
+    .topbar{
+      position:sticky;top:14px;z-index:25;margin-bottom:18px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:14px 18px;border-radius:22px;
+      background:rgba(12,13,19,.58);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 16px 40px rgba(0,0,0,.24);
+      backdrop-filter:blur(18px);
+    }
+    .brand{display:flex;align-items:center;gap:14px;min-width:0}
+    .brand-mark{
+      width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-size:1.05rem;
+      background:linear-gradient(135deg, rgba(242,140,98,.28), rgba(201,139,255,.22));
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .brand-copy{min-width:0}
+    .brand-copy strong{display:block;font-size:.95rem;font-weight:700}
+    .brand-copy span{display:block;color:var(--muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+
+    .hero{
+      position:relative;overflow:hidden;
+      padding:34px;border-radius:34px;margin-top:10px;margin-bottom:20px;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(242,140,98,.18), transparent 30%),
+        radial-gradient(circle at 90% 12%, rgba(201,139,255,.14), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.09);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(18px);
+    }
+    .hero-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:18px;align-items:end}
+    .hero-kicker{
+      display:inline-flex;align-items:center;gap:10px;margin-bottom:16px;
+      padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase
+    }
+    .hero h1{
+      font-size:clamp(2.8rem,7vw,6rem);
+      line-height:.92;letter-spacing:-.06em;font-weight:800;max-width:10ch;
+    }
+    .hero h1 em{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400}
+    .hero p{
+      margin-top:16px;max-width:58ch;color:var(--muted);font-size:1rem
+    }
+    .hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+    .meta-pill{
+      padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:.84rem;color:var(--text)
+    }
+    .hero-side{
+      display:grid;gap:12px
+    }
+    .mini-panel{
+      padding:18px;border-radius:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)
+    }
+    .mini-panel .eyebrow{font-size:.73rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
+    .mini-panel strong{font-size:2rem;letter-spacing:-.04em;display:block}
+    .sparkline{display:flex;align-items:end;gap:7px;height:70px;margin-top:14px}
+    .sparkline span{flex:1;border-radius:999px 999px 8px 8px;background:linear-gradient(180deg, rgba(242,140,98,.95), rgba(242,140,98,.35));opacity:.95;animation:growBar .9s ease both}
+
+    .layout{display:grid;grid-template-columns:340px 1fr;gap:18px;margin-top:18px}
+    .stack{display:grid;gap:18px}
+    .panel{
+      position:relative;overflow:hidden;
+      background:var(--panel);
+      border:1px solid var(--panel-border);
+      border-radius:28px;padding:22px;box-shadow:var(--shadow);backdrop-filter:blur(18px)
+    }
+    .panel-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+    .panel-title h2{font-size:1.05rem;letter-spacing:-.02em}
+    .panel-title p{font-size:.82rem;color:var(--muted)}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}
+    .stat-card{
+      position:relative;overflow:hidden;padding:18px;border-radius:24px;
+      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);min-height:132px
+    }
+    .stat-card .label{font-size:.77rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    .stat-card .value{font-size:2.4rem;font-weight:800;letter-spacing:-.06em;margin-top:12px}
+    .stat-card .sub{color:var(--muted);font-size:.84rem;margin-top:6px}
+    .stat-ring{
+      position:absolute;right:-16px;bottom:-18px;width:92px;height:92px;border-radius:999px;border:1px solid rgba(255,255,255,.08);opacity:.7
+    }
+    .stat-ring::after{content:'';position:absolute;inset:12px;border-radius:inherit;border:1px dashed rgba(255,255,255,.12)}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+    .input-group{display:grid;gap:8px;margin-bottom:14px}
+    .input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{font-size:.77rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+    input,textarea,select{
+      width:100%;border:none;outline:none;color:var(--text);background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:14px 15px;
+      font-family:'Inter',sans-serif;font-size:.96rem;transition:.25s ease;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    input:focus,textarea:focus,select:focus{border-color:rgba(242,140,98,.65);box-shadow:0 0 0 5px rgba(242,140,98,.10);transform:translateY(-1px)}
+    textarea{min-height:120px;resize:vertical}
+
+    .btn{
+      appearance:none;border:none;cursor:pointer;
+      font-family:'Inter',sans-serif;font-weight:700;letter-spacing:-.01em;
+      color:var(--text);background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:13px 16px;
+      transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease, background .22s ease;
+    }
+    .btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.22);border-color:rgba(255,255,255,.16)}
+    .btn:active{transform:translateY(0)}
+    .btn-primary{
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      color:#130e0b;border:none;box-shadow:0 14px 32px rgba(242,140,98,.24)
+    }
+    .btn-ghost{background:rgba(255,255,255,.05)}
+    .btn-soft{background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.03))}
+    .btn-danger{background:rgba(255,140,140,.08);color:#ffd4d4}
+    .btn-small{padding:10px 12px;border-radius:14px;font-size:.88rem}
+    .btn-icon{display:inline-flex;align-items:center;gap:10px}
+
+    .filter-wrap{display:grid;gap:12px}
+    .filter-chips,.quick-stats{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{
+      padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);font-size:.86rem;color:var(--muted);cursor:pointer;transition:.22s ease
+    }
+    .chip:hover,.chip.active{color:#13110f;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent}
+
+    .search-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:8px}
+
+    .entries-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+    .entries-head h2{font-size:1.1rem}
+    .entries-meta{color:var(--muted);font-size:.88rem}
+
+    .entries-list{display:grid;gap:14px}
+    .entry-card{
+      position:relative;overflow:hidden;
+      padding:20px;border-radius:26px;background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      transition:transform .24s ease, border-color .24s ease, box-shadow .24s ease;
+    }
+    .entry-card:hover{transform:translateY(-3px) scale(1.005);border-color:rgba(255,255,255,.16);box-shadow:0 16px 34px rgba(0,0,0,.24)}
+    .entry-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+    .entry-date{font-size:1.1rem;font-weight:700;letter-spacing:-.03em}
+    .entry-hours{
+      font-size:1.25rem;font-weight:800;letter-spacing:-.05em;
+      padding:10px 14px;border-radius:18px;background:rgba(242,140,98,.12);color:#ffd7c6;border:1px solid rgba(242,140,98,.22)
+    }
+    .entry-task{font-size:1rem;color:rgba(246,241,234,.9);margin-bottom:14px;max-width:70ch}
+    .entry-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+    .tags{display:flex;flex-wrap:wrap;gap:8px}
+    .tag{padding:8px 11px;border-radius:999px;background:var(--tag);font-size:.8rem;color:var(--muted);border:1px solid rgba(255,255,255,.06)}
+    .tag.completed{background:rgba(115,214,163,.12);color:#bcf1d3;border-color:rgba(115,214,163,.2)}
+    .tag.progress{background:rgba(201,139,255,.12);color:#e3cbff;border-color:rgba(201,139,255,.22)}
+    .entry-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+    .empty{
+      padding:46px 20px;text-align:center;border-radius:28px;
+      background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.1);color:var(--muted)
+    }
+    .empty strong{display:block;font-size:1.1rem;color:var(--text);margin-bottom:6px}
+
+    .insight-list{display:grid;gap:12px}
+    .insight-item{
+      padding:16px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)
+    }
+    .insight-item .k{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}
+    .insight-item .v{font-size:1.2rem;font-weight:700;letter-spacing:-.03em}
+
+    .modal{width:min(520px,100%)}
+    .modal h3{font-size:1.4rem;letter-spacing:-.03em;margin-bottom:18px}
+    .modal-actions{display:flex;gap:10px;margin-top:10px}
+    .modal-actions .btn{flex:1}
+
+    .toast-wrap{position:fixed;right:18px;bottom:18px;display:grid;gap:10px;z-index:60}
+    .toast{
+      min-width:280px;max-width:360px;padding:14px 16px;border-radius:18px;
+      background:rgba(14,15,22,.88);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(16px);
+      box-shadow:0 18px 40px rgba(0,0,0,.28);animation:toastIn .35s ease
+    }
+    .toast strong{display:block;margin-bottom:4px}
+    .toast p{color:var(--muted);font-size:.9rem}
+
+    .error{min-height:20px;color:#ffb0b0;font-size:.84rem;margin-top:4px}
+    .muted{color:var(--muted)}
+    .hidden{display:none!important}
+
+    @keyframes floatBlob{
+      0%,100%{transform:translate3d(0,0,0) scale(1)}
+      50%{transform:translate3d(18px,-22px,0) scale(1.07)}
+    }
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}
+    }
+    @keyframes growBar{from{height:10px;opacity:.2}to{opacity:1}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    @keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+    .reveal{animation:fadeUp .7s cubic-bezier(.18,.82,.24,1) both}
+    .delay-1{animation-delay:.05s}.delay-2{animation-delay:.1s}.delay-3{animation-delay:.15s}.delay-4{animation-delay:.2s}
+
+    @media (max-width:1080px){
+      .layout{grid-template-columns:1fr}
+      .hero-grid{grid-template-columns:1fr}
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:720px){
+      .container{padding:18px 14px 70px}
+      .topbar{top:10px;padding:12px 14px}
+      .toolbar{justify-content:flex-start}
+      .hero,.panel{padding:18px}
+      .hero h1{max-width:none}
+      .input-row,.grid-2,.search-row{grid-template-columns:1fr}
+      .stats-grid{grid-template-columns:1fr}
+      .entry-top,.entry-bottom,.entries-head{flex-direction:column;align-items:flex-start}
+      .lock-box,.modal{padding:24px}
+    }
+  </style>
 </head>
 <body>
+  <div class="noise"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
 
-<div class="lock-screen" id="lockScreen">
-  <div class="lock-box">
-    <div class="lock-icon" id="lockIcon">&#128274;</div>
-    <h1 id="lockTitle">Saturday Log</h1>
-    <p class="subtitle" id="lockSubtitle">Enter your password</p>
-    <input type="password" id="lockPassword" placeholder="password" autocomplete="off">
-    <input type="password" id="lockConfirm" placeholder="confirm password" autocomplete="off" style="display:none">
-    <div class="lock-error" id="lockError"></div>
-    <button class="btn btn-primary" id="lockBtn" onclick="handleLogin()">Unlock</button>
-    <p class="setup-note" id="setupNote" style="display:none">First time here. Pick a password you'll remember.</p>
-  </div>
-</div>
-
-<div class="app" id="app">
-  <div class="container">
-    <header>
-      <h1>Saturday Log</h1>
-      <p>Track the work you get done every Saturday</p>
-      <div class="header-actions">
-        <button class="link-btn" onclick="showChangePw()">Change password</button>
-        <button class="link-btn" onclick="logout()">Lock</button>
-      </div>
-    </header>
-
-    <div class="stats">
-      <div class="stat"><div class="stat-value" id="totalSats">0</div><div class="stat-label">Saturdays</div></div>
-      <div class="stat"><div class="stat-value" id="totalHours">0</div><div class="stat-label">Total Hours</div></div>
-      <div class="stat"><div class="stat-value" id="totalTasks">0</div><div class="stat-label">Tasks Done</div></div>
-      <div class="stat"><div class="stat-value" id="streak">0</div><div class="stat-label">Week Streak</div></div>
-    </div>
-
-    <div class="add-form">
-      <h2>&#9998; New Entry</h2>
-      <div class="form-row">
-        <div class="form-group"><label>Date (Saturday)</label><input type="date" id="entryDate"></div>
-        <div class="form-group"><label>Hours Spent</label><input type="number" id="entryHours" min="0.25" max="24" step="0.25" placeholder="e.g. 3"></div>
-      </div>
-      <div class="form-group" style="margin-bottom:14px"><label>What did you work on?</label><textarea id="entryTask" placeholder="Built the landing page, fixed auth bug..."></textarea></div>
-      <div class="form-row">
-        <div class="form-group"><label>Category</label>
-          <select id="entryCategory"><option value="coding">Coding</option><option value="design">Design</option><option value="writing">Writing</option><option value="learning">Learning</option><option value="admin">Admin</option><option value="other">Other</option></select>
+  <div class="lock-screen" id="lockScreen">
+    <div class="lock-shell reveal">
+      <div class="lock-box">
+        <div class="lock-badge">Private journal • secured access</div>
+        <h1 id="lockTitle">Saturday Log</h1>
+        <p id="lockSubtitle">A private, premium workspace for tracking the work you choose to do on Saturdays.</p>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="lockPassword" placeholder="Enter your password" autocomplete="off" />
         </div>
-        <div class="form-group"><label>Status</label>
-          <select id="entryStatus"><option value="completed">Completed</option><option value="in progress">In Progress</option></select>
+        <div class="input-group hidden" id="confirmWrap">
+          <label>Confirm Password</label>
+          <input type="password" id="lockConfirm" placeholder="Confirm password" autocomplete="off" />
+        </div>
+        <div class="error" id="lockError"></div>
+        <button class="btn btn-primary btn-icon" id="lockBtn" onclick="handleLogin()">Enter workspace</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app" id="app">
+    <div class="container">
+      <div class="topbar reveal">
+        <div class="brand">
+          <div class="brand-mark">✦</div>
+          <div class="brand-copy">
+            <strong>Saturday Log</strong>
+            <span>Elegant weekly tracking for focused work sessions</span>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-small btn-soft" onclick="showChangePw()">Change password</button>
+          <button class="btn btn-small btn-ghost" onclick="logout()">Lock workspace</button>
         </div>
       </div>
-      <button class="btn btn-primary" id="addBtn" onclick="addEntry()">Log It</button>
-    </div>
 
-    <div class="filter-bar">
-      <span>Show:</span>
-      <button class="filter-chip active" data-filter="all">All</button>
-      <button class="filter-chip" data-filter="coding">Coding</button>
-      <button class="filter-chip" data-filter="design">Design</button>
-      <button class="filter-chip" data-filter="writing">Writing</button>
-      <button class="filter-chip" data-filter="learning">Learning</button>
-      <button class="filter-chip" data-filter="admin">Admin</button>
-      <button class="filter-chip" data-filter="other">Other</button>
-    </div>
+      <section class="hero reveal delay-1">
+        <div class="hero-grid">
+          <div>
+            <div class="hero-kicker">Personal dashboard • premium edition</div>
+            <h1>Track your <em>best</em> Saturdays.</h1>
+            <p>More than a simple log. This workspace gives your Saturday effort a polished home, with richer visuals, smarter summaries, refined motion, and a higher-end editorial feel.</p>
+            <div class="hero-meta">
+              <div class="meta-pill">Private by default</div>
+              <div class="meta-pill">Weekly streak insights</div>
+              <div class="meta-pill">Fast edit & export</div>
+            </div>
+          </div>
+          <div class="hero-side">
+            <div class="mini-panel">
+              <div class="eyebrow">Hours trend</div>
+              <strong id="heroHours">0h</strong>
+              <div class="sparkline" id="sparkline"></div>
+            </div>
+            <div class="mini-panel">
+              <div class="eyebrow">Current focus</div>
+              <div class="muted" id="focusSummary">Start logging to unlock your weekly narrative.</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <div class="entries-section">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <h2>Your Saturdays</h2>
-        <button class="btn-export" onclick="exportData()">Export CSV</button>
+      <section class="stats-grid reveal delay-2">
+        <div class="stat-card"><div class="label">Saturdays logged</div><div class="value" id="totalSats">0</div><div class="sub">Unique tracked Saturdays</div><div class="stat-ring"></div></div>
+        <div class="stat-card"><div class="label">Total hours</div><div class="value" id="totalHours">0</div><div class="sub">All recorded effort</div><div class="stat-ring"></div></div>
+        <div class="stat-card"><div class="label">Completed tasks</div><div class="value" id="totalTasks">0</div><div class="sub">Marked done so far</div><div class="stat-ring"></div></div>
+        <div class="stat-card"><div class="label">Streak</div><div class="value" id="streak">0</div><div class="sub">Consecutive weeks</div><div class="stat-ring"></div></div>
+      </section>
+
+      <div class="layout">
+        <aside class="stack reveal delay-3">
+          <section class="panel">
+            <div class="panel-title">
+              <div>
+                <h2>New entry</h2>
+                <p>Log the work behind the progress.</p>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="input-group">
+                <label>Date</label>
+                <input type="date" id="entryDate">
+              </div>
+              <div class="input-group">
+                <label>Hours spent</label>
+                <input type="number" id="entryHours" min="0.25" max="24" step="0.25" placeholder="e.g. 3.5">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>What did you work on?</label>
+              <textarea id="entryTask" placeholder="Designed a cleaner onboarding flow, fixed auth edge-cases, wrote release notes, polished visuals..."></textarea>
+            </div>
+
+            <div class="grid-2">
+              <div class="input-group">
+                <label>Category</label>
+                <select id="entryCategory">
+                  <option value="coding">Coding</option>
+                  <option value="design">Design</option>
+                  <option value="writing">Writing</option>
+                  <option value="learning">Learning</option>
+                  <option value="admin">Admin</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Status</label>
+                <select id="entryStatus">
+                  <option value="completed">Completed</option>
+                  <option value="in progress">In Progress</option>
+                </select>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="addBtn" onclick="addEntry()">Log Saturday</button>
+          </section>
+
+          <section class="panel">
+            <div class="panel-title">
+              <div>
+                <h2>Insights</h2>
+                <p>Small signals from your data.</p>
+              </div>
+            </div>
+            <div class="insight-list">
+              <div class="insight-item">
+                <div class="k">Most active category</div>
+                <div class="v" id="insightCategory">—</div>
+              </div>
+              <div class="insight-item">
+                <div class="k">Average hours / Saturday</div>
+                <div class="v" id="insightAverage">—</div>
+              </div>
+              <div class="insight-item">
+                <div class="k">Latest entry status</div>
+                <div class="v" id="insightLatest">—</div>
+              </div>
+            </div>
+          </section>
+        </aside>
+
+        <main class="stack reveal delay-4">
+          <section class="panel">
+            <div class="panel-title">
+              <div>
+                <h2>Your Saturdays</h2>
+                <p>Filter, search, review, and export.</p>
+              </div>
+              <button class="btn btn-small btn-soft" onclick="exportData()">Export CSV</button>
+            </div>
+
+            <div class="filter-wrap">
+              <div class="filter-chips">
+                <button class="chip active" data-filter="all">All</button>
+                <button class="chip" data-filter="coding">Coding</button>
+                <button class="chip" data-filter="design">Design</button>
+                <button class="chip" data-filter="writing">Writing</button>
+                <button class="chip" data-filter="learning">Learning</button>
+                <button class="chip" data-filter="admin">Admin</button>
+                <button class="chip" data-filter="other">Other</button>
+              </div>
+
+              <div class="search-row">
+                <input type="search" id="searchInput" placeholder="Search tasks, dates, categories..." />
+                <button class="btn btn-small btn-ghost" onclick="clearSearch()">Clear</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="entries-head">
+              <div>
+                <h2>Entries</h2>
+                <div class="entries-meta" id="entryCountText">0 results</div>
+              </div>
+            </div>
+            <div class="entries-list" id="entriesList"></div>
+          </section>
+        </main>
       </div>
-      <div id="entriesList"></div>
     </div>
   </div>
-</div>
 
-<div class="modal-overlay hidden" id="changePwModal">
-  <div class="modal">
-    <h3>Change Password</h3>
-    <input type="password" id="cpOld" placeholder="Current password">
-    <input type="password" id="cpNew" placeholder="New password">
-    <div class="lock-error" id="cpError"></div>
-    <div class="modal-actions">
-      <button class="btn btn-cancel" onclick="hideChangePw()">Cancel</button>
-      <button class="btn btn-primary" style="width:auto" onclick="changePassword()">Save</button>
+  <div class="modal-overlay hidden" id="changePwModal">
+    <div class="modal">
+      <h3>Change password</h3>
+      <div class="input-group">
+        <label>Current password</label>
+        <input type="password" id="cpOld" placeholder="Current password">
+      </div>
+      <div class="input-group">
+        <label>New password</label>
+        <input type="password" id="cpNew" placeholder="New password">
+      </div>
+      <div class="error" id="cpError"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="hideChangePw()">Cancel</button>
+        <button class="btn btn-primary" onclick="changePassword()">Save changes</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="modal-overlay hidden" id="editModal">
-  <div class="modal" style="width:420px">
-    <h3>Edit Entry</h3>
-    <input type="hidden" id="editId">
-    <div style="display:flex;gap:12px;margin-bottom:10px">
-      <div style="flex:1;display:flex;flex-direction:column">
-        <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Date</label>
-        <input type="date" id="editDate">
+  <div class="modal-overlay hidden" id="editModal">
+    <div class="modal">
+      <h3>Edit entry</h3>
+      <input type="hidden" id="editId">
+      <div class="input-row">
+        <div class="input-group">
+          <label>Date</label>
+          <input type="date" id="editDate">
+        </div>
+        <div class="input-group">
+          <label>Hours</label>
+          <input type="number" id="editHours" min="0.25" max="24" step="0.25">
+        </div>
       </div>
-      <div style="flex:1;display:flex;flex-direction:column">
-        <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Hours</label>
-        <input type="number" id="editHours" min="0.25" max="24" step="0.25">
+      <div class="input-group">
+        <label>Task</label>
+        <textarea id="editTask"></textarea>
       </div>
-    </div>
-    <div style="margin-bottom:10px;display:flex;flex-direction:column">
-      <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Task</label>
-      <textarea id="editTask" style="min-height:60px"></textarea>
-    </div>
-    <div style="display:flex;gap:12px;margin-bottom:10px">
-      <div style="flex:1;display:flex;flex-direction:column">
-        <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Category</label>
-        <select id="editCategory"><option value="coding">Coding</option><option value="design">Design</option><option value="writing">Writing</option><option value="learning">Learning</option><option value="admin">Admin</option><option value="other">Other</option></select>
+      <div class="grid-2">
+        <div class="input-group">
+          <label>Category</label>
+          <select id="editCategory">
+            <option value="coding">Coding</option>
+            <option value="design">Design</option>
+            <option value="writing">Writing</option>
+            <option value="learning">Learning</option>
+            <option value="admin">Admin</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Status</label>
+          <select id="editStatus">
+            <option value="completed">Completed</option>
+            <option value="in progress">In Progress</option>
+          </select>
+        </div>
       </div>
-      <div style="flex:1;display:flex;flex-direction:column">
-        <label style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-light);margin-bottom:6px;font-weight:600">Status</label>
-        <select id="editStatus"><option value="completed">Completed</option><option value="in progress">In Progress</option></select>
+      <div class="error" id="editError"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="hideEdit()">Cancel</button>
+        <button class="btn btn-primary" id="editSaveBtn" onclick="saveEdit()">Save entry</button>
       </div>
-    </div>
-    <div class="lock-error" id="editError"></div>
-    <div class="modal-actions">
-      <button class="btn btn-cancel" onclick="hideEdit()">Cancel</button>
-      <button class="btn btn-primary" style="width:auto" id="editSaveBtn" onclick="saveEdit()">Save</button>
     </div>
   </div>
-</div>
 
-<script>
-const WORKER_URL = 'https://st.vkrishnaanand.workers.dev';
+  <div class="toast-wrap" id="toastWrap"></div>
 
-let token = null;
-let entries = [];
-let activeFilter = 'all';
+  <script>
+    const WORKER_URL = 'https://st.vkrishnaanand.workers.dev';
 
-function api(path, opts = {}) {
-  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
-  if (token) headers['Authorization'] = 'Bearer ' + token;
-  return fetch(WORKER_URL + path, { ...opts, headers });
-}
+    let token = null;
+    let entries = [];
+    let activeFilter = 'all';
+    let searchTerm = '';
 
-async function checkSetup() {
-  try {
-    const res = await api('/api/has-password');
-    const data = await res.json();
-    if (!data.hasPassword) {
-      document.getElementById('lockIcon').innerHTML = '&#128075;';
-      document.getElementById('lockTitle').textContent = 'Welcome';
-      document.getElementById('lockSubtitle').textContent = 'Set up your password';
-      document.getElementById('lockConfirm').style.display = '';
-      document.getElementById('lockBtn').textContent = 'Create & Enter';
-      document.getElementById('setupNote').style.display = '';
+    const $ = id => document.getElementById(id);
+
+    function showToast(title, message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<strong>${title}</strong><p>${message}</p>`;
+      $('toastWrap').appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 260);
+      }, 2600);
     }
-  } catch (e) {
-    document.getElementById('lockError').textContent = 'Cannot reach server. Check WORKER_URL.';
-  }
-}
 
-async function handleLogin() {
-  const pw = document.getElementById('lockPassword').value;
-  const confirm = document.getElementById('lockConfirm');
-  const errEl = document.getElementById('lockError');
-  const btn = document.getElementById('lockBtn');
-
-  if (!pw) { errEl.textContent = 'Type a password.'; return; }
-
-  if (confirm.style.display !== 'none') {
-    if (pw !== confirm.value) {
-      errEl.textContent = "Passwords don't match.";
-      confirm.classList.add('shake');
-      setTimeout(() => confirm.classList.remove('shake'), 400);
-      return;
+    function api(path, opts = {}) {
+      const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      return fetch(WORKER_URL + path, { ...opts, headers });
     }
-    btn.disabled = true; btn.textContent = 'Setting up...';
-    try {
-      const res = await api('/api/setup', { method: 'POST', body: JSON.stringify({ password: pw }) });
-      const data = await res.json();
-      btn.disabled = false;
-      if (data.ok) { token = data.token; unlock(); }
-      else { errEl.textContent = data.error; btn.textContent = 'Create & Enter'; }
-    } catch { btn.disabled = false; errEl.textContent = 'Network error'; btn.textContent = 'Create & Enter'; }
-    return;
-  }
 
-  btn.disabled = true; btn.textContent = 'Checking...';
-  try {
-    const res = await api('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) });
-    const data = await res.json();
-    btn.disabled = false; btn.textContent = 'Unlock';
-    if (data.ok) { token = data.token; unlock(); }
-    else {
-      errEl.textContent = 'Wrong password.';
-      document.getElementById('lockPassword').classList.add('shake');
-      setTimeout(() => document.getElementById('lockPassword').classList.remove('shake'), 400);
+    async function checkSetup() {
+      try {
+        const res = await api('/api/has-password');
+        const data = await res.json();
+        if (!data.hasPassword) {
+          $('lockTitle').textContent = 'Welcome';
+          $('lockSubtitle').textContent = 'Create a password to unlock your private Saturday workspace.';
+          $('confirmWrap').classList.remove('hidden');
+          $('lockBtn').textContent = 'Create workspace';
+        }
+      } catch (e) {
+        $('lockError').textContent = 'Cannot reach server. Check WORKER_URL.';
+      }
     }
-  } catch { btn.disabled = false; btn.textContent = 'Unlock'; errEl.textContent = 'Network error'; }
-}
 
-document.getElementById('lockPassword').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
-document.getElementById('lockConfirm').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+    async function handleLogin() {
+      const pw = $('lockPassword').value.trim();
+      const confirmVisible = !$('confirmWrap').classList.contains('hidden');
+      const confirm = $('lockConfirm').value.trim();
+      const btn = $('lockBtn');
+      const errEl = $('lockError');
+      errEl.textContent = '';
 
-function unlock() {
-  document.getElementById('lockScreen').classList.add('hidden');
-  document.getElementById('app').classList.add('visible');
-  loadEntries();
-}
+      if (!pw) { errEl.textContent = 'Type a password.'; return; }
 
-function logout() {
-  token = null;
-  document.getElementById('lockScreen').classList.remove('hidden');
-  document.getElementById('app').classList.remove('visible');
-  document.getElementById('lockPassword').value = '';
-  document.getElementById('lockError').textContent = '';
-}
+      if (confirmVisible) {
+        if (pw !== confirm) {
+          errEl.textContent = "Passwords don't match.";
+          $('lockConfirm').style.animation = 'shake .4s ease';
+          setTimeout(() => $('lockConfirm').style.animation = '', 400);
+          return;
+        }
+        btn.disabled = true; btn.textContent = 'Creating...';
+        try {
+          const res = await api('/api/setup', { method: 'POST', body: JSON.stringify({ password: pw }) });
+          const data = await res.json();
+          btn.disabled = false; btn.textContent = 'Create workspace';
+          if (data.ok) { token = data.token; unlock(); showToast('Workspace ready', 'Password created successfully.'); }
+          else errEl.textContent = data.error || 'Setup failed.';
+        } catch {
+          btn.disabled = false; btn.textContent = 'Create workspace'; errEl.textContent = 'Network error';
+        }
+        return;
+      }
 
-async function loadEntries() {
-  const res = await api('/api/entries');
-  const data = await res.json();
-  entries = data.entries || [];
-  render();
-}
+      btn.disabled = true; btn.textContent = 'Checking...';
+      try {
+        const res = await api('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) });
+        const data = await res.json();
+        btn.disabled = false; btn.textContent = 'Enter workspace';
+        if (data.ok) { token = data.token; unlock(); showToast('Welcome back', 'Your workspace is ready.'); }
+        else {
+          errEl.textContent = 'Wrong password.';
+          $('lockPassword').style.animation = 'shake .4s ease';
+          setTimeout(() => $('lockPassword').style.animation = '', 400);
+        }
+      } catch {
+        btn.disabled = false; btn.textContent = 'Enter workspace'; errEl.textContent = 'Network error';
+      }
+    }
 
-function getLastSaturday() {
-  const d = new Date();
-  d.setDate(d.getDate() - ((d.getDay() + 1) % 7));
-  return d.toISOString().split('T')[0];
-}
-document.getElementById('entryDate').value = getLastSaturday();
+    function unlock() {
+      $('lockScreen').classList.add('hidden');
+      $('app').classList.add('visible');
+      loadEntries();
+    }
 
-document.querySelectorAll('.filter-chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeFilter = chip.dataset.filter;
-    render();
-  });
-});
+    function logout() {
+      token = null;
+      $('lockScreen').classList.remove('hidden');
+      $('app').classList.remove('visible');
+      $('lockPassword').value = '';
+      $('lockError').textContent = '';
+      showToast('Workspace locked', 'Your private log is hidden again.');
+    }
 
-async function addEntry() {
-  const date = document.getElementById('entryDate').value;
-  const hours = parseFloat(document.getElementById('entryHours').value);
-  const task = document.getElementById('entryTask').value.trim();
-  const category = document.getElementById('entryCategory').value;
-  const status = document.getElementById('entryStatus').value;
+    async function loadEntries() {
+      try {
+        const res = await api('/api/entries');
+        const data = await res.json();
+        entries = (data.entries || []).sort((a,b) => new Date(b.date) - new Date(a.date));
+        render();
+      } catch {
+        showToast('Error', 'Could not load entries.');
+      }
+    }
 
-  if (!date) return alert('Pick a date.');
-  if (!hours || hours <= 0) return alert('How many hours?');
-  if (!task) return alert('What did you work on?');
+    function getLastSaturday() {
+      const d = new Date();
+      d.setDate(d.getDate() - ((d.getDay() + 1) % 7));
+      return d.toISOString().split('T')[0];
+    }
+    $('entryDate').value = getLastSaturday();
 
-  const dayOfWeek = new Date(date + 'T12:00:00').getDay();
-  if (dayOfWeek !== 6 && !confirm("That's not a Saturday. Log it anyway?")) return;
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        activeFilter = chip.dataset.filter;
+        render();
+      });
+    });
 
-  const btn = document.getElementById('addBtn');
-  btn.disabled = true; btn.textContent = 'Saving...';
-  const res = await api('/api/entries', { method: 'POST', body: JSON.stringify({ entry: { date, hours, task, category, status } }) });
-  const data = await res.json();
-  btn.disabled = false; btn.textContent = 'Log It';
+    $('searchInput').addEventListener('input', e => {
+      searchTerm = e.target.value.trim().toLowerCase();
+      render();
+    });
 
-  if (data.ok) {
-    document.getElementById('entryHours').value = '';
-    document.getElementById('entryTask').value = '';
-    await loadEntries();
-  } else { alert(data.error || 'Failed to save'); }
-}
+    function clearSearch() {
+      $('searchInput').value = '';
+      searchTerm = '';
+      render();
+    }
 
-async function deleteEntry(id) {
-  if (!confirm('Delete this entry?')) return;
-  await api('/api/entries/' + id, { method: 'DELETE' });
-  await loadEntries();
-}
+    async function addEntry() {
+      const date = $('entryDate').value;
+      const hours = parseFloat($('entryHours').value);
+      const task = $('entryTask').value.trim();
+      const category = $('entryCategory').value;
+      const status = $('entryStatus').value;
 
-function calcStreak() {
-  if (!entries.length) return 0;
-  const sats = [...new Set(entries.map(e => e.date))].sort().reverse();
-  let s = 1;
-  for (let i = 0; i < sats.length - 1; i++) {
-    const diff = (new Date(sats[i] + 'T12:00:00') - new Date(sats[i + 1] + 'T12:00:00')) / 864e5;
-    if (diff === 7) s++; else break;
-  }
-  return s;
-}
+      if (!date) return showToast('Missing date', 'Pick a date first.');
+      if (!hours || hours <= 0) return showToast('Missing hours', 'Add how many hours you spent.');
+      if (!task) return showToast('Missing task', 'Write what you worked on.');
 
-function formatDate(d) {
-  return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-}
+      const dayOfWeek = new Date(date + 'T12:00:00').getDay();
+      if (dayOfWeek !== 6 && !confirm("That date isn't a Saturday. Log it anyway?")) return;
 
-function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+      const btn = $('addBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
 
-function render() {
-  document.getElementById('totalSats').textContent = new Set(entries.map(e => e.date)).size;
-  document.getElementById('totalHours').textContent = entries.reduce((s, e) => s + e.hours, 0);
-  document.getElementById('totalTasks').textContent = entries.filter(e => e.status === 'completed').length;
-  document.getElementById('streak').textContent = calcStreak();
+      try {
+        const res = await api('/api/entries', { method: 'POST', body: JSON.stringify({ entry: { date, hours, task, category, status } }) });
+        const data = await res.json();
+        btn.disabled = false; btn.textContent = 'Log Saturday';
+        if (data.ok) {
+          $('entryHours').value = '';
+          $('entryTask').value = '';
+          await loadEntries();
+          showToast('Saved', 'Your Saturday entry was added.');
+        } else {
+          showToast('Could not save', data.error || 'Please try again.');
+        }
+      } catch {
+        btn.disabled = false; btn.textContent = 'Log Saturday';
+        showToast('Network error', 'Something went wrong while saving.');
+      }
+    }
 
-  const list = document.getElementById('entriesList');
-  const filtered = activeFilter === 'all' ? entries : entries.filter(e => e.category === activeFilter);
+    async function deleteEntry(id) {
+      if (!confirm('Delete this entry?')) return;
+      try {
+        await api('/api/entries/' + id, { method: 'DELETE' });
+        await loadEntries();
+        showToast('Deleted', 'The entry has been removed.');
+      } catch {
+        showToast('Error', 'Could not delete the entry.');
+      }
+    }
 
-  if (!filtered.length) {
-    list.innerHTML = '<div class="empty-state"><div class="icon">&#128221;</div><p>' +
-      (activeFilter === 'all' ? 'No entries yet. Log your first Saturday!' : 'Nothing here yet.') + '</p></div>';
-    return;
-  }
+    function calcStreak() {
+      if (!entries.length) return 0;
+      const sats = [...new Set(entries.map(e => e.date))].sort().reverse();
+      let s = 1;
+      for (let i = 0; i < sats.length - 1; i++) {
+        const diff = (new Date(sats[i] + 'T12:00:00') - new Date(sats[i + 1] + 'T12:00:00')) / 864e5;
+        if (diff === 7) s++; else break;
+      }
+      return s;
+    }
 
-  list.innerHTML = filtered.map(e =>
-    '<div class="entry-card"><div class="entry-header"><div class="entry-date">' + formatDate(e.date) +
-    '</div><div class="entry-hours">' + e.hours + 'h</div></div><div class="entry-task">' + esc(e.task) +
-    '</div><div class="entry-footer"><div class="entry-tags"><span class="tag">' + e.category +
-    '</span><span class="tag ' + (e.status === 'completed' ? 'completed' : '') + '">' + e.status +
-    '</span></div><div class="entry-actions"><button class="btn btn-small btn-edit" onclick="showEdit(' + e.id + ')">Edit</button><button class="btn btn-small btn-delete" onclick="deleteEntry(' + e.id + ')">Delete</button></div></div></div>'
-  ).join('');
-}
+    function formatDate(d) {
+      return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    }
 
-function showEdit(id) {
-  const e = entries.find(x => x.id === id);
-  if (!e) return;
-  document.getElementById('editId').value = id;
-  document.getElementById('editDate').value = e.date;
-  document.getElementById('editHours').value = e.hours;
-  document.getElementById('editTask').value = e.task;
-  document.getElementById('editCategory').value = e.category;
-  document.getElementById('editStatus').value = e.status;
-  document.getElementById('editError').textContent = '';
-  document.getElementById('editModal').classList.remove('hidden');
-}
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
 
-function hideEdit() { document.getElementById('editModal').classList.add('hidden'); }
+    function getFilteredEntries() {
+      return entries.filter(e => {
+        const matchesFilter = activeFilter === 'all' || e.category === activeFilter;
+        const haystack = `${e.task} ${e.category} ${e.status} ${e.date}`.toLowerCase();
+        const matchesSearch = !searchTerm || haystack.includes(searchTerm);
+        return matchesFilter && matchesSearch;
+      });
+    }
 
-async function saveEdit() {
-  const id = parseInt(document.getElementById('editId').value);
-  const date = document.getElementById('editDate').value;
-  const hours = parseFloat(document.getElementById('editHours').value);
-  const task = document.getElementById('editTask').value.trim();
-  const category = document.getElementById('editCategory').value;
-  const status = document.getElementById('editStatus').value;
-  const errEl = document.getElementById('editError');
+    function buildSparkline() {
+      const holder = $('sparkline');
+      holder.innerHTML = '';
+      const lastSix = [...entries].slice(0, 6).reverse();
+      const vals = lastSix.map(e => Math.max(10, Math.round(e.hours * 12)));
+      if (!vals.length) {
+        [18,30,24,42,35,48].forEach(v => vals.push(v));
+      }
+      vals.forEach((v, i) => {
+        const bar = document.createElement('span');
+        bar.style.height = v + 'px';
+        bar.style.animationDelay = `${i * .06}s`;
+        holder.appendChild(bar);
+      });
+    }
 
-  if (!date) { errEl.textContent = 'Pick a date.'; return; }
-  if (!hours || hours <= 0) { errEl.textContent = 'How many hours?'; return; }
-  if (!task) { errEl.textContent = 'What did you work on?'; return; }
+    function renderInsights() {
+      if (!entries.length) {
+        $('insightCategory').textContent = 'No data yet';
+        $('insightAverage').textContent = '—';
+        $('insightLatest').textContent = '—';
+        $('focusSummary').textContent = 'Start logging to unlock your weekly narrative.';
+        $('heroHours').textContent = '0h';
+        buildSparkline();
+        return;
+      }
 
-  const btn = document.getElementById('editSaveBtn');
-  btn.disabled = true; btn.textContent = 'Saving...';
-  const res = await api('/api/entries/' + id, { method: 'PUT', body: JSON.stringify({ entry: { date, hours, task, category, status } }) });
-  const data = await res.json();
-  btn.disabled = false; btn.textContent = 'Save';
+      const categoryCounts = entries.reduce((acc, e) => {
+        acc[e.category] = (acc[e.category] || 0) + 1;
+        return acc;
+      }, {});
+      const topCategory = Object.entries(categoryCounts).sort((a,b) => b[1] - a[1])[0]?.[0] || '—';
+      const uniqueSats = new Set(entries.map(e => e.date)).size || 1;
+      const avg = (entries.reduce((s,e) => s + Number(e.hours || 0), 0) / uniqueSats).toFixed(1);
+      const latest = entries[0];
+      const totalHours = entries.reduce((s,e) => s + Number(e.hours || 0), 0);
 
-  if (data.ok) { hideEdit(); await loadEntries(); }
-  else { errEl.textContent = data.error || 'Failed to save'; }
-}
+      $('insightCategory').textContent = topCategory[0].toUpperCase() + topCategory.slice(1);
+      $('insightAverage').textContent = `${avg}h`;
+      $('insightLatest').textContent = latest.status === 'completed' ? 'Completed' : 'In Progress';
+      $('focusSummary').textContent = `Most of your recent effort has gone into ${topCategory}. Keep the streak alive.`;
+      $('heroHours').textContent = `${Number(totalHours).toFixed(totalHours % 1 ? 1 : 0)}h`;
+      buildSparkline();
+    }
 
-function exportData() {
-  if (!entries.length) return alert('Nothing to export.');
-  const rows = [['Date','Hours','Task','Category','Status']];
-  entries.forEach(e => rows.push([e.date, e.hours, '"' + e.task.replace(/"/g,'""') + '"', e.category, e.status]));
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' }));
-  a.download = 'saturday_log.csv';
-  a.click();
-}
+    function render() {
+      const totalSats = new Set(entries.map(e => e.date)).size;
+      const totalHours = entries.reduce((s, e) => s + Number(e.hours || 0), 0);
+      const totalTasks = entries.filter(e => e.status === 'completed').length;
 
-function showChangePw() { document.getElementById('changePwModal').classList.remove('hidden'); document.getElementById('cpOld').value = ''; document.getElementById('cpNew').value = ''; document.getElementById('cpError').textContent = ''; }
-function hideChangePw() { document.getElementById('changePwModal').classList.add('hidden'); }
+      $('totalSats').textContent = totalSats;
+      $('totalHours').textContent = Number(totalHours).toFixed(totalHours % 1 ? 1 : 0);
+      $('totalTasks').textContent = totalTasks;
+      $('streak').textContent = calcStreak();
 
-async function changePassword() {
-  const old = document.getElementById('cpOld').value;
-  const nw = document.getElementById('cpNew').value;
-  const err = document.getElementById('cpError');
-  if (!old || !nw) { err.textContent = 'Fill in both fields.'; return; }
-  const res = await api('/api/change-password', { method: 'POST', body: JSON.stringify({ oldPassword: old, newPassword: nw }) });
-  const data = await res.json();
-  if (data.ok) { hideChangePw(); alert('Password changed!'); } else { err.textContent = data.error || 'Failed'; }
-}
+      renderInsights();
 
-checkSetup();
-</script>
+      const filtered = getFilteredEntries();
+      $('entryCountText').textContent = `${filtered.length} result${filtered.length === 1 ? '' : 's'}`;
+
+      const list = $('entriesList');
+      if (!filtered.length) {
+        list.innerHTML = `
+          <div class="empty">
+            <strong>No entries found</strong>
+            <p>${searchTerm || activeFilter !== 'all' ? 'Try changing your filter or search.' : 'Log your first Saturday and the timeline begins here.'}</p>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(e => `
+        <article class="entry-card">
+          <div class="entry-top">
+            <div>
+              <div class="entry-date">${formatDate(e.date)}</div>
+              <div class="muted">A curated snapshot of what you worked on.</div>
+            </div>
+            <div class="entry-hours">${e.hours}h</div>
+          </div>
+          <div class="entry-task">${esc(e.task)}</div>
+          <div class="entry-bottom">
+            <div class="tags">
+              <span class="tag">${e.category}</span>
+              <span class="tag ${e.status === 'completed' ? 'completed' : 'progress'}">${e.status}</span>
+            </div>
+            <div class="entry-actions">
+              <button class="btn btn-small btn-soft" onclick="showEdit(${e.id})">Edit</button>
+              <button class="btn btn-small btn-danger" onclick="deleteEntry(${e.id})">Delete</button>
+            </div>
+          </div>
+        </article>`).join('');
+    }
+
+    function showEdit(id) {
+      const e = entries.find(x => x.id === id);
+      if (!e) return;
+      $('editId').value = id;
+      $('editDate').value = e.date;
+      $('editHours').value = e.hours;
+      $('editTask').value = e.task;
+      $('editCategory').value = e.category;
+      $('editStatus').value = e.status;
+      $('editError').textContent = '';
+      $('editModal').classList.remove('hidden');
+    }
+
+    function hideEdit() { $('editModal').classList.add('hidden'); }
+
+    async function saveEdit() {
+      const id = parseInt($('editId').value, 10);
+      const date = $('editDate').value;
+      const hours = parseFloat($('editHours').value);
+      const task = $('editTask').value.trim();
+      const category = $('editCategory').value;
+      const status = $('editStatus').value;
+      const errEl = $('editError');
+      errEl.textContent = '';
+
+      if (!date) { errEl.textContent = 'Pick a date.'; return; }
+      if (!hours || hours <= 0) { errEl.textContent = 'Enter valid hours.'; return; }
+      if (!task) { errEl.textContent = 'Describe the task.'; return; }
+
+      const btn = $('editSaveBtn');
+      btn.disabled = true; btn.textContent = 'Saving...';
+      try {
+        const res = await api('/api/entries/' + id, { method: 'PUT', body: JSON.stringify({ entry: { date, hours, task, category, status } }) });
+        const data = await res.json();
+        btn.disabled = false; btn.textContent = 'Save entry';
+        if (data.ok) {
+          hideEdit();
+          await loadEntries();
+          showToast('Updated', 'Your entry was saved.');
+        } else {
+          errEl.textContent = data.error || 'Failed to save.';
+        }
+      } catch {
+        btn.disabled = false; btn.textContent = 'Save entry';
+        errEl.textContent = 'Network error';
+      }
+    }
+
+    function exportData() {
+      if (!entries.length) return showToast('Nothing to export', 'Add some entries first.');
+      const rows = [['Date','Hours','Task','Category','Status']];
+      entries.forEach(e => rows.push([e.date, e.hours, '"' + String(e.task).replace(/"/g,'""') + '"', e.category, e.status]));
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([rows.map(r => r.join(',')).join('\n')], { type: 'text/csv' }));
+      a.download = 'saturday_log.csv';
+      a.click();
+      showToast('Export started', 'CSV download is ready.');
+    }
+
+    function showChangePw() {
+      $('changePwModal').classList.remove('hidden');
+      $('cpOld').value = '';
+      $('cpNew').value = '';
+      $('cpError').textContent = '';
+    }
+    function hideChangePw() { $('changePwModal').classList.add('hidden'); }
+
+    async function changePassword() {
+      const old = $('cpOld').value;
+      const nw = $('cpNew').value;
+      const err = $('cpError');
+      err.textContent = '';
+      if (!old || !nw) { err.textContent = 'Fill in both fields.'; return; }
+      try {
+        const res = await api('/api/change-password', { method: 'POST', body: JSON.stringify({ oldPassword: old, newPassword: nw }) });
+        const data = await res.json();
+        if (data.ok) { hideChangePw(); showToast('Password updated', 'Your new password has been saved.'); }
+        else err.textContent = data.error || 'Failed';
+      } catch {
+        err.textContent = 'Network error';
+      }
+    }
+
+    $('lockPassword').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+    $('lockConfirm').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+
+    window.addEventListener('mousemove', e => {
+      const glow = $('cursorGlow');
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.add('hidden');
+      });
+    });
+
+    checkSetup();
+  </script>
 </body>
 </html>
