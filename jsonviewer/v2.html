@@ -1031,40 +1031,83 @@ function undoEdit() {
 // ==================== ADD / DELETE ROWS ====================
 function addRow() {
   const newRow = {};
-  allColumns.forEach(col => newRow[col] = null);
-  jsonData.push(newRow);
-  applyFilters();
-  toast('Row added', 'success');
 
-  // Scroll to bottom
+  allColumns.forEach(col => {
+    newRow[col] = null;
+  });
+
+  jsonData.push(newRow);
+
+  // Update the JSON text panel
+  document.getElementById('jsonInput').value =
+    JSON.stringify(jsonData, null, 2);
+
+  updateStatus();
+
+  // Everything is now synced
+  editHistory = [];
+  dirtyCells.clear();
+  updateEditUI();
+
+  applyFilters();
+
+  toast('Row added and JSON updated', 'success');
+
   const scroll = document.getElementById('tableScroll');
-  const ps = parseInt(document.getElementById('pageSize').value);
-  if (ps > 0) {
-    const totalPages = Math.ceil(filteredData.length / ps);
-    currentPage = totalPages;
+  const pageSize = parseInt(
+    document.getElementById('pageSize').value
+  );
+
+  if (pageSize > 0) {
+    currentPage = Math.ceil(filteredData.length / pageSize);
     renderTable();
   }
-  setTimeout(() => scroll.scrollTop = scroll.scrollHeight, 50);
-}
 
+  setTimeout(() => {
+    scroll.scrollTop = scroll.scrollHeight;
+  }, 50);
+}
 function deleteRow(ri) {
   if (!confirm(`Delete row ${ri + 1}?`)) return;
+
   jsonData.splice(ri, 1);
-  // Clean up edit history and dirty cells referencing this row
-  editHistory = editHistory.filter(e => e.ri !== ri).map(e => {
-    if (e.ri > ri) e.ri--;
-    return e;
-  });
+
+  editHistory = editHistory
+    .filter(e => e.ri !== ri)
+    .map(e => {
+      if (e.ri > ri) e.ri--;
+      return e;
+    });
+
   const newDirty = new Set();
+
   dirtyCells.forEach(key => {
     const [r, c] = key.split(':');
     const rn = parseInt(r);
-    if (rn < ri) newDirty.add(key);
-    else if (rn > ri) newDirty.add(`${rn - 1}:${c}`);
+
+    if (rn < ri) {
+      newDirty.add(key);
+    } else if (rn > ri) {
+      newDirty.add(`${rn - 1}:${c}`);
+    }
   });
+
   dirtyCells = newDirty;
+
+  // Update the JSON text panel
+  document.getElementById('jsonInput').value =
+    JSON.stringify(jsonData, null, 2);
+
+  updateStatus();
+
+  // Everything is now synced
+  editHistory = [];
+  dirtyCells.clear();
+  updateEditUI();
+
   applyFilters();
-  toast('Row deleted', 'info');
+
+  toast('Row deleted and JSON updated', 'info');
 }
 
 // ==================== SYNC TO JSON ====================
