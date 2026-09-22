@@ -1,0 +1,6 @@
+# Serve this file at https://krishnaanalytics.in/robots.txt.
+# If a root robots.txt already exists, merge the sitemap line into it.
+User-agent: *
+Allow: /krishfinds/
+
+Sitemap: https://krishnaanalytics.in/krishfinds/sitemap.xml
