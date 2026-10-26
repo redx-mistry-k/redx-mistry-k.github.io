@@ -1,1 +1,26 @@
 
+# Keep only reviewed browser release artifacts in this directory.
+# Ignore rules do not protect secrets already tracked by Git or copied to a host.
+.env
+.env.*
+*.local.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.map
+node_modules/
+.dart_tool/
+.tool_state/
+.supabase/
+/lib/
+/test/
+/supabase/
+/android/
+/ios/
+/pubspec.yaml
+/pubspec.lock
+/package.json
+/package-lock.json
