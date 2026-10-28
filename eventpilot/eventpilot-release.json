@@ -1,0 +1,11 @@
+{
+  "builtAt": "2026-10-28T12:33:35.763Z",
+  "sourceCommit": "a36507a68e2ab0f352c95570380a4e92e5b72ec4",
+  "sourceDirty": false,
+  "flutterVersion": "3.47.5",
+  "publicConfiguration": {
+    "EVENTPILOT_ENVIRONMENT": "demo",
+    "EVENTPILOT_BACKEND": "demo",
+    "EVENTPILOT_PUBLIC_BASE_URL": "https://krishnaanalytics.in/eventpilot/"
+  }
+}
