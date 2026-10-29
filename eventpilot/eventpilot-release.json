@@ -1,11 +1,14 @@
 {
-  "builtAt": "2026-10-28T13:42:01.983Z",
-  "sourceCommit": "3e2f08c333853feb7305f3720619568b42055917",
+  "builtAt": "2026-10-29T11:51:28.501Z",
+  "sourceCommit": "bfb1d71b041fe080a622c894bfe279e160dafa4e",
   "sourceDirty": false,
   "flutterVersion": "3.47.5",
   "publicConfiguration": {
-    "EVENTPILOT_ENVIRONMENT": "demo",
-    "EVENTPILOT_BACKEND": "demo",
-    "EVENTPILOT_PUBLIC_BASE_URL": "https://krishnaanalytics.in/eventpilot/"
+    "EVENTPILOT_ENVIRONMENT": "production",
+    "EVENTPILOT_BACKEND": "supabase",
+    "EVENTPILOT_RELEASE_MODE": "connected_nonpayable",
+    "EVENTPILOT_PUBLIC_BASE_URL": "https://krishnaanalytics.in/eventpilot/",
+    "SUPABASE_URL": "https://dzyomryyjcooadwhhbom.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_WiHUWenNayIMVZoQEzRLXA_GGUlatky"
   }
 }
