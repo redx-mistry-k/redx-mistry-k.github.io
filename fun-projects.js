@@ -21,8 +21,18 @@ function updateDirectory() {
   });
   status.textContent = `${count} of ${entries.length} projects shown`;
   empty.hidden = count !== 0;
+  document.querySelectorAll('.tool-group').forEach(group => {
+    const groupEntries = [...group.querySelectorAll('.tool-entry')];
+    const visible = groupEntries.filter(entry => !entry.hidden).length;
+    group.hidden = visible === 0;
+    const label = group.querySelector('.group-heading .eyebrow');
+    const number = label.textContent.split(' / ')[0];
+    const countLabel = visible === groupEntries.length ? String(visible) : `${visible} of ${groupEntries.length}`;
+    label.textContent = `${number} / ${countLabel} tools`;
+  });
 }
 controls.hidden = false;
+updateDirectory();
 buttons.forEach(button => button.addEventListener('click', () => {
   category = button.dataset.filter;
   updateDirectory();
