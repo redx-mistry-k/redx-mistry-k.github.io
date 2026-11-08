@@ -52,31 +52,6 @@ This repository also contains a separate Node.js/Express app in [`clashviewer/`]
 | [`robots.txt`](robots.txt), [`sitemap.xml`](sitemap.xml) | Search crawler guidance for the portfolio pages |
 | [`resume.pdf`](resume.pdf) | Downloadable résumé |
 
-## Run locally
-
-The portfolio is static. Clone the repository and serve its root directory with any local HTTP server:
-
-```bash
-git clone https://github.com/redx-mistry-k/redx-mistry-k.github.io.git
-cd redx-mistry-k.github.io
-python -m http.server 8000
-```
-
-Open [http://localhost:8000/](http://localhost:8000/) for the portfolio or [http://localhost:8000/fun-projects.html](http://localhost:8000/fun-projects.html) for the project directory. Some standalone tools load libraries or fonts from external CDNs and need an internet connection. The `clashviewer/` Express app has its own [`package.json`](clashviewer/package.json) and is separate from this static-site setup.
-
-## GitHub Pages deployment
-
-The site files are at the repository root. To publish this layout, select **Settings → Pages → Build and deployment → Deploy from a branch**, then choose `main` and `/(root)` as the publishing source. GitHub Pages publishes that folder after changes are pushed to the selected branch; there is no site build command in this repository.
-
-The root [`CNAME`](CNAME) contains `krishnaanalytics.in`. The same domain must also be configured in the repository's Pages settings, with the appropriate DNS records at the domain provider. See GitHub's guides for [publishing from a branch](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) and [configuring a custom domain](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site).
-
-## Google Search Console
-
-After the site is deployed and the domain resolves:
-
-1. Add `krishnaanalytics.in` as a **Domain property** in [Google Search Console](https://search.google.com/search-console/) and verify ownership with the DNS TXT record Google provides.
-2. Confirm that `https://krishnaanalytics.in/robots.txt` and `https://krishnaanalytics.in/sitemap.xml` load, then submit `sitemap.xml` in Search Console's **Sitemaps** report.
-3. Use **URL Inspection** to check the homepage and project directory. Monitor **Pages** for indexing issues and **Performance** for search queries and clicks. Submission helps discovery but does not guarantee indexing or rankings.
 
 ## Contact
 
