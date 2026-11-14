@@ -4,9 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#090d15" />
-  <meta name="description" content="30 Days of Focus: a private, offline-friendly career accountability dashboard, November 14 to December 13, 2026." />
-  <title>FOCUS/30 — Your 30-day career challenge</title>
-  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTciIGZpbGw9IiMxMTE2MjkiLz48cmVjdCB4PSIxMyIgeT0iMTMiIHdpZHRoPSIxNyIgaGVpZ2h0PSIxNyIgcng9IjUiIGZpbGw9IiNhNzk2ZmYiLz48cmVjdCB4PSIzNCIgeT0iMTMiIHdpZHRoPSIxNyIgaGVpZ2h0PSIxNyIgcng9IjUiIGZpbGw9IiNhNzk2ZmYiIG9wYWNpdHk9Ii41OCIvPjxyZWN0IHg9IjEzIiB5PSIzNCIgd2lkdGg9IjE3IiBoZWlnaHQ9IjE3IiByeD0iNSIgZmlsbD0iI2E3OTZmZiIgb3BhY2l0eT0iLjU4Ii8+PHJlY3QgeD0iMzQiIHk9IjM0IiB3aWR0aD0iMTciIGhlaWdodD0iMTciIHJ4PSI1IiBmaWxsPSIjNzBmMGM1Ii8+PC9zdmc+Cg==" type="image/svg+xml" />
+  <meta name="description" content="FOCUS/30: set your own daily tasks, choose when to start, and track your progress for 30 days." />
+  <title>FOCUS/30 — Your 30-day challenge</title>
   <style>
 :root{color-scheme:dark;--bg:#090c13;--sidebar:#0d111b;--surface:#121825;--surface2:#151c2b;--surface3:#1a2333;--border:#252d3d;--border-subtle:#1e2533;--text:#f4f5fb;--muted:#9ca6bc;--faint:#6e7a92;--purple:#ad9bff;--purple-deep:#7664dd;--green:#74e9c1;--blue:#80bcff;--orange:#ffb67c;--shadow:0 24px 70px rgba(0,0,0,.16);--radius:20px}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:26px}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.4}a{color:inherit;text-decoration:none}svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex:none}.svg-sprite{position:absolute;width:0;height:0;overflow:hidden}::selection{background:#8f7af4;color:#fff}:focus-visible{outline:2px solid var(--purple);outline-offset:3px}input,textarea,select{min-width:0}input[type=date]{color-scheme:dark} .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
@@ -75,7 +74,40 @@
 @media(max-width:690px){.task-actions-bar{gap:9px}.task-actions-bar p{font-size:10px;max-width:160px}.task-actions-buttons{gap:5px}.compact-btn{font-size:10px;padding:7px 9px;min-height:32px}.compact-btn svg{width:13px;height:13px}.task-progress-head{margin-top:16px}.manage-task-list{padding:12px 16px 4px}.manage-task-row{align-items:flex-start;flex-direction:column;gap:10px}.manage-task-controls{align-self:flex-end}.manage-task-footer{padding:14px 17px 20px}.weekday-picks{gap:3px}.weekday-picks label span{font-size:10px;min-height:33px}.goal-title span{max-width:220px}}
 @media(max-width:390px){.task-actions-bar{align-items:flex-start;flex-direction:column}.task-actions-bar p{max-width:100%}.task-actions-buttons{width:100%}.task-actions-buttons>*{flex:1}}
 
-</style>
+/* V3: a challenge starts only when the user clicks Start. */
+[hidden]{display:none!important}
+.challenge-start-card{display:flex;gap:18px;align-items:center;padding:22px 25px;margin:16px 0 8px;border:1px solid #68619d;border-radius:17px;background:linear-gradient(115deg,#211d35,#151b2a 65%,#141e33);box-shadow:0 10px 45px rgba(0,0,0,.12)}
+.start-card-icon{display:grid;place-items:center;width:48px;height:48px;flex-shrink:0;border-radius:14px;background:#353050;color:#c2acff}
+.start-card-icon svg{width:26px;height:26px}
+.start-card-text{flex:1;min-width:0}
+.start-card-text .overline{margin:0 0 5px}
+.start-card-text h2{font-size:18px;letter-spacing:-.4px;margin:0 0 5px;color:#f4f2ff}
+.start-card-text p:not(.overline){font-size:12px;color:#acb9cf;line-height:1.6;margin:0 0 5px}
+.start-card-text>span{color:#bba9ff;font-weight:600;font-size:10px}
+.start-main-button{flex-shrink:0;white-space:nowrap}
+.challenge-active-bar{margin:14px 1px 6px;display:flex;align-items:center;justify-content:space-between;gap:15px;color:#a8b7d3;font-size:11px}
+.challenge-active-bar>span{display:flex;align-items:center;gap:7px}
+.challenge-active-bar svg{width:16px;height:16px;color:#a795ef}
+.start-dialog-intro{color:#c1cce1;font-size:12px;line-height:1.8;margin:0 0 16px}
+.carry-task-option{margin:18px 0 0;display:flex!important;align-items:flex-start;gap:11px;padding:13px;border:1px solid #37415e;border-radius:12px;background:#141b2b;cursor:pointer}
+.carry-task-option input{width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:#ae92ff}
+.carry-task-option span{display:flex;flex-direction:column;gap:5px}
+.carry-task-option strong{color:#f0ecff;font-size:12px}
+.carry-task-option small{color:#98a8c1;font-size:11px;line-height:1.55}
+.start-dialog-note{display:flex;align-items:flex-start;gap:10px;margin-top:13px;padding:12px;border-radius:10px;background:#202741}
+.start-dialog-note svg{width:18px;height:18px;color:#b3a5fb;flex:none;margin-top:2px}
+.start-dialog-note p{margin:0;color:#afbdd7;font-size:11px;line-height:1.6}
+.archive-list{max-height:54vh;overflow:auto;padding:15px 22px}
+.archive-entry{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid #293149}
+.archive-entry:last-child{border-bottom:0}
+.archive-details{display:flex;flex-direction:column;gap:6px;min-width:0}
+.archive-details strong{font-size:12px;color:#e7e9ff}
+.archive-details span{font-size:10px;color:#a1afc7;line-height:1.5}
+.archive-controls{display:flex;gap:7px;flex:none}
+.archive-bottom{border-top:1px solid #283246;display:flex;justify-content:space-between;gap:9px;color:#8494b0;font-size:10px;padding:15px 22px 20px}
+@media(max-width:760px){.challenge-start-card{flex-wrap:wrap;padding:20px 18px;gap:12px}.start-main-button{margin-left:0;width:100%;justify-content:center}.start-card-icon{width:40px;height:40px}.start-card-text{flex-basis:calc(100% - 60px)}.challenge-active-bar{align-items:flex-start;flex-wrap:wrap}.archive-entry{align-items:flex-start;flex-direction:column}.archive-controls{width:100%}.archive-controls button{flex:1}}
+
+  </style>
 
 </head>
 <body>
@@ -127,16 +159,16 @@
       <div class="side-pledge">
         <span class="mini-orbit"><svg><use href="#i-target"/></svg></span>
         <p class="side-pledge-title">ONE OBJECTIVE.</p>
-        <p>Land your next career opportunity. No new major projects for these 30 days.</p>
+        <p>Your goals. Your tasks. Thirty days of showing up for what matters.</p>
         <div class="side-pledge-bar"><span id="sidebarProgress"></span></div>
-        <span class="side-pledge-caption" id="sidebarProgressText">Day 1 of 30</span>
+        <span class="side-pledge-caption" id="sidebarProgressText">Choose when your challenge begins</span>
       </div>
       <button class="side-settings" id="settingsButton" type="button"><svg><use href="#i-settings"/></svg> Data & settings</button>
     </aside>
 
     <main class="main-content" id="overview">
       <header class="page-header">
-        <div class="eyebrow"><span class="live-dot"></span> YOUR CAREER RESET <span class="eyebrow-separator">/</span> 2026</div>
+        <div class="eyebrow"><span class="live-dot"></span> YOUR CAREER RESET <span class="eyebrow-separator">/</span> ON YOUR TERMS</div>
         <div class="header-actions">
           <span class="quiet-date" id="todayLabel"></span>
           <button class="icon-btn mobile-settings" id="mobileSettingsButton" type="button" aria-label="Data and settings" title="Data and settings"><svg><use href="#i-settings"/></svg></button>
@@ -147,10 +179,10 @@
       <section class="hero" aria-label="Challenge summary">
         <div class="hero-glow"></div>
         <div class="hero-copy">
-          <p class="hero-kicker"><span class="tiny-line"></span> NOV 14 – DEC 13, 2026</p>
+          <p class="hero-kicker"><span class="tiny-line"></span> <span id="heroKicker">30 DAYS, START WHEN YOU ARE READY</span></p>
           <h1>30 days.<br/><em>One direction.</em></h1>
           <p class="hero-sub">Small, consistent actions. A stronger career. Show up today, and let the results compound.</p>
-          <div class="hero-badges"><span><svg><use href="#i-target"/></svg> One career objective</span><span><svg><use href="#i-lock"/></svg> No new major projects</span></div>
+          <div class="hero-badges"><span><svg><use href="#i-target"/></svg> Your own tasks</span><span><svg><use href="#i-lock"/></svg> Focus on consistency</span></div>
         </div>
         <div class="hero-progress">
           <div class="progress-ring" id="heroRing" style="--ring-progress:0%">
@@ -160,6 +192,13 @@
         </div>
         <div class="hero-noise"></div>
       </section>
+
+      <section id="startCard" class="challenge-start-card" aria-label="Start your 30-day challenge" hidden>
+        <div class="start-card-icon"><svg><use href="#i-target"/></svg></div>
+        <div class="start-card-text"><p class="overline">NOT STARTED YET</p><h2>Your 30 days start when you decide.</h2><p>Build your tasks first, then start on a date you choose. Opening this website does not start the clock.</p><span id="startPreview">Preview dates are flexible.</span></div>
+        <button class="primary-btn start-main-button" id="startChallengeButton" type="button"><svg><use href="#i-check"/></svg> Start challenge</button>
+      </section>
+      <div id="activeChallengeBar" class="challenge-active-bar" hidden><span><svg><use href="#i-calendar"/></svg> <span id="activeRangeLabel">Active challenge</span></span><button class="outline-btn compact-btn" id="newChallengeButton" type="button">Start another 30 days</button></div>
 
       <section class="stats-grid" aria-label="Progress statistics">
         <div class="stat-card"><div class="stat-label">SELECTED DAY <svg><use href="#i-list"/></svg></div><div class="stat-figure"><strong id="statToday">0<span>/0</span></strong><span class="stat-hint" id="statTodayHint">Tasks done</span></div><div class="stat-foot"><span class="stat-small-dot dot-purple"></span> Your custom checklist</div></div>
@@ -199,7 +238,7 @@
       <section id="calendar" class="content-section anchor-section">
         <div class="section-header-row"><div><p class="overline">THE FULL JOURNEY</p><h2>30-day calendar<span class="heading-dot">.</span></h2><p class="section-desc">Your daily history at a glance. Select any day to view or update it.</p></div><div class="legend"><span><i class="legend-dot done"></i> Perfect day</span><span><i class="legend-dot partial"></i> In progress</span><span><i class="legend-dot upcoming"></i> Upcoming</span></div></div>
         <div class="panel calendar-panel">
-          <div class="calendar-toolbar"><span class="calendar-range">NOVEMBER 14 <span>→</span> DECEMBER 13</span><span class="calendar-mini" id="calendarSummary">0 of 30 perfect days</span></div>
+          <div class="calendar-toolbar"><span class="calendar-range" id="calendarRange">YOUR 30-DAY PLAN</span><span class="calendar-mini" id="calendarSummary">0 of 30 perfect days</span></div>
           <div class="weekday-header" aria-hidden="true"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div>
           <div class="calendar-grid" id="calendarGrid" aria-label="Select a challenge day"></div>
           <div class="calendar-bottom"><span><svg><use href="#i-info"/></svg> Dots show completed tasks for each day.</span><button id="calendarGoToday" class="text-button" type="button">Jump to today <svg><use href="#i-chevron-right"/></svg></button></div>
@@ -226,11 +265,30 @@
         </div>
       </section>
 
-      <footer class="site-footer"><div><span class="footer-logo">FOCUS<span>/30</span></span><span>Built for consistency, not perfection.</span></div><p>Nov 14 – Dec 13, 2026 <span>·</span> Your data stays in this browser unless you export it.</p></footer>
+      <footer class="site-footer"><div><span class="footer-logo">FOCUS<span>/30</span></span><span>Built for consistency, not perfection.</span></div><p><span id="footerDate">Challenge not started</span> <span>·</span> Your data stays in this browser unless you export it.</p></footer>
     </main>
   </div>
 
   <nav class="mobile-nav" aria-label="Mobile navigation"><a class="active" href="#overview"><svg><use href="#i-grid"/></svg><span>Home</span></a><a href="#calendar"><svg><use href="#i-calendar"/></svg><span>Calendar</span></a><a href="#applications"><svg><use href="#i-briefcase"/></svg><span>Jobs</span></a><a href="#review"><svg><use href="#i-book"/></svg><span>Review</span></a></nav>
+
+  <dialog class="modal" id="startDialog" aria-labelledby="startDialogTitle">
+    <form id="startForm">
+      <div class="modal-header"><div><p class="overline">BEGIN ON YOUR TERMS</p><h2 id="startDialogTitle">Start your 30 days</h2></div><button class="icon-btn" id="closeStartDialog" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+      <div class="modal-body">
+        <p id="startDialogIntro" class="start-dialog-intro">Choose when your challenge starts.</p>
+        <label>Challenge start date <span>*</span><input type="date" id="challengeStartDate" required /></label>
+        <p class="task-form-help">The end date is calculated automatically as Day 30 (29 days after your start).</p>
+        <label class="carry-task-option"><input id="carryTasks" type="checkbox" checked/><span><strong>Keep my custom tasks</strong><small>Shift the current tasks into the new 30-day period. Previous checkmarks and reflections are not copied.</small></span></label>
+        <div class="start-dialog-note"><svg><use href="#i-info"/></svg><p>Existing job applications carry forward. When you start another challenge, the current challenge is saved in Archives.</p></div>
+      </div>
+      <div class="modal-footer"><button class="outline-btn" type="button" id="cancelStartDialog">Cancel</button><button class="primary-btn" type="submit"><svg><use href="#i-check"/></svg><span id="startSubmitLabel">Start challenge</span></button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal manage-modal" id="archivesDialog" aria-labelledby="archivesTitle">
+    <div class="modal-header"><div><p class="overline">YOUR PAST CHALLENGES</p><h2 id="archivesTitle">Challenge archives</h2><p class="section-desc">Export or restore a previous 30-day challenge, including its saved tasks and checkmarks.</p></div><button class="icon-btn" id="closeArchivesDialog" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+    <div class="archive-list" id="archiveList"></div><div class="archive-bottom"><span id="archiveCount">0 saved</span><span>Stored only on this browser</span></div>
+  </dialog>
 
   <dialog class="modal" id="taskDialog" aria-labelledby="taskDialogTitle">
     <form id="taskForm">
@@ -240,7 +298,7 @@
         <label>Details or target (optional)<textarea name="detail" maxlength="300" rows="2" placeholder="Define what completing this task means for you"></textarea></label>
         <label>Repeat <span>*</span><select name="repeat" id="taskRepeat"><option value="daily">Every day</option><option value="weekly">Selected weekdays</option><option value="once">One day only</option></select></label>
         <fieldset class="weekday-field" id="weekdayField" hidden><legend>Repeat on these days</legend><div class="weekday-picks"><label><input type="checkbox" name="weekday" value="1" checked/><span>Mon</span></label><label><input type="checkbox" name="weekday" value="2" checked/><span>Tue</span></label><label><input type="checkbox" name="weekday" value="3" checked/><span>Wed</span></label><label><input type="checkbox" name="weekday" value="4" checked/><span>Thu</span></label><label><input type="checkbox" name="weekday" value="5" checked/><span>Fri</span></label><label><input type="checkbox" name="weekday" value="6"/><span>Sat</span></label><label><input type="checkbox" name="weekday" value="7"/><span>Sun</span></label></div></fieldset>
-        <div class="field-row"><label><span id="taskStartLabel">Start date *</span><input id="taskStart" name="start" type="date" min="2026-11-14" max="2026-12-13" required/></label><label id="taskEndLabel">End date <span>*</span><input id="taskEnd" name="end" type="date" min="2026-11-14" max="2026-12-13" required/></label></div>
+        <div class="field-row"><label><span id="taskStartLabel">Start date *</span><input id="taskStart" name="start" type="date" required/></label><label id="taskEndLabel">End date <span>*</span><input id="taskEnd" name="end" type="date" required/></label></div>
         <p class="task-form-help" id="taskFormHelp">Your recurring task appears on every day within this range.</p>
       </div>
       <div class="modal-footer"><button class="outline-btn" type="button" id="cancelTaskDialog">Cancel</button><button class="primary-btn" type="submit"><svg><use href="#i-check"/></svg> Save task</button></div>
@@ -255,17 +313,18 @@
 
   <dialog class="modal" id="applicationDialog" aria-labelledby="appDialogTitle"><form id="applicationForm"><div class="modal-header"><div><p class="overline">YOUR APPLICATION TRACKER</p><h2 id="appDialogTitle">Log an application</h2></div><button class="icon-btn" type="button" id="closeApplicationDialog" aria-label="Close"><svg><use href="#i-x"/></svg></button></div><div class="modal-body"><div class="field-row"><label>Company name <span>*</span><input name="company" maxlength="100" required placeholder="e.g. Acme Analytics"/></label><label>Role / position <span>*</span><input name="role" maxlength="140" required placeholder="e.g. Data Analyst"/></label></div><div class="field-row"><label>Application date <span>*</span><input name="date" type="date" required/></label><label>Status <span>*</span><select name="status"><option>Applied</option><option>Screening</option><option>Assessment</option><option>Interview</option><option>Offer</option><option>Rejected</option></select></label></div><div class="field-row"><label>Recruiter / contact<input name="contact" maxlength="120" placeholder="Name or email (optional)"/></label><label>Follow-up date<input name="followup" type="date"/></label></div><label>Job posting URL<input name="url" type="url" maxlength="700" placeholder="https://... (optional)"/></label><label>Notes<textarea name="notes" rows="3" maxlength="1200" placeholder="Which skills match? Who did you message? Next step?"></textarea></label></div><div class="modal-footer"><button class="outline-btn" id="cancelApplicationDialog" type="button">Cancel</button><button class="primary-btn" type="submit"><svg><use href="#i-check"/></svg> Save application</button></div></form></dialog>
 
-  <dialog class="modal settings-modal" id="settingsDialog" aria-labelledby="settingsTitle"><div class="modal-header"><div><p class="overline">KEEP YOUR DATA SAFE</p><h2 id="settingsTitle">Data & settings</h2></div><button class="icon-btn" id="closeSettingsDialog" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button></div><div class="settings-content"><div class="setting-item"><div class="setting-icon"><svg><use href="#i-download"/></svg></div><div><h3>Export your progress</h3><p>Download a JSON backup with tasks, their schedules, checkmarks, notes, applications and weekly reviews.</p></div><button class="outline-btn" id="exportButton" type="button">Export</button></div><div class="setting-item"><div class="setting-icon"><svg><use href="#i-upload"/></svg></div><div><h3>Import a backup</h3><p>Restore an exported FOCUS/30 file. This replaces the data on this device.</p></div><button class="outline-btn" id="importButton" type="button">Import</button><input type="file" id="importFile" accept=".json,application/json" hidden/></div><div class="setting-item danger-item"><div class="setting-icon"><svg><use href="#i-trash"/></svg></div><div><h3>Reset all progress</h3><p>Erase your custom tasks, all checkmarks and applications. Starter tasks return. This cannot be undone.</p></div><button class="outline-btn danger-btn" id="resetAllButton" type="button">Reset</button></div><div class="privacy-note"><svg><use href="#i-shield"/></svg><p><strong>Your data stays yours.</strong> This website works offline and doesn't send your information to a server. Browser storage is device- and browser-specific, and may be cleared by private browsing or browser cleanup. Export a backup regularly.</p></div></div></dialog>
+  <dialog class="modal settings-modal" id="settingsDialog" aria-labelledby="settingsTitle"><div class="modal-header"><div><p class="overline">KEEP YOUR DATA SAFE</p><h2 id="settingsTitle">Data & settings</h2></div><button class="icon-btn" id="closeSettingsDialog" type="button" aria-label="Close"><svg><use href="#i-x"/></svg></button></div><div class="settings-content"><div class="setting-item"><div class="setting-icon"><svg><use href="#i-download"/></svg></div><div><h3>Export your progress</h3><p>Download a JSON backup with tasks, their schedules, checkmarks, notes, applications and weekly reviews.</p></div><button class="outline-btn" id="exportButton" type="button">Export</button></div><div class="setting-item"><div class="setting-icon"><svg><use href="#i-upload"/></svg></div><div><h3>Import a backup</h3><p>Restore an exported FOCUS/30 file. This replaces the data on this device.</p></div><button class="outline-btn" id="importButton" type="button">Import</button><input type="file" id="importFile" accept=".json,application/json" hidden/></div><div class="setting-item"><div class="setting-icon"><svg><use href="#i-calendar"/></svg></div><div><h3>Challenge archives</h3><p>Review, export or restore previous challenges. Starting a new challenge saves the current round automatically.</p></div><button class="outline-btn" id="viewArchivesButton" type="button">View</button></div><div class="setting-item danger-item"><div class="setting-icon"><svg><use href="#i-trash"/></svg></div><div><h3>Reset all progress</h3><p>Permanently erase everything on this browser, including archives. Export a backup first.</p></div><button class="outline-btn danger-btn" id="resetAllButton" type="button">Reset</button></div><div class="privacy-note"><svg><use href="#i-shield"/></svg><p><strong>Your data stays yours.</strong> This website works offline and doesn't send your information to a server. Browser storage is device- and browser-specific, and may be cleared by private browsing or browser cleanup. Export a backup regularly.</p></div></div></dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script>
+  <script>
 /* FOCUS/30: zero dependencies. Your data is stored only in this browser. */
 (() => {
   'use strict';
 
-  const STORAGE_KEY = 'focus30-career-challenge-v2';
+  const STORAGE_KEY = 'focus30-career-challenge-v3';
+  const PREVIOUS_STORAGE_KEY = 'focus30-career-challenge-v2';
   const LEGACY_STORAGE_KEY = 'focus30-career-challenge-v1';
-  const START = '2026-11-14';
+  const LEGACY_START = '2026-11-14';
   const TOTAL_DAYS = 30;
   const STAGES = ['Applied', 'Screening', 'Assessment', 'Interview', 'Offer', 'Rejected'];
   // Editable starter ideas, not fixed daily requirements.
@@ -290,94 +349,128 @@
   }
   function toKey(date) { return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`; }
   function todayKey() { return toKey(new Date()); }
-  function dayAt(index) {
-    const d = toDate(START);
-    d.setDate(d.getDate() + index);
-    return toKey(d);
+  function addDays(key, days) {
+    const date = toDate(key);
+    date.setDate(date.getDate() + days);
+    return toKey(date);
   }
-  const DAYS = Array.from({ length: TOTAL_DAYS }, (_, i) => dayAt(i));
-  const END = DAYS[TOTAL_DAYS - 1];
+  function rangeDays(start) { return Array.from({length: TOTAL_DAYS}, (_, i) => addDays(start, i)); }
+  let START = todayKey();
+  let DAYS = rangeDays(START);
+  let END = DAYS[TOTAL_DAYS - 1];
+  function setCalendar(start) {
+    START = start;
+    DAYS = rangeDays(START);
+    END = DAYS[TOTAL_DAYS - 1];
+  }
   function indexForDate(key) { return DAYS.indexOf(key); }
   function formatDate(key, opts = { weekday: 'long', month: 'long', day: 'numeric' }) { return new Intl.DateTimeFormat('en-US', opts).format(toDate(key)); }
   function shortDate(key) { return formatDate(key, { month: 'short', day: 'numeric' }); }
+  function displayRange(start, end, includeYear = true) {
+    const opts = {month:'short',day:'numeric', ...(includeYear ? {year:'numeric'} : {})};
+    return `${formatDate(start, opts)} – ${formatDate(end, opts)}`;
+  }
   function currentChallengeIndex() { return clamp(Math.round((toDate(todayKey()) - toDate(START)) / DAY_MS), 0, TOTAL_DAYS - 1); }
   function elapsedDays() {
+    if (!data.startDate) return 0;
     const today = todayKey();
     return today < START ? 0 : today > END ? TOTAL_DAYS : indexForDate(today) + 1;
   }
   function cleanString(value, max = 1400) { return typeof value === 'string' ? value.slice(0, max) : ''; }
-  function validDate(key) { return typeof key === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(key) && toKey(toDate(key)) === key; }
-  function makeStarterTasks() {
-    return STARTER_TASKS.map(task => ({ ...task, repeat: 'daily', start: START, end: END, weekdays: [1,2,3,4,5,6,7] }));
+  function validDate(key) { return typeof key === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(key) && Number(key.slice(0,4)) >= 2000 && Number(key.slice(0,4)) <= 2099 && toKey(toDate(key)) === key; }
+  function makeStarterTasks(anchor = START) {
+    const end = addDays(anchor, TOTAL_DAYS - 1);
+    return STARTER_TASKS.map(task => ({ ...task, repeat: 'daily', start: anchor, end, weekdays: [1,2,3,4,5,6,7] }));
   }
-  function freshData() { return { version: 2, tasks: makeStarterTasks(), daily: {}, applications: [], weekly: {} }; }
-  function sanitizeTask(task) {
+  function freshData(startDate = null, planningDate = todayKey()) {
+    return {version:3, startDate, planningDate, tasks:makeStarterTasks(startDate || planningDate), daily:{}, applications:[], weekly:{}, archives:[]};
+  }
+  function sanitizeTask(task, lower = START, upper = END) {
     if (!task || typeof task !== 'object' || Array.isArray(task)) return null;
     const id = cleanString(task.id, 110).trim();
     const title = cleanString(task.title, 120).trim();
     if (!id || !title) return null;
     const repeat = ['daily','weekly','once'].includes(task.repeat) ? task.repeat : 'daily';
-    const start = validDate(task.start) && task.start >= START && task.start <= END ? task.start : START;
-    let end = repeat === 'once' ? start : validDate(task.end) && task.end >= start && task.end <= END ? task.end : END;
+    const start = validDate(task.start) && task.start >= lower && task.start <= upper ? task.start : lower;
+    const end = repeat === 'once' ? start : validDate(task.end) && task.end >= start && task.end <= upper ? task.end : upper;
     const weekdays = Array.isArray(task.weekdays) ? [...new Set(task.weekdays.filter(n => Number.isInteger(n) && n >= 1 && n <= 7))] : [1,2,3,4,5,6,7];
-    return { id, title, detail: cleanString(task.detail, 300), repeat, start, end, weekdays: weekdays.length ? weekdays : [1,2,3,4,5,6,7] };
+    return {id, title, detail:cleanString(task.detail, 300), repeat, start, end, weekdays:weekdays.length ? weekdays : [1,2,3,4,5,6,7]};
   }
-  function sanitizeData(raw) {
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw) || ![1,2].includes(raw.version) || !raw.daily || !Array.isArray(raw.applications) || !raw.weekly) throw new Error('The backup file is not a valid FOCUS/30 export.');
-    const result = freshData();
-    if (raw.version === 2) {
+  function sanitizeData(raw, withArchives = true) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw) || ![1,2,3].includes(raw.version) || !raw.daily || !Array.isArray(raw.applications) || !raw.weekly) {
+      throw new Error('The backup file is not a valid FOCUS/30 export.');
+    }
+    // V1 and V2 were locked to Nov 14, 2026. Retain their date and progress intact.
+    const startDate = raw.version === 3 ? (validDate(raw.startDate) ? raw.startDate : null) : LEGACY_START;
+    const planningDate = raw.version === 3 && validDate(raw.planningDate) ? raw.planningDate : startDate || todayKey();
+    const anchor = startDate || planningDate;
+    const end = addDays(anchor, TOTAL_DAYS - 1);
+    const days = rangeDays(anchor);
+    const result = freshData(startDate, planningDate);
+    if (raw.version >= 2) {
       if (!Array.isArray(raw.tasks)) throw new Error('This backup has no task definitions.');
       const ids = new Set();
-      result.tasks = raw.tasks.slice(0, 150).map(sanitizeTask).filter(task => {
+      result.tasks = raw.tasks.slice(0, 150).map(task => sanitizeTask(task, anchor, end)).filter(task => {
         if (!task || ids.has(task.id)) return false;
         ids.add(task.id); return true;
       });
     }
     const daily = raw.daily && typeof raw.daily === 'object' && !Array.isArray(raw.daily) ? raw.daily : {};
-    for (const key of DAYS) {
+    for (const key of days) {
       const item = daily[key];
       if (!item || typeof item !== 'object' || Array.isArray(item)) continue;
       const checks = {};
       for (const task of result.tasks) if (item.checks?.[task.id] === true) checks[task.id] = true;
-      result.daily[key] = { checks, note: cleanString(item.note, 1500) };
+      result.daily[key] = {checks, note:cleanString(item.note, 1500)};
     }
-    const apps = raw.applications.slice(0, 10000);
-    result.applications = apps.filter(app => app && typeof app === 'object' && cleanString(app.company, 100).trim() && cleanString(app.role, 140).trim()).map((app, i) => ({
-      id: cleanString(app.id, 100) || `imported-${i}`,
-      company: cleanString(app.company, 100), role: cleanString(app.role, 140),
-      date: validDate(app.date) ? app.date : START,
-      status: STAGES.includes(app.status) ? app.status : 'Applied',
-      contact: cleanString(app.contact, 120),
-      followup: validDate(app.followup) ? app.followup : '',
-      url: cleanString(app.url, 700), notes: cleanString(app.notes, 1200)
+    result.applications = raw.applications.slice(0,10000).filter(app => app && typeof app === 'object' && cleanString(app.company,100).trim() && cleanString(app.role,140).trim()).map((app,i) => ({
+      id:cleanString(app.id,100) || `imported-${i}`, company:cleanString(app.company,100), role:cleanString(app.role,140),
+      date:validDate(app.date) ? app.date : anchor, status:STAGES.includes(app.status) ? app.status : 'Applied',
+      contact:cleanString(app.contact,120), followup:validDate(app.followup) ? app.followup : '',
+      url:cleanString(app.url,700), notes:cleanString(app.notes,1200)
     }));
     const weekly = raw.weekly && typeof raw.weekly === 'object' && !Array.isArray(raw.weekly) ? raw.weekly : {};
-    for (let week = 1; week <= 5; week++) {
-      const entry = weekly[week];
-      if (!entry || typeof entry !== 'object') continue;
-      result.weekly[week] = { win:cleanString(entry.win, 1000), blocker:cleanString(entry.blocker, 1000), next:cleanString(entry.next, 1000) };
+    for (let week=1;week<=5;week++) {
+      const entry=weekly[week];
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+      result.weekly[week] = {win:cleanString(entry.win,1000), blocker:cleanString(entry.blocker,1000), next:cleanString(entry.next,1000)};
+    }
+    // Archives are sanitized individually, without recursive archive nesting.
+    if (withArchives && raw.version === 3 && Array.isArray(raw.archives)) {
+      const seen = new Set();
+      for (const record of raw.archives.slice(0, 80)) {
+        if (!record || typeof record !== 'object' || !validDate(record.startDate)) continue;
+        try {
+          const id = cleanString(record.archiveId, 100);
+          if (!id || seen.has(id)) continue;
+          const sanitized = sanitizeData({...record, version:3, archives:[]}, false);
+          if (!sanitized.startDate) continue;
+          result.archives.push({...sanitized, archiveId:id, archivedAt:cleanString(record.archivedAt,40)});
+          seen.add(id);
+        } catch (error) { console.warn('Skipped invalid archived challenge', error); }
+      }
     }
     return result;
   }
   let storageAvailable = true;
   function loadData() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return sanitizeData(JSON.parse(saved));
-      const previous = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (previous) {
-        const migrated = sanitizeData(JSON.parse(previous));
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-        return migrated;
+    for (const key of [STORAGE_KEY, PREVIOUS_STORAGE_KEY, LEGACY_STORAGE_KEY]) {
+      try {
+        const saved = localStorage.getItem(key);
+        if (!saved) continue;
+        const restored = sanitizeData(JSON.parse(saved));
+        if (key !== STORAGE_KEY) localStorage.setItem(STORAGE_KEY, JSON.stringify(restored));
+        return restored;
+      } catch(error) {
+        console.warn(`Could not read saved FOCUS/30 data from ${key}`, error);
+        // Do not overwrite corrupt existing data until it can be recovered.
+        if (key === STORAGE_KEY) { storageAvailable=false; return freshData(); }
       }
-      return freshData();
-    } catch(error) {
-      console.warn('Could not read saved FOCUS/30 data.', error);
-      storageAvailable = false;
-      return freshData();
     }
+    return freshData();
   }
   let data = loadData();
+  setCalendar(data.startDate || data.planningDate);
   let selectedIndex = currentChallengeIndex();
   let selectedWeek = Math.floor(selectedIndex / 7) + 1;
   let editingApplicationId = null;
@@ -416,14 +509,14 @@
   }
   function currentStreak() {
     const elapsed = elapsedDays();
-    if (!elapsed) return 0;
+    if (!data.startDate || !elapsed) return 0;
     let i = elapsed - 1;
     if (i >= 0 && !isPerfect(DAYS[i]) && todayKey() === DAYS[i]) i--;
     let count = 0;
     while (i >= 0 && isPerfect(DAYS[i])) { count++; i--; }
     return count;
   }
-  function canCheck(key) { return key <= todayKey(); }
+  function canCheck(key) { return !!data.startDate && key <= todayKey(); }
   function updatePercent(elementId, value, maximum) { $(elementId).style.width = `${clamp(maximum ? value / maximum * 100 : 0, 0, 100)}%`; }
 
   function renderHeroAndStats() {
@@ -436,7 +529,14 @@
     const today = todayKey();
     const elapsed = elapsedDays();
     const activeDay = today < START ? 1 : today > END ? 30 : elapsed;
-    $('headerDayTag').textContent = `DAY ${pad(activeDay)} / 30`;
+    $('headerDayTag').textContent = data.startDate ? `DAY ${pad(activeDay)} / 30` : 'NOT STARTED';
+    $('heroKicker').textContent = data.startDate ? displayRange(START, END).toUpperCase() : 'YOUR 30 DAYS BEGIN WHEN YOU SAY GO';
+    $('calendarRange').textContent = `${data.startDate ? '' : 'PREVIEW · '}${displayRange(START, END).toUpperCase()}`;
+    $('footerDate').textContent = data.startDate ? displayRange(START, END) : 'Challenge not started';
+    $('activeRangeLabel').textContent = `${displayRange(START, END)} · ${today < START ? 'Upcoming' : today > END ? 'Finished' : 'In progress'}`;
+    $('startCard').hidden = !!data.startDate;
+    $('activeChallengeBar').hidden = !data.startDate;
+    $('startPreview').textContent = `Preview: ${displayRange(START, END)}. You can choose another start date.`;
     $('sidebarProgressText').textContent = `${checks} of ${available} scheduled checkmarks`;
     $('todayLabel').textContent = formatDate(today, { month: 'short', day: 'numeric', year: 'numeric' });
     const selected = DAYS[selectedIndex];
@@ -457,6 +557,7 @@
     const tasks = tasksForDay(key);
     const total = tasks.length;
     const future = !canCheck(key);
+    const notStarted = !data.startDate;
     const today = key === todayKey();
     const status = $('dayStatus');
     $('selectedDateLabel').textContent = `${formatDate(key)} · Day ${dayNumber} of 30${today ? ' · Today' : ''}`;
@@ -475,9 +576,11 @@
       </article>`;
     }).join('') : `<div class="task-empty"><span class="task-empty-icon">${icon('plus')}</span><h3>It's a blank page.</h3><p>No tasks are scheduled for this date. Add a one-time task or a recurring habit to get started.</p><button class="outline-btn" type="button" id="taskEmptyAdd">${icon('plus')} Add your first task</button></div>`;
     $('dailyNote').value = dayData(key).note || '';
-    $('dailyNote').placeholder = future ? 'Plan ahead: what will you focus on this day?' : 'What went well? What got in the way? One thing to improve tomorrow...';
-    $('clearDayButton').disabled = !Object.values(dayData(key).checks || {}).some(Boolean) && !dayData(key).note;
-    if (future) status.innerHTML = `${icon('lock')} Future-day checkboxes unlock when the day arrives`;
+    $('dailyNote').disabled = notStarted;
+    $('dailyNote').placeholder = notStarted ? 'Start your challenge to write daily notes.' : future ? 'Plan ahead: what will you focus on this day?' : 'What went well? What got in the way? One thing to improve tomorrow...';
+    $('clearDayButton').disabled = notStarted || (!Object.values(dayData(key).checks || {}).some(Boolean) && !dayData(key).note);
+    if (notStarted) status.innerHTML = `${icon('lock')} Start your challenge to unlock daily checkmarks`;
+    else if (future) status.innerHTML = `${icon('lock')} Future-day checkboxes unlock when the day arrives`;
     else if (isPerfect(key)) status.innerHTML = `${icon('check')} Perfect day. Every scheduled task complete.`;
     else if (!storageAvailable) status.innerHTML = `${icon('info')} Storage blocked. Export a backup to save.`;
     else status.innerHTML = `${icon('info')} Changes save automatically on this device`;
@@ -503,8 +606,8 @@
       const complete = isPerfect(key);
       const future = key > today;
       const when = toDate(key);
-      const month = when.getMonth() === 10 ? 'NOV' : 'DEC';
-      const status = !total ? 'No tasks' : future ? 'Upcoming' : complete ? 'Perfect' : count ? `${count}/${total} done` : key === today ? 'Today' : 'Not started';
+      const month = formatDate(key, {month:'short'}).toUpperCase();
+      const status = !data.startDate ? 'Planned' : !total ? 'No tasks' : future ? 'Upcoming' : complete ? 'Perfect' : count ? `${count}/${total} done` : key === today ? 'Today' : 'Not started';
       const scheduled = tasksForDay(key);
       const dots = scheduled.slice(0, 6).map(task => `<i class="${dayData(key).checks[task.id] === true ? 'filled' : ''}"></i>`).join('') + (total > 6 ? `<b class="dot-overflow">+${total - 6}</b>` : '');
       return `<button type="button" class="day-cell ${complete ? 'is-perfect' : count ? 'is-partial' : ''} ${future ? 'is-future' : ''} ${key === today ? 'is-today' : ''} ${index === selectedIndex ? 'is-selected' : ''}" data-index="${index}" aria-pressed="${index === selectedIndex}" aria-label="Day ${index + 1}, ${formatDate(key)}, ${status}">
@@ -574,7 +677,7 @@
 
     $('reflectionWeekLabel').textContent = `WEEK ${pad(index)} · DAYS ${pad(from + 1)}–${pad(to)}`;
     $('reflectionTitle').textContent = WEEK_NAMES[index - 1];
-    $('reflectionDates').textContent = `${shortDate(DAYS[from])} – ${shortDate(DAYS[to - 1])}, 2026`;
+    $('reflectionDates').textContent = displayRange(DAYS[from], DAYS[to - 1]);
     $('reflectionPercent').textContent = `${percentFor(DAYS.slice(from, to))}%`;
     const notes = data.weekly[index] || {};
     $('reflectionWin').value = notes.win || '';
@@ -617,6 +720,7 @@
     form.elements.repeat.value = task?.repeat || 'daily';
     form.elements.start.value = task?.start || DAYS[selectedIndex];
     form.elements.end.value = task?.end || END;
+    for (const el of [$('taskStart'), $('taskEnd')]) { el.min = START; el.max = END; }
     const weekdays = task?.weekdays || [1,2,3,4,5];
     form.querySelectorAll('input[name="weekday"]').forEach(input => { input.checked = weekdays.includes(Number(input.value)); });
     updateTaskScheduleForm();
@@ -708,16 +812,98 @@
     persist();
   }
   function downloadBackup() {
-    const content = JSON.stringify({...data, exportedAt: new Date().toISOString(), challenge: 'FOCUS/30 2026'}, null, 2);
-    const blob = new Blob([content], {type:'application/json'});
+    saveJSON({...data, exportedAt:new Date().toISOString(), challenge:'FOCUS/30'}, `focus30-backup-${todayKey()}.json`);
+    toast('Backup downloaded, including your archives.');
+  }
+  function saveJSON(value, filename) {
+    const blob = new Blob([JSON.stringify(value, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `focus30-backup-${todayKey()}.json`;
+    link.download = filename;
     document.body.appendChild(link);
     link.click(); link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    toast('Backup downloaded. Keep it somewhere safe.');
+  }
+  function makeArchive(source) {
+    return {
+      ...structuredCopy({...source, archives:[]}),
+      archiveId:typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `archive-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      archivedAt:new Date().toISOString()
+    };
+  }
+  function structuredCopy(value) { return JSON.parse(JSON.stringify(value)); }
+  function shiftTaskSchedule(task, oldStart, newStart) {
+    const startOffset = Math.round((toDate(task.start) - toDate(oldStart)) / DAY_MS);
+    const endOffset = Math.round((toDate(task.end) - toDate(oldStart)) / DAY_MS);
+    const first = addDays(newStart, clamp(startOffset,0,29));
+    const last = addDays(newStart,clamp(endOffset,clamp(startOffset,0,29),29));
+    return {...task, start:first, end:task.repeat === 'once' ? first : last};
+  }
+  function openStartDialog() {
+    $('challengeStartDate').value = todayKey();
+    $('carryTasks').checked = true;
+    $('startDialogIntro').textContent = data.startDate ?
+      'Your current challenge will be saved in the archives. Its notes, checkmarks, and job history remain available.' :
+      'Nothing begins until you press Start. You can pick today or any other calendar date.';
+    $('startSubmitLabel').textContent = data.startDate ? 'Archive & start new challenge' : 'Start challenge';
+    $('startDialog').showModal();
+  }
+  function startChallenge(event) {
+    event.preventDefault();
+    const start = $('challengeStartDate').value;
+    if (!validDate(start)) { toast('Please select a valid start date (2000–2099).'); return; }
+    if (data.startDate && !confirm(`Archive your current challenge and begin another 30 days starting ${formatDate(start)}?`)) return;
+    const oldAnchor = START;
+    const old = data;
+    const next = freshData(start, start);
+    next.archives = structuredCopy(old.archives || []);
+    if (old.startDate) next.archives.unshift(makeArchive(old));
+    if ($('carryTasks').checked) next.tasks = old.tasks.map(task => shiftTaskSchedule(task, oldAnchor, start));
+    // Job applications are a long-running pipeline, not disposable between challenges.
+    next.applications = structuredCopy(old.applications);
+    data = next;
+    setCalendar(start);
+    selectedIndex = currentChallengeIndex();
+    selectedWeek = Math.floor(selectedIndex / 7) + 1;
+    persist(); renderAll();
+    $('startDialog').close();
+    toast(old.startDate ? 'New challenge started. The previous challenge is archived.' : 'Challenge started. Day 1 is ready!');
+  }
+  function archiveStats(record) {
+    const days = rangeDays(record.startDate);
+    const tasks = record.tasks;
+    const appliesTo = (task,key) => key >= task.start && key <= task.end && (task.repeat !== 'weekly' || task.weekdays.includes(toDate(key).getDay() || 7));
+    let total=0, done=0, perfect=0;
+    for (const day of days) {
+      const scheduled = tasks.filter(task => appliesTo(task,day));
+      const completed = scheduled.filter(task => record.daily[day]?.checks?.[task.id] === true).length;
+      total += scheduled.length;
+      done += completed;
+      if (scheduled.length && completed === scheduled.length) perfect++;
+    }
+    return {perfect, percentage: total ? Math.round(done/total*100) : 0};
+  }
+  function renderArchives() {
+    $('archiveCount').textContent = `${data.archives.length} saved`;
+    $('archiveList').innerHTML = data.archives.length ? data.archives.map(record => {
+      const stats=archiveStats(record);
+      return `<article class="archive-entry"><div class="archive-details"><strong>${html(displayRange(record.startDate, addDays(record.startDate,29)))}</strong><span>${stats.perfect} perfect days · ${stats.percentage}% complete · ${record.tasks.length} tasks</span></div><div class="archive-controls"><button type="button" class="outline-btn compact-btn" data-export-archive="${html(record.archiveId)}">Export</button><button type="button" class="primary-btn compact-btn" data-restore-archive="${html(record.archiveId)}">Restore</button></div></article>`;
+    }).join('') : '<div class="manage-empty">No archived challenges yet. Start a new round to archive your current one.</div>';
+  }
+  function restoreArchive(id) {
+    const saved = data.archives.find(item => item.archiveId === id);
+    if (!saved || !confirm(`Restore the challenge from ${displayRange(saved.startDate,addDays(saved.startDate,29))}? Your current challenge will be archived first.`)) return;
+    const archives = data.archives.filter(item => item.archiveId !== id);
+    if (data.startDate) archives.unshift(makeArchive(data));
+    data = sanitizeData({...saved, version:3, archives:[]});
+    data.archives = archives;
+    setCalendar(data.startDate || data.planningDate);
+    selectedIndex = currentChallengeIndex();
+    selectedWeek = Math.floor(selectedIndex / 7) + 1;
+    persist(); renderAll();
+    $('archivesDialog').close(); $('settingsDialog').close();
+    toast('Archived challenge restored. Your previous current challenge was saved.');
   }
   function updateNav() {
     const sectionIds = ['overview','calendar','applications','review'];
@@ -734,7 +920,7 @@
       const button = event.target.closest('button[data-task]');
       if (!button) return;
       const key = DAYS[selectedIndex];
-      if (!canCheck(key)) { toast('That date is in the future. Come back on the day.'); return; }
+      if (!canCheck(key)) { toast(data.startDate ? 'That date is in the future. Come back on the day.' : 'Start your challenge to unlock checkmarks.'); return; }
       if (!data.daily[key]) data.daily[key] = {checks:{},note:''};
       const id = button.dataset.task;
       if (!tasksForDay(key).some(task => task.id === id)) return;
@@ -744,6 +930,21 @@
       renderHeroAndStats(); renderDaily(); renderGoals(); renderCalendar(); renderWeeks();
       if (perfect) toast('Perfect day! Every scheduled task complete. ✨');
       else $('taskList').querySelectorAll('[data-task]').forEach(el => { if (el.dataset.task === id) el.focus({preventScroll:true}); });
+    });
+    $('startChallengeButton').addEventListener('click', openStartDialog);
+    $('newChallengeButton').addEventListener('click', openStartDialog);
+    $('startForm').addEventListener('submit', startChallenge);
+    $('cancelStartDialog').addEventListener('click', () => $('startDialog').close());
+    $('closeStartDialog').addEventListener('click', () => $('startDialog').close());
+    $('viewArchivesButton').addEventListener('click', () => { renderArchives(); $('archivesDialog').showModal(); });
+    $('closeArchivesDialog').addEventListener('click', () => $('archivesDialog').close());
+    $('archiveList').addEventListener('click', event => {
+      const exportButton = event.target.closest('[data-export-archive]');
+      const restoreButton = event.target.closest('[data-restore-archive]');
+      if (exportButton) {
+        const record = data.archives.find(item => item.archiveId === exportButton.dataset.exportArchive);
+        if (record) { saveJSON({...record, archives:[]}, `focus30-archive-${record.startDate}.json`); toast('Archived challenge exported.'); }
+      } else if (restoreButton) restoreArchive(restoreButton.dataset.restoreArchive);
     });
     $('addTaskButton').addEventListener('click', () => openTaskDialog());
     $('manageTasksButton').addEventListener('click', () => { renderManageTasks(); $('manageTasksDialog').showModal(); });
@@ -774,6 +975,7 @@
     });
     $('dailyNote').addEventListener('input', event => {
       const key = DAYS[selectedIndex];
+      if (!data.startDate) return;
       if (!data.daily[key]) data.daily[key] = {checks:{},note:''};
       data.daily[key].note = event.target.value;
       persist();
@@ -823,17 +1025,19 @@
       try {
         const next = sanitizeData(JSON.parse(await file.text()));
         if (!confirm('Import this backup? It will replace your tasks, checkmarks, notes and applications in this browser.')) return;
-        data = next; persist();
+        data = next; setCalendar(data.startDate || data.planningDate); persist();
         selectedIndex = currentChallengeIndex(); selectedWeek = Math.floor(selectedIndex / 7) + 1;
         $('appSearch').value = ''; $('appFilter').value = 'all';
         renderAll(); $('settingsDialog').close(); toast('Backup restored successfully.');
       } catch(error) { console.warn(error); toast('This file is not a valid FOCUS/30 backup.'); }
     });
     $('resetAllButton').addEventListener('click', () => {
-      if (!confirm('Reset ALL custom tasks, checkmarks, notes, reviews and applications? The four starter tasks will return. Export a backup first to save your work.')) return;
-      data = freshData(); persist(); renderAll(); $('settingsDialog').close(); toast('All progress reset on this device.');
+      if (!confirm('PERMANENTLY DELETE all tasks, progress, applications AND archived challenges? Export a full backup first. This cannot be undone.')) return;
+      if (!confirm('Final confirmation: delete all FOCUS/30 information saved on this browser?')) return;
+      data = freshData(); setCalendar(data.planningDate); selectedIndex=0; selectedWeek=1;
+      persist(); renderAll(); $('settingsDialog').close(); toast('All data cleared. Start a new challenge whenever you are ready.');
     });
-    ['applicationDialog','settingsDialog','taskDialog','manageTasksDialog'].forEach(id => {
+    ['applicationDialog','settingsDialog','taskDialog','manageTasksDialog','startDialog','archivesDialog'].forEach(id => {
       $(id).addEventListener('click', event => {
         if (event.target === $(id)) $(id).close();
       });
@@ -857,6 +1061,6 @@
   if (!storageAvailable) toast('Storage is unavailable in this browser. Export backups of your work.');
 })();
 
-</script>
+  </script>
 </body>
 </html>
